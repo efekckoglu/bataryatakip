@@ -1,6 +1,5 @@
 /* =====================================================
-   BMW / MINI Battery Tracker
-   Premium Theme
+        BMW | MINI AKÜ TAKİP SİSTEMİ
 ===================================================== */
 
 *{
@@ -11,154 +10,295 @@
 
 :root{
 
-    --bg:#0d1117;
-    --sidebar:#111827;
-    --card:#1b2430;
-    --card2:#222b38;
+    --bg:#0b0d12;
+    --bg2:#151922;
+    --card:#1c212d;
+    --card2:#242b39;
 
-    --primary:#0099ff;
-    --green:#23c55e;
-    --yellow:#facc15;
-    --red:#ef4444;
+    --primary:#0A84FF;
+    --success:#17c964;
+    --warning:#f5a524;
+    --danger:#f31260;
 
     --text:#ffffff;
-    --text2:#9ca3af;
+    --text2:#c7ced8;
+    --border:#303848;
+
+    --shadow:0 10px 35px rgba(0,0,0,.35);
 
     --radius:18px;
 
-    --shadow:0 15px 35px rgba(0,0,0,.35);
+}
+
+html{
+
+    scroll-behavior:smooth;
 
 }
 
 body{
 
-    background:linear-gradient(135deg,#0b1220,#111827);
+    font-family:"Poppins",sans-serif;
 
-    color:white;
+    background:linear-gradient(135deg,#090b10,#10141d,#181f2b);
 
-    font-family:Poppins,sans-serif;
-
-    display:flex;
+    color:var(--text);
 
     min-height:100vh;
 
+    display:flex;
+
 }
 
-/* Sidebar */
+/* =====================================
+            Scroll
+===================================== */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#11151d;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#394456;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#4e5c72;
+
+}
+
+/* =====================================
+            Sidebar
+===================================== */
 
 .sidebar{
 
-    width:260px;
+    width:290px;
 
-    background:rgba(17,24,39,.96);
+    background:rgba(19,23,31,.95);
 
-    backdrop-filter:blur(12px);
+    backdrop-filter:blur(18px);
 
-    border-right:1px solid rgba(255,255,255,.08);
-
-    padding:30px;
-
-}
-
-.logo{
-
-    text-align:center;
-
-    margin-bottom:45px;
-
-}
-
-.logoIcon{
-
-    width:75px;
-
-    height:75px;
-
-    margin:auto;
-
-    border-radius:50%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:linear-gradient(135deg,#008cff,#00d4ff);
-
-    font-size:28px;
-
-    box-shadow:0 0 35px rgba(0,153,255,.5);
-
-}
-
-.logo h2{
-
-    margin-top:18px;
-
-    font-size:23px;
-
-}
-
-.logo p{
-
-    color:#9ca3af;
-
-    font-size:13px;
-
-}
-
-nav{
+    border-right:1px solid rgba(255,255,255,.06);
 
     display:flex;
 
     flex-direction:column;
 
-    gap:14px;
+    justify-content:space-between;
+
+    position:fixed;
+
+    left:0;
+
+    top:0;
+
+    bottom:0;
+
+    z-index:100;
 
 }
 
-nav a{
+.logoArea{
 
-    padding:15px 18px;
+    padding:35px 30px;
 
-    border-radius:12px;
+    text-align:center;
 
-    cursor:pointer;
+}
 
-    transition:.3s;
+.logoCircle{
+
+    width:82px;
+
+    height:82px;
+
+    border-radius:50%;
+
+    margin:auto;
+
+    background:linear-gradient(135deg,var(--primary),#1e4fff);
 
     display:flex;
 
-    gap:14px;
+    justify-content:center;
 
     align-items:center;
 
-    color:white;
+    font-size:34px;
+
+    color:#fff;
+
+    box-shadow:0 0 35px rgba(10,132,255,.35);
 
 }
 
-nav a:hover{
+.logoArea h2{
 
-    background:#1f2937;
+    margin-top:20px;
 
-}
+    font-size:25px;
 
-nav .active{
-
-    background:linear-gradient(90deg,#008cff,#005eff);
+    font-weight:700;
 
 }
 
-/* Main */
+.logoArea span{
 
-.content{
+    display:block;
 
-    flex:1;
+    margin-top:8px;
+
+    color:var(--text2);
+
+    font-size:14px;
+
+}
+
+/* =====================================
+            Menü
+===================================== */
+
+.sidebar nav{
+
+    padding:10px 18px;
+
+}
+
+.sidebar nav a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    text-decoration:none;
+
+    color:var(--text2);
+
+    padding:17px 18px;
+
+    margin-bottom:12px;
+
+    border-radius:15px;
+
+    transition:.30s;
+
+    font-size:15px;
+
+    font-weight:500;
+
+}
+
+.sidebar nav a i{
+
+    width:24px;
+
+    text-align:center;
+
+    font-size:18px;
+
+}
+
+.sidebar nav a:hover{
+
+    background:rgba(255,255,255,.05);
+
+    color:#fff;
+
+    transform:translateX(5px);
+
+}
+
+.sidebar nav a.active{
+
+    background:linear-gradient(135deg,var(--primary),#2364ff);
+
+    color:#fff;
+
+    box-shadow:0 10px 30px rgba(0,132,255,.25);
+
+}
+
+/* =====================================
+        Sidebar Alt
+===================================== */
+
+.sidebarBottom{
+
+    padding:25px;
+
+}
+
+.versionCard{
+
+    background:linear-gradient(135deg,#1e2633,#2c3647);
+
+    border-radius:20px;
+
+    padding:22px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,255,255,.05);
+
+}
+
+.versionCard h4{
+
+    font-size:20px;
+
+    margin-bottom:8px;
+
+}
+
+.versionCard p{
+
+    color:var(--text2);
+
+    margin-bottom:10px;
+
+}
+
+.versionCard small{
+
+    color:#8fa2be;
+
+}
+
+/* =====================================
+        Main
+===================================== */
+
+.mainContent{
+
+    margin-left:290px;
+
+    width:calc(100% - 290px);
+
+    min-height:100vh;
 
     padding:35px;
 
 }
+
+/* =====================================================
+                    HEADER
+===================================================== */
 
 header{
 
@@ -174,51 +314,77 @@ header{
 
 header h1{
 
-    font-size:33px;
+    font-size:34px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+    letter-spacing:.5px;
 
 }
 
 header p{
 
-    color:#9ca3af;
+    color:var(--text2);
+
+    font-size:15px;
 
 }
 
-.headerButtons{
+.headerRight{
 
     display:flex;
 
-    gap:12px;
+    align-items:center;
+
+    gap:15px;
 
 }
 
-.headerButtons button{
+.todayDate{
 
-    border:none;
+    background:rgba(255,255,255,.05);
 
-    background:#1f2937;
+    border:1px solid rgba(255,255,255,.08);
 
-    color:white;
+    backdrop-filter:blur(15px);
 
     padding:14px 22px;
 
-    border-radius:12px;
+    border-radius:15px;
 
-    cursor:pointer;
+    display:flex;
 
-    transition:.3s;
+    align-items:center;
+
+    gap:12px;
+
+    color:#fff;
+
+    box-shadow:var(--shadow);
 
 }
 
-.headerButtons button:hover{
+.todayDate i{
 
-    background:#0099ff;
+    color:var(--primary);
+
+    font-size:18px;
 
 }
 
-/* Dashboard */
+.todayDate span{
 
-.cards{
+    font-weight:600;
+
+}
+
+/* =====================================================
+                DASHBOARD KARTLARI
+===================================================== */
+
+.dashboardCards{
 
     display:grid;
 
@@ -232,11 +398,9 @@ header p{
 
 .card{
 
-    background:rgba(255,255,255,.04);
+    background:linear-gradient(145deg,var(--card),var(--card2));
 
-    border:1px solid rgba(255,255,255,.05);
-
-    border-radius:20px;
+    border-radius:22px;
 
     padding:24px;
 
@@ -246,37 +410,51 @@ header p{
 
     gap:20px;
 
+    border:1px solid rgba(255,255,255,.05);
+
     transition:.35s;
 
     box-shadow:var(--shadow);
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+.card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:180px;
+
+    height:180px;
+
+    background:rgba(255,255,255,.03);
+
+    border-radius:50%;
+
+    right:-90px;
+
+    top:-90px;
 
 }
 
 .card:hover{
 
-    transform:translateY(-6px);
+    transform:translateY(-8px);
+
+    border-color:rgba(255,255,255,.12);
 
 }
 
-.card h2{
+.cardIcon{
 
-    margin-top:5px;
+    width:72px;
 
-    font-size:30px;
-
-}
-
-.card span{
-
-    color:#9ca3af;
-
-}
-
-.icon{
-
-    width:65px;
-
-    height:65px;
+    height:72px;
 
     border-radius:18px;
 
@@ -286,579 +464,99 @@ header p{
 
     align-items:center;
 
-    font-size:24px;
+    font-size:28px;
+
+    flex-shrink:0;
 
 }
 
-.blue{
+.cardIcon.blue{
 
-    background:#0099ff22;
+    background:rgba(10,132,255,.15);
 
-    color:#0099ff;
-
-}
-
-.green{
-
-    background:#23c55e22;
-
-    color:#23c55e;
+    color:var(--primary);
 
 }
 
-.yellow{
+.cardIcon.green{
 
-    background:#facc1522;
+    background:rgba(23,201,100,.15);
 
-    color:#facc15;
-
-}
-
-.red{
-
-    background:#ef444422;
-
-    color:#ef4444;
+    color:var(--success);
 
 }
 
-.danger{
+.cardIcon.yellow{
 
-    border:1px solid rgba(239,68,68,.45);
+    background:rgba(245,165,36,.15);
 
-}
-
-/* ==========================================
-   Toolbar
-========================================== */
-
-.toolbar{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
-    margin-bottom:25px;
-    flex-wrap:wrap;
+    color:var(--warning);
 
 }
 
-.toolbar input{
+.cardIcon.red{
 
-    flex:1;
-    min-width:250px;
-    background:#1b2430;
-    border:1px solid #2e3b4e;
-    color:#fff;
-    padding:14px 18px;
-    border-radius:12px;
-    outline:none;
-    transition:.3s;
+    background:rgba(243,18,96,.15);
+
+    color:var(--danger);
 
 }
 
-.toolbar input:focus{
-
-    border-color:#0099ff;
-    box-shadow:0 0 0 4px rgba(0,153,255,.15);
-
-}
-
-.toolbar select{
-
-    background:#1b2430;
-    border:1px solid #2e3b4e;
-    color:white;
-    padding:14px 18px;
-    border-radius:12px;
-    cursor:pointer;
-
-}
-
-.toolbar button{
-
-    background:linear-gradient(135deg,#0099ff,#0066ff);
-    color:white;
-    border:none;
-    padding:14px 24px;
-    border-radius:12px;
-    cursor:pointer;
-    transition:.3s;
-    font-weight:600;
-
-}
-
-.toolbar button:hover{
-
-    transform:translateY(-2px);
-    box-shadow:0 10px 25px rgba(0,153,255,.35);
-
-}
-
-/* ==========================================
-   Table
-========================================== */
-
-.tableBox{
-
-    background:#161f2d;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:var(--shadow);
-
-}
-
-table{
-
-    width:100%;
-    border-collapse:collapse;
-
-}
-
-thead{
-
-    background:#0f1724;
-
-}
-
-thead th{
-
-    padding:18px;
-    text-align:left;
-    font-size:14px;
-    color:#bfc7d5;
-    letter-spacing:.5px;
-
-}
-
-tbody td{
-
-    padding:18px;
-    border-top:1px solid rgba(255,255,255,.05);
-
-}
-
-tbody tr{
-
-    transition:.25s;
-
-}
-
-tbody tr:hover{
-
-    background:#1f2937;
-
-}
-
-/* ==========================================
-   Status
-========================================== */
-
-.status{
-
-    padding:8px 14px;
-    border-radius:30px;
-    display:inline-block;
-    font-size:13px;
-    font-weight:600;
-
-}
-
-.status.good{
-
-    background:#23c55e22;
-    color:#23c55e;
-
-}
-
-.status.warning{
-
-    background:#facc1522;
-    color:#facc15;
-
-}
-
-.status.danger{
-
-    background:#ef444422;
-    color:#ef4444;
-
-}
-
-/* ==========================================
-   Buttons
-========================================== */
-
-.actionButtons{
-
-    display:flex;
-    gap:8px;
-
-}
-
-.actionButtons button{
-
-    width:38px;
-    height:38px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    color:white;
-    transition:.25s;
-
-}
-
-.editBtn{
-
-    background:#0099ff;
-
-}
-
-.deleteBtn{
-
-    background:#ef4444;
-
-}
-
-.batteryBtn{
-
-    background:#23c55e;
-
-}
-
-.actionButtons button:hover{
-
-    transform:scale(1.08);
-
-}
-
-/* ==========================================
-   Modal
-========================================== */
-
-.modal{
-
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.65);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:999;
-
-}
-
-.modal.active{
+.cardContent{
 
     display:flex;
 
-}
-
-.modalContent{
-
-    width:900px;
-    max-width:95%;
-    background:#161f2d;
-    border-radius:20px;
-    overflow:hidden;
-    animation:popup .25s ease;
-
-}
-
-.modalHeader{
-
-    padding:22px 30px;
-    background:#0f1724;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-}
-
-.modalHeader button{
-
-    background:none;
-    border:none;
-    color:white;
-    font-size:24px;
-    cursor:pointer;
-
-}
-
-.modalBody{
-
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:20px;
-    padding:30px;
-
-}
-
-.inputGroup{
-
-    display:flex;
     flex-direction:column;
-    gap:8px;
 
 }
 
-.inputGroup.full{
+.cardContent span{
 
-    grid-column:1 / -1;
+    color:var(--text2);
 
-}
-
-.inputGroup label{
-
-    color:#c8d0dc;
     font-size:14px;
 
 }
 
-.inputGroup input,
-.inputGroup select,
-.inputGroup textarea{
+.cardContent h2{
 
-    background:#1b2430;
-    color:white;
-    border:1px solid #2d3c50;
-    border-radius:12px;
-    padding:14px;
-    outline:none;
+    font-size:34px;
+
+    margin:8px 0;
+
+    font-weight:700;
 
 }
 
-.inputGroup textarea{
+.cardContent small{
 
-    resize:vertical;
-
-}
-
-.modalFooter{
-
-    padding:20px 30px;
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
-    border-top:1px solid rgba(255,255,255,.05);
+    color:#8fa2be;
 
 }
 
-.cancel{
+.card.danger{
 
-    background:#374151;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:10px;
-    cursor:pointer;
+    border:1px solid rgba(243,18,96,.30);
 
 }
 
-.save{
+.card.danger:hover{
 
-    background:linear-gradient(135deg,#0099ff,#0066ff);
-    color:white;
-    border:none;
-    padding:12px 24px;
-    border-radius:10px;
-    cursor:pointer;
+    box-shadow:0 15px 35px rgba(243,18,96,.20);
 
 }
 
-@keyframes popup{
-
-    from{
-
-        opacity:0;
-        transform:translateY(-20px) scale(.95);
-
-    }
-
-    to{
-
-        opacity:1;
-        transform:translateY(0) scale(1);
-
-    }
-
-}
-
-/* ==========================================
-   Warning Area
-========================================== */
-
-.warningArea{
-
-    margin-top:35px;
-
-    background:#161f2d;
-
-    border-radius:20px;
-
-    padding:25px;
-
-    box-shadow:var(--shadow);
-
-}
-
-.warningHeader{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-}
-
-.warningHeader h2{
-
-    font-size:22px;
-
-}
-
-.empty{
-
-    padding:30px;
-
-    text-align:center;
-
-    color:#9ca3af;
-
-    border:2px dashed rgba(255,255,255,.08);
-
-    border-radius:15px;
-
-}
-
-/* ==========================================
-   Notification Card
-========================================== */
-
-.notificationCard{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    background:#1b2430;
-
-    padding:18px;
-
-    border-radius:14px;
-
-    margin-bottom:15px;
-
-    transition:.3s;
-
-}
-
-.notificationCard:hover{
-
-    transform:translateX(5px);
-
-}
-
-.notificationCard.red{
-
-    border-left:6px solid #ef4444;
-
-}
-
-.notificationCard.yellow{
-
-    border-left:6px solid #facc15;
-
-}
-
-.notificationCard.green{
-
-    border-left:6px solid #23c55e;
-
-}
-
-.notificationInfo h3{
-
-    font-size:17px;
-
-}
-
-.notificationInfo p{
-
-    color:#9ca3af;
-
-    margin-top:5px;
-
-}
-
-/* ==========================================
-   Footer
-========================================== */
-
-footer{
-
-    margin-top:35px;
-
-    text-align:center;
-
-    color:#8f99aa;
-
-    padding:25px;
-
-}
-
-/* ==========================================
-   Scrollbar
-========================================== */
-
-::-webkit-scrollbar{
-
-    width:10px;
-
-}
-
-::-webkit-scrollbar-track{
-
-    background:#111827;
-
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:#0099ff;
-
-    border-radius:20px;
-
-}
-
-::-webkit-scrollbar-thumb:hover{
-
-    background:#00b7ff;
-
-}
-
-/* ==========================================
-   Fade Animation
-========================================== */
-
-.fadeIn{
-
-    animation:fadeIn .5s ease;
-
-}
-
-@keyframes fadeIn{
+/* =====================================================
+                    KART ANİMASYONU
+===================================================== */
+
+@keyframes fadeUp{
 
     from{
 
         opacity:0;
 
-        transform:translateY(20px);
+        transform:translateY(25px);
 
     }
 
@@ -872,161 +570,1289 @@ footer{
 
 }
 
-/* ==========================================
-   Glow Effects
-========================================== */
+.dashboardCards .card{
 
-.card:hover{
-
-    box-shadow:
-        0 0 15px rgba(0,153,255,.25),
-        0 15px 35px rgba(0,0,0,.4);
+    animation:fadeUp .6s ease;
 
 }
 
-button:hover{
+.dashboardCards .card:nth-child(2){
 
-    filter:brightness(1.08);
-
-}
-
-/* ==========================================
-   Responsive Tablet
-========================================== */
-
-@media(max-width:1200px){
-
-.cards{
-
-grid-template-columns:repeat(2,1fr);
+    animation-delay:.1s;
 
 }
 
-.modalBody{
+.dashboardCards .card:nth-child(3){
 
-grid-template-columns:1fr;
-
-}
+    animation-delay:.2s;
 
 }
 
-/* ==========================================
-   Responsive Mobile
-========================================== */
+.dashboardCards .card:nth-child(4){
 
-@media(max-width:900px){
-
-.sidebar{
-
-position:fixed;
-
-left:-260px;
-
-transition:.4s;
-
-z-index:999;
-
-height:100vh;
+    animation-delay:.3s;
 
 }
 
-.sidebar.active{
+.dashboardCards .card{
 
-left:0;
-
-}
-
-.content{
-
-padding:20px;
+    animation-fill-mode:both;
 
 }
 
-.cards{
+/* =====================================================
+                ARAÇ LİSTESİ
+===================================================== */
 
-grid-template-columns:1fr;
+.vehicleSection{
+
+    background:linear-gradient(145deg,var(--card),var(--card2));
+
+    border-radius:22px;
+
+    padding:28px;
+
+    border:1px solid rgba(255,255,255,.05);
+
+    box-shadow:var(--shadow);
+
+    margin-bottom:35px;
 
 }
 
-.toolbar{
+.sectionHeader{
 
-flex-direction:column;
+    display:flex;
 
-align-items:stretch;
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
 
 }
 
-.toolbar input{
+.sectionHeader h2{
 
-width:100%;
+    font-size:24px;
+
+    margin-bottom:6px;
+
+}
+
+.sectionHeader p{
+
+    color:var(--text2);
+
+    font-size:14px;
+
+}
+
+.sectionHeader button{
+
+    background:linear-gradient(135deg,var(--primary),#2468ff);
+
+    color:#fff;
+
+    border:none;
+
+    padding:14px 22px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    transition:.30s;
+
+}
+
+.sectionHeader button:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(10,132,255,.30);
+
+}
+
+/* =====================================================
+                    TABLO
+===================================================== */
+
+.tableArea{
+
+    overflow-x:auto;
 
 }
 
 table{
 
-font-size:13px;
+    width:100%;
+
+    border-collapse:collapse;
 
 }
 
 thead{
 
-display:none;
+    background:rgba(255,255,255,.04);
 
 }
 
-tbody tr{
+thead th{
 
-display:flex;
+    text-align:left;
 
-flex-direction:column;
+    padding:18px;
 
-margin-bottom:20px;
+    color:var(--text2);
 
-background:#1b2430;
+    font-size:14px;
 
-border-radius:15px;
+    font-weight:600;
 
-padding:10px;
+    border-bottom:1px solid rgba(255,255,255,.06);
 
 }
 
 tbody td{
 
-border:none;
+    padding:18px;
 
-padding:8px 10px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+    transition:.30s;
+
+}
+
+tbody tr{
+
+    transition:.30s;
+
+}
+
+tbody tr:hover{
+
+    background:rgba(255,255,255,.03);
+
+}
+
+/* =====================================================
+                BATARYA KARTI
+===================================================== */
+
+.batteryCard{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+
+}
+
+.batteryCard strong{
+
+    font-size:15px;
+
+    color:#fff;
+
+}
+
+.batteryCard small{
+
+    color:var(--text2);
+
+    font-size:12px;
+
+}
+
+/* =====================================================
+                ŞARJ DURUMU
+===================================================== */
+
+.needCharge{
+
+    background:rgba(243,18,96,.15);
+
+    color:var(--danger);
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.noCharge{
+
+    background:rgba(23,201,100,.15);
+
+    color:var(--success);
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+/* =====================================================
+                GÜN ROZETLERİ
+===================================================== */
+
+.dayBadge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:72px;
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+.dayBadge.green{
+
+    background:rgba(23,201,100,.15);
+
+    color:var(--success);
+
+}
+
+.dayBadge.yellow{
+
+    background:rgba(245,165,36,.15);
+
+    color:var(--warning);
+
+}
+
+.dayBadge.red{
+
+    background:rgba(243,18,96,.15);
+
+    color:var(--danger);
+
+}
+
+/* =====================================================
+                İŞLEM BUTONLARI
+===================================================== */
+
+.tableButtons{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.tableButtons button{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    color:#fff;
+
+    transition:.25s;
+
+}
+
+.detailBtn{
+
+    background:rgba(10,132,255,.18);
+
+}
+
+.detailBtn:hover{
+
+    background:var(--primary);
+
+    transform:scale(1.08);
+
+}
+
+.editBtn{
+
+    background:rgba(245,165,36,.18);
+
+}
+
+.editBtn:hover{
+
+    background:var(--warning);
+
+    transform:scale(1.08);
+
+}
+
+.deleteBtn{
+
+    background:rgba(243,18,96,.18);
+
+}
+
+.deleteBtn:hover{
+
+    background:var(--danger);
+
+    transform:scale(1.08);
+
+}
+
+/* =====================================================
+                BİLDİRİMLER
+===================================================== */
+
+.notificationSection{
+
+    margin-bottom:35px;
+
+}
+
+#notificationArea{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.notificationCard{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    background:linear-gradient(145deg,var(--card),var(--card2));
+
+    border-radius:20px;
+
+    padding:20px;
+
+    border:1px solid rgba(255,255,255,.05);
+
+    transition:.30s;
+
+}
+
+.notificationCard:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.notificationLeft{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+    flex-shrink:0;
+
+}
+
+.notificationCard.warning .notificationLeft{
+
+    background:rgba(245,165,36,.15);
+
+    color:var(--warning);
+
+}
+
+.notificationCard.danger .notificationLeft{
+
+    background:rgba(243,18,96,.15);
+
+    color:var(--danger);
+
+}
+
+.notificationContent h3{
+
+    margin-bottom:6px;
+
+    font-size:18px;
+
+}
+
+.notificationContent p{
+
+    color:var(--text2);
+
+    line-height:1.6;
+
+}
+
+/* =====================================================
+                    MODAL
+===================================================== */
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    backdrop-filter:blur(8px);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:30px;
+
+    z-index:9999;
+
+    animation:fadeModal .25s ease;
+
+}
+
+.modal.active{
+
+    display:flex;
 
 }
 
 .modalContent{
 
-width:95%;
+    width:100%;
+
+    max-width:760px;
+
+    background:linear-gradient(145deg,var(--card),var(--card2));
+
+    border-radius:24px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:0 25px 60px rgba(0,0,0,.45);
+
+    overflow:hidden;
 
 }
 
+.modalContent.large{
+
+    max-width:980px;
+
 }
 
-/* ==========================================
-   Premium Glass Effect
-========================================== */
+@keyframes fadeModal{
 
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+.modalHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:25px 30px;
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+}
+
+.modalHeader h2{
+
+    font-size:24px;
+
+    font-weight:700;
+
+}
+
+.modalHeader button{
+
+    width:44px;
+
+    height:44px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:rgba(255,255,255,.06);
+
+    color:#fff;
+
+    transition:.25s;
+
+}
+
+.modalHeader button:hover{
+
+    background:var(--danger);
+
+    transform:rotate(90deg);
+
+}
+
+.modalBody{
+
+    padding:30px;
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:22px;
+
+    max-height:70vh;
+
+    overflow-y:auto;
+
+}
+
+.modalFooter{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:15px;
+
+    padding:25px 30px;
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+}
+
+/* =====================================================
+                    FORM
+===================================================== */
+
+.inputGroup{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.inputGroup.full{
+
+    grid-column:1 / -1;
+
+}
+
+.inputGroup label{
+
+    font-size:14px;
+
+    color:var(--text2);
+
+    font-weight:500;
+
+}
+
+.inputGroup input,
+
+.inputGroup select,
+
+.inputGroup textarea{
+
+    width:100%;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#fff;
+
+    border-radius:14px;
+
+    padding:15px 16px;
+
+    font-size:15px;
+
+    font-family:inherit;
+
+    transition:.25s;
+
+}
+
+.inputGroup textarea{
+
+    resize:vertical;
+
+    min-height:120px;
+
+}
+
+.inputGroup input:focus,
+
+.inputGroup select:focus,
+
+.inputGroup textarea:focus{
+
+    outline:none;
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(10,132,255,.12);
+
+}
+
+.inputGroup input::placeholder,
+
+.inputGroup textarea::placeholder{
+
+    color:#8fa2be;
+
+}
+
+.inputGroup select option{
+
+    background:#1d2430;
+
+    color:#fff;
+
+}
+
+/* =====================================================
+                MODAL BUTONLARI
+===================================================== */
+
+.cancelButton,
+
+.saveButton{
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:14px 24px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.30s;
+
+}
+
+.cancelButton{
+
+    background:#323b49;
+
+    color:#fff;
+
+}
+
+.cancelButton:hover{
+
+    background:#414c5d;
+
+}
+
+.saveButton{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    background:linear-gradient(135deg,var(--primary),#2b63ff);
+
+    color:#fff;
+
+}
+
+.saveButton:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 15px 35px rgba(10,132,255,.30);
+
+}
+
+/* =====================================================
+                DETAY KARTLARI
+===================================================== */
+
+.detailCard,
+
+.historyCard{
+
+    grid-column:1 / -1;
+
+    background:rgba(255,255,255,.03);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    border-radius:18px;
+
+    padding:22px;
+
+}
+
+.detailCard h3,
+
+.historyCard h3{
+
+    margin-bottom:20px;
+
+    font-size:20px;
+
+}
+
+.detailGrid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+}
+
+.detailGrid div{
+
+    background:rgba(255,255,255,.03);
+
+    border-radius:14px;
+
+    padding:18px;
+
+}
+
+.detailGrid span{
+
+    display:block;
+
+    color:var(--text2);
+
+    font-size:13px;
+
+    margin-bottom:8px;
+
+}
+
+.detailGrid strong{
+
+    font-size:16px;
+
+}
+
+/* =====================================================
+                GEÇMİŞ KAYITLARI
+===================================================== */
+
+.historyItem{
+
+    display:flex;
+
+    gap:18px;
+
+    align-items:flex-start;
+
+    padding:18px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+}
+
+.historyItem:last-child{
+
+    border-bottom:none;
+
+}
+
+.historyDate{
+
+    min-width:110px;
+
+    background:rgba(10,132,255,.12);
+
+    color:var(--primary);
+
+    padding:10px 12px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    font-weight:600;
+
+    font-size:13px;
+
+}
+
+.historyInfo{
+
+    flex:1;
+
+}
+
+.historyInfo h4{
+
+    margin-bottom:6px;
+
+    font-size:16px;
+
+}
+
+.historyInfo p{
+
+    color:var(--text2);
+
+    line-height:1.6;
+
+}
+
+/* =====================================================
+                    FOOTER
+===================================================== */
+
+.footer{
+
+    margin-top:40px;
+
+    padding:25px 30px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+    color:var(--text2);
+
+    font-size:14px;
+
+}
+
+.footerLeft{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.footerLeft strong{
+
+    color:#fff;
+
+    font-size:16px;
+
+}
+
+.footerRight{
+
+    background:rgba(255,255,255,.05);
+
+    padding:10px 16px;
+
+    border-radius:12px;
+
+    border:1px solid rgba(255,255,255,.06);
+
+}
+
+/* =====================================================
+                GEÇİŞ EFEKTLERİ
+===================================================== */
+
+button,
+input,
+select,
+textarea,
 .card,
-.tableBox,
-.warningArea,
-.modalContent{
+.notificationCard,
+.versionCard,
+.tableButtons button{
 
-backdrop-filter:blur(14px);
+    transition:all .30s ease;
 
 }
 
-/* ==========================================
-   BMW Blue Selection
-========================================== */
+input:hover,
+select:hover,
+textarea:hover{
 
-::selection{
+    border-color:rgba(255,255,255,.18);
 
-background:#0099ff;
+}
 
-color:white;
+.card:hover,
+.notificationCard:hover,
+.versionCard:hover{
+
+    transform:translateY(-4px);
+
+}
+
+/* =====================================================
+                ODAK HALKASI
+===================================================== */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+
+    outline:none;
+
+    box-shadow:0 0 0 4px rgba(10,132,255,.20);
+
+}
+
+/* =====================================================
+                RESPONSIVE
+===================================================== */
+
+@media(max-width:1400px){
+
+    .dashboardCards{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:1100px){
+
+    .sidebar{
+
+        width:90px;
+
+    }
+
+    .logoArea h2,
+    .logoArea span,
+    .sidebar nav a span,
+    .versionCard{
+
+        display:none;
+
+    }
+
+    .sidebar nav a{
+
+        justify-content:center;
+
+        padding:18px;
+
+    }
+
+    .mainContent{
+
+        margin-left:90px;
+
+        width:calc(100% - 90px);
+
+    }
+
+}
+
+@media(max-width:900px){
+
+    header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:20px;
+
+    }
+
+    .dashboardCards{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .detailGrid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .modalBody{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .footer{
+
+        flex-direction:column;
+
+        gap:18px;
+
+        text-align:center;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .mainContent{
+
+        margin-left:0;
+
+        width:100%;
+
+        padding:20px;
+
+    }
+
+    .sidebar{
+
+        position:fixed;
+
+        left:-100%;
+
+        width:280px;
+
+        transition:left .35s ease;
+
+    }
+
+    .sidebar.active{
+
+        left:0;
+
+    }
+
+    .sectionHeader{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:16px;
+
+    }
+
+    .modal{
+
+        padding:15px;
+
+    }
+
+    .modalContent{
+
+        max-height:95vh;
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    header h1{
+
+        font-size:26px;
+
+    }
+
+    .card{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+    .cardIcon{
+
+        margin-bottom:8px;
+
+    }
+
+    .tableButtons{
+
+        flex-wrap:wrap;
+
+    }
+
+    .tableButtons button{
+
+        width:38px;
+
+        height:38px;
+
+    }
+
+    .historyItem{
+
+        flex-direction:column;
+
+    }
+
+    .historyDate{
+
+        min-width:auto;
+
+        width:100%;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .vehicleSection,
+    .notificationCard,
+    .detailCard,
+    .historyCard{
+
+        padding:18px;
+
+    }
+
+    .todayDate{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+    .saveButton,
+    .cancelButton{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+    .modalFooter{
+
+        flex-direction:column;
+
+    }
+
+}
+
+/* =====================================================
+                YARDIMCI SINIFLAR
+===================================================== */
+
+.hidden{
+
+    display:none !important;
+
+}
+
+.text-center{
+
+    text-align:center;
+
+}
+
+.w-100{
+
+    width:100%;
+
+}
+
+.mt-10{
+
+    margin-top:10px;
+
+}
+
+.mt-20{
+
+    margin-top:20px;
+
+}
+
+.mb-20{
+
+    margin-bottom:20px;
+
+}
+
+.shadow{
+
+    box-shadow:var(--shadow);
+
+}
+
+.radius{
+
+    border-radius:var(--radius);
 
 }
