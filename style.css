@@ -1,0 +1,1032 @@
+/* =====================================================
+   BMW / MINI Battery Tracker
+   Premium Theme
+===================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --bg:#0d1117;
+    --sidebar:#111827;
+    --card:#1b2430;
+    --card2:#222b38;
+
+    --primary:#0099ff;
+    --green:#23c55e;
+    --yellow:#facc15;
+    --red:#ef4444;
+
+    --text:#ffffff;
+    --text2:#9ca3af;
+
+    --radius:18px;
+
+    --shadow:0 15px 35px rgba(0,0,0,.35);
+
+}
+
+body{
+
+    background:linear-gradient(135deg,#0b1220,#111827);
+
+    color:white;
+
+    font-family:Poppins,sans-serif;
+
+    display:flex;
+
+    min-height:100vh;
+
+}
+
+/* Sidebar */
+
+.sidebar{
+
+    width:260px;
+
+    background:rgba(17,24,39,.96);
+
+    backdrop-filter:blur(12px);
+
+    border-right:1px solid rgba(255,255,255,.08);
+
+    padding:30px;
+
+}
+
+.logo{
+
+    text-align:center;
+
+    margin-bottom:45px;
+
+}
+
+.logoIcon{
+
+    width:75px;
+
+    height:75px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:linear-gradient(135deg,#008cff,#00d4ff);
+
+    font-size:28px;
+
+    box-shadow:0 0 35px rgba(0,153,255,.5);
+
+}
+
+.logo h2{
+
+    margin-top:18px;
+
+    font-size:23px;
+
+}
+
+.logo p{
+
+    color:#9ca3af;
+
+    font-size:13px;
+
+}
+
+nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+
+}
+
+nav a{
+
+    padding:15px 18px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    display:flex;
+
+    gap:14px;
+
+    align-items:center;
+
+    color:white;
+
+}
+
+nav a:hover{
+
+    background:#1f2937;
+
+}
+
+nav .active{
+
+    background:linear-gradient(90deg,#008cff,#005eff);
+
+}
+
+/* Main */
+
+.content{
+
+    flex:1;
+
+    padding:35px;
+
+}
+
+header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:35px;
+
+}
+
+header h1{
+
+    font-size:33px;
+
+}
+
+header p{
+
+    color:#9ca3af;
+
+}
+
+.headerButtons{
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+.headerButtons button{
+
+    border:none;
+
+    background:#1f2937;
+
+    color:white;
+
+    padding:14px 22px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.headerButtons button:hover{
+
+    background:#0099ff;
+
+}
+
+/* Dashboard */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:22px;
+
+    margin-bottom:35px;
+
+}
+
+.card{
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.05);
+
+    border-radius:20px;
+
+    padding:24px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    transition:.35s;
+
+    box-shadow:var(--shadow);
+
+}
+
+.card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.card h2{
+
+    margin-top:5px;
+
+    font-size:30px;
+
+}
+
+.card span{
+
+    color:#9ca3af;
+
+}
+
+.icon{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+}
+
+.blue{
+
+    background:#0099ff22;
+
+    color:#0099ff;
+
+}
+
+.green{
+
+    background:#23c55e22;
+
+    color:#23c55e;
+
+}
+
+.yellow{
+
+    background:#facc1522;
+
+    color:#facc15;
+
+}
+
+.red{
+
+    background:#ef444422;
+
+    color:#ef4444;
+
+}
+
+.danger{
+
+    border:1px solid rgba(239,68,68,.45);
+
+}
+
+/* ==========================================
+   Toolbar
+========================================== */
+
+.toolbar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+
+}
+
+.toolbar input{
+
+    flex:1;
+    min-width:250px;
+    background:#1b2430;
+    border:1px solid #2e3b4e;
+    color:#fff;
+    padding:14px 18px;
+    border-radius:12px;
+    outline:none;
+    transition:.3s;
+
+}
+
+.toolbar input:focus{
+
+    border-color:#0099ff;
+    box-shadow:0 0 0 4px rgba(0,153,255,.15);
+
+}
+
+.toolbar select{
+
+    background:#1b2430;
+    border:1px solid #2e3b4e;
+    color:white;
+    padding:14px 18px;
+    border-radius:12px;
+    cursor:pointer;
+
+}
+
+.toolbar button{
+
+    background:linear-gradient(135deg,#0099ff,#0066ff);
+    color:white;
+    border:none;
+    padding:14px 24px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.3s;
+    font-weight:600;
+
+}
+
+.toolbar button:hover{
+
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(0,153,255,.35);
+
+}
+
+/* ==========================================
+   Table
+========================================== */
+
+.tableBox{
+
+    background:#161f2d;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#0f1724;
+
+}
+
+thead th{
+
+    padding:18px;
+    text-align:left;
+    font-size:14px;
+    color:#bfc7d5;
+    letter-spacing:.5px;
+
+}
+
+tbody td{
+
+    padding:18px;
+    border-top:1px solid rgba(255,255,255,.05);
+
+}
+
+tbody tr{
+
+    transition:.25s;
+
+}
+
+tbody tr:hover{
+
+    background:#1f2937;
+
+}
+
+/* ==========================================
+   Status
+========================================== */
+
+.status{
+
+    padding:8px 14px;
+    border-radius:30px;
+    display:inline-block;
+    font-size:13px;
+    font-weight:600;
+
+}
+
+.status.good{
+
+    background:#23c55e22;
+    color:#23c55e;
+
+}
+
+.status.warning{
+
+    background:#facc1522;
+    color:#facc15;
+
+}
+
+.status.danger{
+
+    background:#ef444422;
+    color:#ef4444;
+
+}
+
+/* ==========================================
+   Buttons
+========================================== */
+
+.actionButtons{
+
+    display:flex;
+    gap:8px;
+
+}
+
+.actionButtons button{
+
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    color:white;
+    transition:.25s;
+
+}
+
+.editBtn{
+
+    background:#0099ff;
+
+}
+
+.deleteBtn{
+
+    background:#ef4444;
+
+}
+
+.batteryBtn{
+
+    background:#23c55e;
+
+}
+
+.actionButtons button:hover{
+
+    transform:scale(1.08);
+
+}
+
+/* ==========================================
+   Modal
+========================================== */
+
+.modal{
+
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.65);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+
+}
+
+.modal.active{
+
+    display:flex;
+
+}
+
+.modalContent{
+
+    width:900px;
+    max-width:95%;
+    background:#161f2d;
+    border-radius:20px;
+    overflow:hidden;
+    animation:popup .25s ease;
+
+}
+
+.modalHeader{
+
+    padding:22px 30px;
+    background:#0f1724;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+.modalHeader button{
+
+    background:none;
+    border:none;
+    color:white;
+    font-size:24px;
+    cursor:pointer;
+
+}
+
+.modalBody{
+
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    padding:30px;
+
+}
+
+.inputGroup{
+
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+}
+
+.inputGroup.full{
+
+    grid-column:1 / -1;
+
+}
+
+.inputGroup label{
+
+    color:#c8d0dc;
+    font-size:14px;
+
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea{
+
+    background:#1b2430;
+    color:white;
+    border:1px solid #2d3c50;
+    border-radius:12px;
+    padding:14px;
+    outline:none;
+
+}
+
+.inputGroup textarea{
+
+    resize:vertical;
+
+}
+
+.modalFooter{
+
+    padding:20px 30px;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    border-top:1px solid rgba(255,255,255,.05);
+
+}
+
+.cancel{
+
+    background:#374151;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+
+}
+
+.save{
+
+    background:linear-gradient(135deg,#0099ff,#0066ff);
+    color:white;
+    border:none;
+    padding:12px 24px;
+    border-radius:10px;
+    cursor:pointer;
+
+}
+
+@keyframes popup{
+
+    from{
+
+        opacity:0;
+        transform:translateY(-20px) scale(.95);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0) scale(1);
+
+    }
+
+}
+
+/* ==========================================
+   Warning Area
+========================================== */
+
+.warningArea{
+
+    margin-top:35px;
+
+    background:#161f2d;
+
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.warningHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.warningHeader h2{
+
+    font-size:22px;
+
+}
+
+.empty{
+
+    padding:30px;
+
+    text-align:center;
+
+    color:#9ca3af;
+
+    border:2px dashed rgba(255,255,255,.08);
+
+    border-radius:15px;
+
+}
+
+/* ==========================================
+   Notification Card
+========================================== */
+
+.notificationCard{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#1b2430;
+
+    padding:18px;
+
+    border-radius:14px;
+
+    margin-bottom:15px;
+
+    transition:.3s;
+
+}
+
+.notificationCard:hover{
+
+    transform:translateX(5px);
+
+}
+
+.notificationCard.red{
+
+    border-left:6px solid #ef4444;
+
+}
+
+.notificationCard.yellow{
+
+    border-left:6px solid #facc15;
+
+}
+
+.notificationCard.green{
+
+    border-left:6px solid #23c55e;
+
+}
+
+.notificationInfo h3{
+
+    font-size:17px;
+
+}
+
+.notificationInfo p{
+
+    color:#9ca3af;
+
+    margin-top:5px;
+
+}
+
+/* ==========================================
+   Footer
+========================================== */
+
+footer{
+
+    margin-top:35px;
+
+    text-align:center;
+
+    color:#8f99aa;
+
+    padding:25px;
+
+}
+
+/* ==========================================
+   Scrollbar
+========================================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#111827;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#0099ff;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#00b7ff;
+
+}
+
+/* ==========================================
+   Fade Animation
+========================================== */
+
+.fadeIn{
+
+    animation:fadeIn .5s ease;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ==========================================
+   Glow Effects
+========================================== */
+
+.card:hover{
+
+    box-shadow:
+        0 0 15px rgba(0,153,255,.25),
+        0 15px 35px rgba(0,0,0,.4);
+
+}
+
+button:hover{
+
+    filter:brightness(1.08);
+
+}
+
+/* ==========================================
+   Responsive Tablet
+========================================== */
+
+@media(max-width:1200px){
+
+.cards{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.modalBody{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+/* ==========================================
+   Responsive Mobile
+========================================== */
+
+@media(max-width:900px){
+
+.sidebar{
+
+position:fixed;
+
+left:-260px;
+
+transition:.4s;
+
+z-index:999;
+
+height:100vh;
+
+}
+
+.sidebar.active{
+
+left:0;
+
+}
+
+.content{
+
+padding:20px;
+
+}
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+.toolbar{
+
+flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.toolbar input{
+
+width:100%;
+
+}
+
+table{
+
+font-size:13px;
+
+}
+
+thead{
+
+display:none;
+
+}
+
+tbody tr{
+
+display:flex;
+
+flex-direction:column;
+
+margin-bottom:20px;
+
+background:#1b2430;
+
+border-radius:15px;
+
+padding:10px;
+
+}
+
+tbody td{
+
+border:none;
+
+padding:8px 10px;
+
+}
+
+.modalContent{
+
+width:95%;
+
+}
+
+}
+
+/* ==========================================
+   Premium Glass Effect
+========================================== */
+
+.card,
+.tableBox,
+.warningArea,
+.modalContent{
+
+backdrop-filter:blur(14px);
+
+}
+
+/* ==========================================
+   BMW Blue Selection
+========================================== */
+
+::selection{
+
+background:#0099ff;
+
+color:white;
+
+}

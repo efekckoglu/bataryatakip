@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BMW / MINI Battery Tracking</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">
+
+<div class="logoIcon">
+
+<i class="fa-solid fa-car-side"></i>
+
+</div>
+
+<h2>Battery Tracker</h2>
+
+<p>BMW / MINI</p>
+
+</div>
+
+<nav>
+
+<a class="active">
+
+<i class="fa-solid fa-chart-pie"></i>
+
+Dashboard
+
+</a>
+
+<a>
+
+<i class="fa-solid fa-car"></i>
+
+Araçlar
+
+</a>
+
+<a id="openModal">
+
+<i class="fa-solid fa-plus"></i>
+
+Yeni Araç
+
+</a>
+
+<a>
+
+<i class="fa-solid fa-battery-three-quarters"></i>
+
+Batarya
+
+</a>
+
+<a>
+
+<i class="fa-solid fa-chart-line"></i>
+
+Raporlar
+
+</a>
+
+<a>
+
+<i class="fa-solid fa-gear"></i>
+
+Ayarlar
+
+</a>
+
+</nav>
+
+</div>
+
+<div class="content">
+
+<header>
+
+<div>
+
+<h1>
+
+Batarya Takip Sistemi
+
+</h1>
+
+<p>
+
+BMW / MINI Araç Yönetimi
+
+</p>
+
+</div>
+
+<div class="headerButtons">
+
+<button>
+
+<i class="fa-solid fa-download"></i>
+
+Dışa Aktar
+
+</button>
+
+<button>
+
+<i class="fa-solid fa-upload"></i>
+
+İçe Aktar
+
+</button>
+
+</div>
+
+</header>
+
+<section class="cards">
+
+<div class="card">
+
+<div class="icon blue">
+
+<i class="fa-solid fa-car"></i>
+
+</div>
+
+<div>
+
+<span>
+
+Toplam Araç
+
+</span>
+
+<h2 id="totalVehicle">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="icon green">
+
+<i class="fa-solid fa-circle-check"></i>
+
+</div>
+
+<div>
+
+<span>
+
+Normal
+
+</span>
+
+<h2 id="normalVehicle">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="icon yellow">
+
+<i class="fa-solid fa-triangle-exclamation"></i>
+
+</div>
+
+<div>
+
+<span>
+
+Yaklaşan
+
+</span>
+
+<h2 id="warningVehicle">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="card danger">
+
+<div class="icon red">
+
+<i class="fa-solid fa-circle-xmark"></i>
+
+</div>
+
+<div>
+
+<span>
+
+7+ Gün
+
+</span>
+
+<h2 id="dangerVehicle">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="toolbar">
+
+<input
+type="text"
+id="search"
+placeholder="Plaka, Şase veya Model Ara">
+
+<select id="filter">
+
+<option value="all">Tümü</option>
+
+<option value="stok">Stok</option>
+
+<option value="konsinye">Konsinye</option>
+
+<option value="benzin">Benzin</option>
+
+<option value="dizel">Dizel</option>
+
+<option value="plugin">Plug-in</option>
+
+<option value="electric">Elektrikli</option>
+
+</select>
+
+<button id="newVehicle">
+
+<i class="fa-solid fa-plus"></i>
+
+Yeni Araç
+
+</button>
+
+</section>
+
+<section class="tableBox">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Plaka</th>
+
+<th>Şase</th>
+
+<th>Model</th>
+
+<th>Durum</th>
+
+<th>Yakıt</th>
+
+<th>Büyük Akü</th>
+
+<th>Küçük Akü</th>
+
+<th>Genel</th>
+
+<th>Durum</th>
+
+<th>İşlem</th>
+
+</tr>
+
+</thead>
+
+<tbody id="vehicleTable">
+
+<!-- JS Dolduracak -->
+
+</tbody>
+
+</table>
+
+</section>
+
+        <!-- Araç Ekle Modal -->
+
+        <div class="modal" id="vehicleModal">
+
+            <div class="modalContent">
+
+                <div class="modalHeader">
+
+                    <h2>Yeni Araç Ekle</h2>
+
+                    <button id="closeModal">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
+
+                <div class="modalBody">
+
+                    <div class="inputGroup">
+
+                        <label>Plaka</label>
+
+                        <input
+                            type="text"
+                            id="plate"
+                            placeholder="31 ABC 123">
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Şase No</label>
+
+                        <input
+                            type="text"
+                            id="chassis"
+                            placeholder="WBAXXXXXXXXXXXXX">
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Model</label>
+
+                        <input
+                            type="text"
+                            id="model"
+                            placeholder="BMW X1">
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Durum</label>
+
+                        <select id="status">
+
+                            <option value="Stok">Stok</option>
+
+                            <option value="Konsinye">Konsinye</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Yakıt Türü</label>
+
+                        <select id="fuel">
+
+                            <option>Benzin</option>
+
+                            <option>Dizel</option>
+
+                            <option>Plug-in Hybrid</option>
+
+                            <option>Elektrikli</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Büyük Akü Tarihi</label>
+
+                        <input
+                            type="date"
+                            id="bigBattery">
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Küçük Akü Tarihi</label>
+
+                        <input
+                            type="date"
+                            id="smallBattery">
+
+                    </div>
+
+                    <div class="inputGroup">
+
+                        <label>Genel Batarya Tarihi</label>
+
+                        <input
+                            type="date"
+                            id="generalBattery">
+
+                    </div>
+
+                    <div class="inputGroup full">
+
+                        <label>Not</label>
+
+                        <textarea
+                            id="note"
+                            rows="4"
+                            placeholder="Araç hakkında not..."></textarea>
+
+                    </div>
+
+                </div>
+
+                <div class="modalFooter">
+
+                    <button class="cancel">
+
+                        Vazgeç
+
+                    </button>
+
+                    <button id="saveVehicle" class="save">
+
+                        Kaydet
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Uyarılar -->
+
+        <section class="warningArea">
+
+            <div class="warningHeader">
+
+                <h2>
+
+                    Batarya Uyarıları
+
+                </h2>
+
+            </div>
+
+            <div id="warningList">
+
+                <div class="empty">
+
+                    Şu anda uyarı bulunmuyor.
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <footer>
+
+            <span>
+
+                © 2026 BMW / MINI Battery Tracking System
+
+            </span>
+
+        </footer>
+
+    </div>
+
+    <script src="storage.js"></script>
+    <script src="notifications.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>
