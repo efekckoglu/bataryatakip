@@ -5,31 +5,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMW | MINI Akü Takip Sistemi</title>
+    <title>İnciroğlu BMW | Akü Takip Sistemi</title>
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- SheetJS (Excel Export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="full-screen">
+<body class="light-theme">
 
-    <!-- BMW M Stripe Decorative Top Accent -->
+    <!-- BMW M Stripe Top Accent -->
     <div class="bmw-m-stripe"></div>
 
-    <!-- ==========================
-            Main Content (Tam Ekran)
-    =========================== -->
     <main class="mainContent container-fluid">
 
-        <!-- Header / Navigation Bar -->
+        <!-- Header -->
         <header class="bmw-header">
             <div class="headerLeft">
                 <div class="brandBadge">
@@ -37,90 +37,68 @@
                         <i class="fa-solid fa-car-side"></i>
                     </div>
                     <div>
-                        <div class="bmwSeriesTitle">BAYERISCHE MOTOREN WERKE</div>
-                        <h1>BMW | MINI Akü Takip <span class="mText">//M</span></h1>
+                        <div class="bmwSeriesTitle">İNCİROĞLU BMW</div>
+                        <h1>BMW | MINI Akü Takip <span class="mTextColorful"><span class="c1">/</span><span class="c2">/</span><span class="c3">M</span></span></h1>
                     </div>
                 </div>
-                <p class="headerSubtitle">Showroom ve Stok Araçları Yüksek & Düşük Volt Akü Takip Paneli</p>
+                <p class="headerSubtitle">Showroom ve Stok Araçları Şarj & Akü Operasyon Paneli</p>
             </div>
 
             <div class="headerRight">
+                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="exportAuditLogToExcel()">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>İşlem Geçmişi Excel (XLSX)</span>
+                </button>
                 <button id="openVehicleModalHeader" class="bmwBtnPrimary">
                     <i class="fa-solid fa-circle-plus"></i>
                     <span>Yeni Araç Ekle</span>
                 </button>
                 <div class="todayDate">
                     <i class="fa-solid fa-calendar-days"></i>
-                    <span id="todayDate">28.07.2026</span>
+                    <span id="todayDate">-</span>
                 </div>
             </div>
         </header>
 
-        <!-- ==========================
-                Dashboard Cards
-        ========================== -->
+        <!-- Dashboard Cards -->
         <section class="dashboardCards">
-            <!-- Kart 1: Toplam -->
             <div class="card">
-                <div class="cardIcon blue">
-                    <i class="fa-solid fa-car"></i>
-                </div>
+                <div class="cardIcon blue"><i class="fa-solid fa-car"></i></div>
                 <div class="cardContent">
                     <span>Toplam Araç</span>
                     <h2 id="totalVehicle">0</h2>
-                    <small>Sistemde kayıtlı araç</small>
+                    <small>Sistemde kayıtlı</small>
                 </div>
             </div>
 
-            <!-- Kart 2: Sağlıklı -->
             <div class="card border-green">
-                <div class="cardIcon green">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
+                <div class="cardIcon green"><i class="fa-solid fa-circle-check"></i></div>
                 <div class="cardContent">
                     <span>Sağlıklı</span>
                     <h2 id="normalVehicle">0</h2>
-                    <small>7 günden az şarj süresi</small>
+                    <small>Şarj durumu iyi</small>
                 </div>
             </div>
 
-            <!-- Kart 3: Yaklaşan -->
-            <div class="card border-yellow">
-                <div class="cardIcon yellow">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <div class="cardContent">
-                    <span>Yaklaşan</span>
-                    <h2 id="warningVehicle">0</h2>
-                    <small>4 - 6 gün arası</small>
-                </div>
-            </div>
-
-            <!-- Kart 4: Kritik (Şarj Gerekli) -->
-            <div class="card danger">
-                <div class="cardIcon red">
-                    <i class="fa-solid fa-circle-xmark"></i>
-                </div>
+            <div class="card border-red">
+                <div class="cardIcon red"><i class="fa-solid fa-battery-quarter"></i></div>
                 <div class="cardContent">
                     <span>Şarj Gerekli</span>
                     <h2 id="dangerVehicle">0</h2>
-                    <small>7 gün ve üzeri (Kritik)</small>
+                    <small>HV %20 Altı veya Şarj İstiyor</small>
                 </div>
             </div>
         </section>
 
-        <!-- ==========================
-                Araç Listesi
-        ========================== -->
+        <!-- Araç Listesi -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
-                    <h2>Araç Listesi</h2>
-                    <p>Sistemdeki BMW & MINI stok araçlarının akü durumları</p>
+                    <h2>İnciroğlu Stok Araç Listesi</h2>
+                    <p>BMW & MINI araçlarının anlık batarya ve şarj durumları</p>
                 </div>
                 <button id="newVehicleButton" class="bmwBtnPrimary">
-                    <i class="fa-solid fa-plus"></i>
-                    Yeni Araç
+                    <i class="fa-solid fa-plus"></i> Yeni Araç
                 </button>
             </div>
 
@@ -132,153 +110,81 @@
                             <th>Model</th>
                             <th>Şarj İhtiyacı</th>
                             <th>Büyük Akü (HV)</th>
-                            <th>Gün</th>
                             <th>Küçük Akü (12V)</th>
-                            <th>Gün</th>
+                            <th>Sisteme Kayıt Tarihi</th>
                             <th>İşlem</th>
                         </tr>
                     </thead>
                     <tbody id="vehicleTable">
-                        <!-- Örnek Satır 1: Sağlıklı (<7 gün) -->
-                        <tr>
-                            <td class="font-mono">WBA11AB000XXXX123</td>
-                            <td class="modelName">BMW X1 sDrive20i</td>
-                            <td>
-                                <span class="statusBadge healthy">
-                                    <i class="fa-solid fa-check"></i> Sağlıklı
-                                </span>
-                            </td>
-                            <td>
-                                <div class="batteryCard">
-                                    <strong>26.07.2026</strong>
-                                    <small>Son Bağlanma</small>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="dayBadge green">2 Gün</span>
-                            </td>
-                            <td>
-                                <div class="batteryCard">
-                                    <strong>23.07.2026</strong>
-                                    <small>Son Bağlanma</small>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="dayBadge yellow">5 Gün</span>
-                            </td>
-                            <td>
-                                <div class="tableButtons">
-                                    <button class="detailBtn" title="Detay"><i class="fa-solid fa-eye"></i></button>
-                                    <button class="editBtn" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="deleteBtn" title="Sil"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Örnek Satır 2: Kritik (>7 gün - Kırmızı) -->
-                        <tr class="rowDanger">
-                            <td class="font-mono">WMW22CD000XXXX456</td>
-                            <td class="modelName">MINI Countryman SE</td>
-                            <td>
-                                <span class="statusBadge needCharge">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> Şarj Gerekli
-                                </span>
-                            </td>
-                            <td>
-                                <div class="batteryCard">
-                                    <strong>18.07.2026</strong>
-                                    <small>Son Bağlanma</small>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="dayBadge red">10 Gün</span>
-                            </td>
-                            <td>
-                                <div class="batteryCard">
-                                    <strong>20.07.2026</strong>
-                                    <small>Son Bağlanma</small>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="dayBadge red">8 Gün</span>
-                            </td>
-                            <td>
-                                <div class="tableButtons">
-                                    <button class="detailBtn" title="Detay"><i class="fa-solid fa-eye"></i></button>
-                                    <button class="editBtn" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="deleteBtn" title="Sil"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
+                        <!-- JS ile doldurulacak -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- ==========================
-                Bildirimler
-        ========================== -->
+        <!-- Bildirimler -->
         <section class="notificationSection">
             <div class="sectionHeader">
                 <div>
-                    <h2>Akü Uyarısı & Bildirimler</h2>
-                    <p>7 günü geçen veya şarj vakti yaklaşan araç uyarısı</p>
+                    <h2>Akü & Şarj Uyarıları</h2>
+                    <p>Acil müdahale gerektiren araçlar</p>
                 </div>
             </div>
-            <div id="notificationArea">
-                <!-- Kritik Bildirim -->
-                <div class="notificationCard danger">
-                    <div class="notificationLeft">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                    </div>
-                    <div class="notificationContent">
-                        <h3>MINI Countryman SE</h3>
-                        <p>Büyük akü ve küçük akü şarj bağlantısı 7 günü geçti (10 Gün). Acil şarja bağlanmalıdır!</p>
-                    </div>
-                </div>
-            </div>
+            <div id="notificationArea"></div>
         </section>
 
-        <!-- ==========================
-                Araç Ekle Modalı
-        ========================== -->
+        <!-- Modal: Araç Ekle / Düzenle -->
         <div class="modal" id="vehicleModal">
             <div class="modalContent">
                 <div class="modalHeader">
-                    <h2>Yeni Araç Ekle</h2>
-                    <button id="closeModal">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <h2 id="modalTitle">Yeni Araç Ekle</h2>
+                    <button id="closeModal"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
-                    <!-- Şase No -->
                     <div class="inputGroup">
-                        <label>Araç Şase No (VIN)</label>
+                        <label>Araç Şase No (VIN) *</label>
                         <input type="text" id="vehicleChassis" placeholder="WBAXXXXXXXXXXXXXXX">
                     </div>
 
-                    <!-- Model -->
                     <div class="inputGroup">
-                        <label>Araç Modeli</label>
+                        <label>Araç Modeli *</label>
                         <input type="text" id="vehicleModel" placeholder="BMW i4 M50 / MINI Cooper EV">
                     </div>
 
-                    <!-- Büyük Akü -->
-                    <div class="inputGroup">
-                        <label>Büyük Akü (HV) Son Şarj Tarihi</label>
-                        <input type="date" id="bigBatteryDate">
+                    <!-- Şarj İhtiyacı Sorusu -->
+                    <div class="inputGroup full">
+                        <label>Şarj İhtiyacı Var mı?</label>
+                        <select id="needsChargeSelect" onchange="toggleChargeInputs()">
+                            <option value="no">Hayır (Şarj Gerekmiyor / Sağlıklı)</option>
+                            <option value="yes">Evet (Şarj İhtiyacı Var)</option>
+                        </select>
                     </div>
 
-                    <!-- Küçük Akü -->
-                    <div class="inputGroup">
-                        <label>Küçük Akü (12V) Son Şarj Tarihi</label>
-                        <input type="date" id="smallBatteryDate">
+                    <!-- Şarj İhtiyacı Evetse Açılan Alanlar -->
+                    <div id="chargeInputsContainer" class="chargeInputsGroup hidden">
+                        <div class="inputGroup">
+                            <label>Büyük Akü Şarj Seviyesi (% SOC)</label>
+                            <input type="number" id="batterySoc" min="0" max="100" placeholder="Örn: 15 (%20 altı kırmızı uyarır)">
+                        </div>
+
+                        <div class="inputGroup">
+                            <label>Küçük Akü Durumu (12V)</label>
+                            <select id="smallBatteryStatus">
+                                <option value="connected">Bağlı (Yeşil)</option>
+                                <option value="disconnected">Bağlı Değil (Kırmızı)</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Not -->
+                    <!-- Düzenleme Sırasında Görünür Olacak Oluşturulma Tarihi -->
+                    <div class="inputGroup full hidden" id="createdAtGroup">
+                        <label>Sisteme Kayıt Tarihi ve Saati</label>
+                        <input type="text" id="vehicleCreatedAtDisplay" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                    </div>
+
                     <div class="inputGroup full">
                         <label>Araç Notu</label>
-                        <textarea id="vehicleNote" rows="4" placeholder="Lokasyon, batarya durumu vb. not ekleyin..."></textarea>
+                        <textarea id="vehicleNote" rows="3" placeholder="Lokasyon veya özel not ekleyin..."></textarea>
                     </div>
                 </div>
                 <div class="modalFooter">
@@ -290,109 +196,47 @@
             </div>
         </div>
 
-        <!-- =======================================
-                ARAÇ DETAY MODALI
-        ======================================== -->
+        <!-- Detay Modalı -->
         <div class="modal" id="detailModal">
-            <div class="modalContent large">
+            <div class="modalContent">
                 <div class="modalHeader">
                     <h2>Araç Detayları</h2>
-                    <button id="closeDetailModal">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button id="closeDetailModal"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
                     <div class="detailCard">
-                        <h3>Araç Bilgileri</h3>
                         <div class="detailGrid">
-                            <div>
-                                <span>Şase No</span>
-                                <strong id="detailChassis">-</strong>
-                            </div>
-                            <div>
-                                <span>Model</span>
-                                <strong id="detailModel">-</strong>
-                            </div>
-                            <div>
-                                <span>Şarj Durumu</span>
-                                <strong id="detailNeed">-</strong>
-                            </div>
+                            <div><span>Şase No</span><strong id="detailChassis">-</strong></div>
+                            <div><span>Model</span><strong id="detailModel">-</strong></div>
+                            <div><span>Şarj Durumu</span><strong id="detailNeed">-</strong></div>
+                            <div><span>Kayıt Tarihi</span><strong id="detailCreated">-</strong></div>
                         </div>
                     </div>
-
-                    <!-- Büyük Akü Geçmişi -->
-                    <div class="historyCard">
-                        <h3>Büyük Akü Geçmişi</h3>
-                        <div id="bigBatteryHistory">
-                            <div class="historyItem">
-                                <div class="historyDate">18.07.2026</div>
-                                <div class="historyInfo">
-                                    <h4>Büyük Akü Şarja Bağlandı</h4>
-                                    <p>AC Şarj istasyonunda %100 dolduruldu.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Küçük Akü Geçmişi -->
-                    <div class="historyCard">
-                        <h3>Küçük Akü Geçmişi</h3>
-                        <div id="smallBatteryHistory">
-                            <div class="historyItem">
-                                <div class="historyDate">20.07.2026</div>
-                                <div class="historyInfo">
-                                    <h4>Küçük Akü Şarja Bağlandı</h4>
-                                    <p>Showroom modu öncesi 12V takviye şarjı yapıldı.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notlar -->
-                    <div class="historyCard">
-                        <h3>Araç Notları</h3>
-                        <div id="vehicleNotes">
-                            <div class="historyItem">
-                                <div class="historyDate">28.07.2026</div>
-                                <div class="historyInfo">
-                                    <h4>İlk Kayıt</h4>
-                                    <p>Araç sisteme eklendi.</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="historyCard" style="margin-top: 15px;">
+                        <h3>Araç Notu</h3>
+                        <p id="detailNoteText" style="color: #475569; font-size: 14px;">-</p>
                     </div>
                 </div>
-
                 <div class="modalFooter">
                     <button class="cancelButton" id="closeDetail">Kapat</button>
-                    <button class="saveButton" id="updateBattery">
-                        <i class="fa-solid fa-battery-half"></i> Akü Güncelle
-                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- =======================================
-                FOOTER
-        ======================================== -->
+        <!-- Footer -->
         <footer class="footer">
             <div class="footerLeft">
-                <strong>BMW | MINI Akü Takip Sistemi</strong>
+                <strong>İnciroğlu BMW Akü Takip Paneli</strong>
                 <span>© 2026 Tüm Hakları Saklıdır</span>
             </div>
             <div class="footerRight">
-                <span class="mColorBadge">BAYERISCHE MOTOREN WERKE</span>
-                <span>v1.0</span>
+                <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
             </div>
         </footer>
 
     </main>
 
-    <!-- =======================================
-            JAVASCRIPT
-    ======================================== -->
     <script src="app.js"></script>
-
 </body>
 
 </html>
