@@ -1,506 +1,706 @@
 /* ==========================================================================
-   İnciroğlu BMW | Akü Takip CSS Framework (Dark & Light Entegreli)
+   İnciroğlu BMW | Stok & Akü Takip JS Engine (Admin & Tema Destekli)
    ========================================================================== */
 
-/* AYDINLIK TEMA DEĞİŞKENLERİ */
-body.light-theme {
-    --bg-main: #f8fafc;
-    --card-bg: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
-    --border-color: #e2e8f0;
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});
+
+const defaultVehicles = [
+    {
+        id: '1',
+        chassis: 'WBA11AB000XXXX123',
+        model: 'BMW i4 M50',
+        ownership: 'stok',
+        location: 'showroom',
+        batteryRequired: 'yes',
+        bigBatteryDate: getDaysAgoDate(6),
+        smallBatteryDate: getDaysAgoDate(2),
+        smallBatteryConnected: 'yes',
+        parkingDate: '',
+        isDeleted: false,
+        notesHistory: [
+            { id: 'n1', date: '28.07.2026 09:00', rawDate: '2026-07-28', note: 'Showroom sergi alanına alındı.' },
+            { id: 'n2', date: '28.07.2026 14:20', rawDate: '2026-07-28', note: 'Büyük akü şarja bağlandı.' }
+        ]
+    }
+];
+
+let vehicles = [];
+let editingVehicleId = null;
+let isAdminLoggedIn = false;
+
+function initApp() {
+    loadTheme();
+    loadVehicles();
+    updateTodayDate();
+    render();
+}
+
+/* TEMA İŞLEMLERİ (KOYU / BEYAZ) */
+function loadTheme() {
+    const savedTheme = localStorage.getItem('inciroglu_theme') || 'light';
+    const body = document.getElementById('appBody');
+    const icon = document.getElementById('themeIcon');
     
-    --bmw-blue: #0066b1;
-    --status-green: #10b981;
-    --status-red: #ef4444;
-    --status-yellow: #f59e0b;
+    if (savedTheme === 'dark') {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+        if (icon) icon.className = 'fa-solid fa-sun';
+    } else {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        if (icon) icon.className = 'fa-solid fa-moon';
+    }
 }
 
-/* KARANLIK TEMA DEĞİŞKENLERİ */
-body.dark-theme {
-    --bg-main: #0f172a;
-    --card-bg: #1e293b;
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-muted: #64748b;
-    --border-color: #334155;
+window.toggleTheme = function() {
+    const body = document.getElementById('appBody');
+    const icon = document.getElementById('themeIcon');
     
-    --bmw-blue: #38bdf8;
-    --status-green: #34d399;
-    --status-red: #f87171;
-    --status-yellow: #fbbf24;
+    if (body.classList.contains('light-theme')) {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+        if (icon) icon.className = 'fa-solid fa-sun';
+        localStorage.setItem('inciroglu_theme', 'dark');
+    } else {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        if (icon) icon.className = 'fa-solid fa-moon';
+        localStorage.setItem('inciroglu_theme', 'light');
+    }
+};
+
+/* YARDIMCI TARIH VE FORMAT FONKSİYONLARI */
+function getDaysAgoDate(days) {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return d.toISOString().split('T')[0];
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Outfit', sans-serif;
+function calculateDaysDiff(dateStr) {
+    if (!dateStr) return 0;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const past = new Date(dateStr);
+    past.setHours(0, 0, 0, 0);
+    const diffTime = Math.abs(now - past);
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
-body {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    min-height: 100vh;
-    transition: background-color 0.3s, color 0.3s;
+function formatDateTR(dateString) {
+    if (!dateString) return 'Gerekli Değil';
+    const [year, month, day] = dateString.split('-');
+    return `${day}.${month}.${year}`;
 }
 
-/* BMW //M Renkli Üst Accent Çizgisi */
-.bmw-m-stripe {
-    height: 5px;
-    width: 100%;
-    background: linear-gradient(90deg, #00a0e3 0%, #002663 50%, #e2001a 100%);
+function updateTodayDate() {
+    const today = new Date();
+    const formatted = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+    const el = document.getElementById('todayDate');
+    if (el) el.innerText = formatted;
 }
 
-.mainContent {
-    padding: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
+function getCurrentDateTimeFormatted() {
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-/* Header */
-.bmw-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--card-bg);
-    padding: 20px 28px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    margin-bottom: 24px;
+function getCurrentISOShortDate() {
+    return new Date().toISOString().split('T')[0];
 }
 
-.brandBadge {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+function loadVehicles() {
+    const saved = localStorage.getItem('inciroglu_bmw_v6_vehicles');
+    if (saved) {
+        try { vehicles = JSON.parse(saved); } catch (e) { vehicles = defaultVehicles; }
+    } else {
+        vehicles = defaultVehicles;
+        saveVehicles();
+    }
 }
 
-.bmwLogoIcon {
-    width: 48px;
-    height: 48px;
-    background: rgba(0, 102, 177, 0.1);
-    color: var(--bmw-blue);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
+function saveVehicles() {
+    localStorage.setItem('inciroglu_bmw_v6_vehicles', JSON.stringify(vehicles));
 }
 
-.bmwSeriesTitle {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--bmw-blue);
-    letter-spacing: 1.5px;
+window.toggleBatteryDateInputs = function() {
+    const batteryRequired = document.getElementById('batteryRequired').value;
+    const wrapper = document.getElementById('batteryDatesWrapper');
+    if (batteryRequired === 'yes') {
+        wrapper.classList.remove('hidden');
+    } else {
+        wrapper.classList.add('hidden');
+    }
+};
+
+window.handleLocationChangeInModal = function() {
+    const location = document.getElementById('vehicleLocation').value;
+    const parkingGroup = document.getElementById('parkingDateGroup');
+    const smallGroup1 = document.getElementById('smallBatteryDateGroup');
+    const smallGroup2 = document.getElementById('smallBatteryStatusGroup');
+
+    if (location === 'parking') {
+        if (parkingGroup) parkingGroup.classList.remove('hidden');
+        if (smallGroup1) smallGroup1.classList.add('hidden');
+        if (smallGroup2) smallGroup2.classList.add('hidden');
+    } else {
+        if (parkingGroup) parkingGroup.classList.add('hidden');
+        if (smallGroup1) smallGroup1.classList.remove('hidden');
+        if (smallGroup2) smallGroup2.classList.remove('hidden');
+    }
+};
+
+function render() {
+    renderShowroomTable();
+    renderParkingTable();
+    renderCards();
+    renderNotifications();
 }
 
-.mTextColorful { font-weight: 900; letter-spacing: -1px; }
-.mTextColorful .c1 { color: #00a0e3; }
-.mTextColorful .c2 { color: #002663; }
-.mTextColorful .c3 { color: #e2001a; }
+function renderShowroomTable() {
+    const body = document.getElementById('showroomTableBody');
+    if (!body) return;
+    body.innerHTML = '';
 
-.headerSubtitle {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-top: 4px;
+    const showroomVehicles = vehicles.filter(v => v.location === 'showroom' && !v.isDeleted);
+
+    if (showroomVehicles.length === 0) {
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 18px;">Showroomda araç bulunmuyor.</td></tr>`;
+        return;
+    }
+
+    showroomVehicles.forEach(vehicle => {
+        const isRequired = vehicle.batteryRequired === 'yes';
+        const bigDays = (isRequired && vehicle.bigBatteryDate) ? calculateDaysDiff(vehicle.bigBatteryDate) : 0;
+        const needsCharge = isRequired && bigDays >= 5;
+
+        const tr = document.createElement('tr');
+        if (needsCharge) tr.classList.add('rowDanger');
+
+        tr.innerHTML = `
+            <td style="font-family: monospace; font-weight: 600;">${vehicle.chassis}</td>
+            <td style="font-weight: 600;">${vehicle.model}</td>
+            <td>${isRequired ? formatDateTR(vehicle.bigBatteryDate) : '<span style="color:var(--text-muted)">Gerekli Değil</span>'}</td>
+            <td>${isRequired ? `<strong>${bigDays} Gün</strong>` : '-'}</td>
+            <td>
+                ${!isRequired ? '<span style="color:var(--text-muted)">Gerekli Değil</span>' : 
+                  (vehicle.smallBatteryConnected === 'yes'
+                    ? `<span class="smallBatteryBadge connected"><i class="fa-solid fa-circle"></i> Bağlı</span>`
+                    : `<span class="smallBatteryBadge disconnected"><i class="fa-solid fa-unlink"></i> Bağlı Değil</span>`)}
+            </td>
+            <td>
+                ${!isRequired ? `<span class="statusBadge healthy" style="background:#f1f5f9; color:#64748b;"><i class="fa-solid fa-minus"></i> Muaf</span>` :
+                  (needsCharge 
+                    ? `<span class="statusBadge needCharge"><i class="fa-solid fa-triangle-exclamation"></i> Bağlanması Gerekli</span>` 
+                    : `<span class="statusBadge healthy"><i class="fa-solid fa-check"></i> İhtiyacı Yok</span>`)}
+            </td>
+            <td>
+                <div class="tableButtons">
+                    <button onclick="openDetailModal('${vehicle.id}')" title="Detay & Not Geçmişi"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editVehicle('${vehicle.id}')" title="Düzenle / Tarih Güncelle"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteVehicle('${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash" style="color: #ef4444;"></i></button>
+                </div>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
 }
 
-.headerRight {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+function renderParkingTable() {
+    const body = document.getElementById('parkingTableBody');
+    if (!body) return;
+    body.innerHTML = '';
+
+    const parkingVehicles = vehicles.filter(v => v.location === 'parking' && !v.isDeleted);
+
+    if (parkingVehicles.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 18px;">Otoparkta araç bulunmuyor.</td></tr>`;
+        return;
+    }
+
+    parkingVehicles.forEach(vehicle => {
+        const isRequired = vehicle.batteryRequired === 'yes';
+        const bigDays = (isRequired && vehicle.bigBatteryDate) ? calculateDaysDiff(vehicle.bigBatteryDate) : 0;
+        const needsCharge = isRequired && bigDays > 10;
+
+        const tr = document.createElement('tr');
+        if (needsCharge) tr.classList.add('rowDanger');
+
+        tr.innerHTML = `
+            <td style="font-family: monospace; font-weight: 600;">${vehicle.chassis}</td>
+            <td style="font-weight: 600;">${vehicle.model}</td>
+            <td>${formatDateTR(vehicle.parkingDate)}</td>
+            <td>${isRequired ? formatDateTR(vehicle.bigBatteryDate) : '<span style="color:var(--text-muted)">Gerekli Değil</span>'}</td>
+            <td>
+                ${!isRequired ? `<span class="statusBadge healthy" style="background:#f1f5f9; color:#64748b;"><i class="fa-solid fa-minus"></i> Muaf</span>` :
+                  (needsCharge 
+                    ? `<span class="statusBadge needCharge"><i class="fa-solid fa-clock-rotate-left"></i> 10 Günü Geçti - Uyarı</span>` 
+                    : `<span class="statusBadge healthy"><i class="fa-solid fa-check"></i> Durum İyi (${bigDays} Gün)</span>`)}
+            </td>
+            <td>
+                <div class="tableButtons">
+                    <button onclick="openDetailModal('${vehicle.id}')" title="Detay & Not Geçmişi"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editVehicle('${vehicle.id}')" title="Düzenle / Tarih Güncelle"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteVehicle('${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash" style="color: #ef4444;"></i></button>
+                </div>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
 }
 
-/* Tema Değiştirme Butonu */
-.themeToggleBtn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: all 0.2s;
-}
-.themeToggleBtn:hover { background: var(--border-color); }
+function renderCards() {
+    const activeVehicles = vehicles.filter(v => !v.isDeleted);
+    const total = activeVehicles.length;
+    const showroom = activeVehicles.filter(v => v.location === 'showroom').length;
+    const parking = activeVehicles.filter(v => v.location === 'parking').length;
 
-.todayDate {
-    background: var(--bg-main);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid var(--border-color);
+    let dangerCount = 0;
+    activeVehicles.forEach(v => {
+        if (v.batteryRequired === 'yes') {
+            const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
+            if (v.location === 'showroom' && (bigDays >= 5 || v.smallBatteryConnected === 'no')) dangerCount++;
+            if (v.location === 'parking' && bigDays > 10) dangerCount++;
+        }
+    });
+
+    if (document.getElementById('totalVehicle')) document.getElementById('totalVehicle').innerText = total;
+    if (document.getElementById('showroomCount')) document.getElementById('showroomCount').innerText = showroom;
+    if (document.getElementById('parkingCount')) document.getElementById('parkingCount').innerText = parking;
+    if (document.getElementById('dangerVehicle')) document.getElementById('dangerVehicle').innerText = dangerCount;
 }
 
-/* Butonlar */
-.bmwBtnPrimary {
-    background: var(--bmw-blue);
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
+function renderNotifications() {
+    const area = document.getElementById('notificationArea');
+    if (!area) return;
+    area.innerHTML = '';
+
+    const notifications = [];
+
+    vehicles.filter(v => !v.isDeleted).forEach(v => {
+        if (v.batteryRequired === 'yes') {
+            const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
+            if (v.location === 'showroom') {
+                if (bigDays >= 5) {
+                    notifications.push(`🔌 <strong>${v.model} (${v.chassis})</strong>: Showroom büyük akü bağlanalı <strong>${bigDays} gün</strong> oldu. Akü bağlanması gerekli!`);
+                }
+                if (v.smallBatteryConnected === 'no') {
+                    notifications.push(`⚠️ <strong>${v.model} (${v.chassis})</strong>: Showroom aracı küçük akü <strong>bağlı değil!</strong>`);
+                }
+            } else if (v.location === 'parking') {
+                if (bigDays > 10) {
+                    notifications.push(`🚨 <strong>${v.model} (${v.chassis})</strong>: Otopark aracı büyük aküye bağlanalı <strong>${bigDays} gün (10 günü geçti)</strong>!`);
+                }
+            }
+        }
+    });
+
+    if (notifications.length === 0) {
+        area.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 12px 16px; border-radius: 10px; font-size: 13px;">
+                <i class="fa-solid fa-circle-check"></i> İkaz gerektiren bir araç bulunmuyor. Tüm akü durumları stabil.
+            </div>
+        `;
+        return;
+    }
+
+    notifications.forEach(msg => {
+        const card = document.createElement('div');
+        card.className = 'notificationCard';
+        card.innerHTML = msg;
+        area.appendChild(card);
+    });
 }
 
-.bmwBtnSecondary {
-    background: #10b981;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+window.openVehicleModal = function() {
+    editingVehicleId = null;
+    document.getElementById('modalTitle').innerText = 'Yeni Araç Ekle';
+    document.getElementById('vehicleChassis').value = '';
+    document.getElementById('vehicleModel').value = '';
+    document.getElementById('vehicleOwnership').value = 'stok';
+    document.getElementById('vehicleLocation').value = 'showroom';
+    document.getElementById('batteryRequired').value = 'no';
+    
+    document.getElementById('parkingDate').value = '';
+    document.getElementById('bigBatteryDate').value = '';
+    document.getElementById('smallBatteryDate').value = '';
+    document.getElementById('smallBatteryConnected').value = 'yes';
+    document.getElementById('vehicleNote').value = '';
+
+    handleLocationChangeInModal();
+    toggleBatteryDateInputs();
+
+    const modal = document.getElementById('vehicleModal');
+    if (modal) modal.classList.add('active');
+};
+
+window.closeVehicleModal = function() {
+    const modal = document.getElementById('vehicleModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.handleSaveVehicle = function() {
+    const chassis = document.getElementById('vehicleChassis').value.trim();
+    const model = document.getElementById('vehicleModel').value.trim();
+    const ownership = document.getElementById('vehicleOwnership').value;
+    const location = document.getElementById('vehicleLocation').value;
+    const batteryRequired = document.getElementById('batteryRequired').value;
+    const parkingDate = document.getElementById('parkingDate').value;
+    const bigBatteryDate = document.getElementById('bigBatteryDate').value;
+    const smallBatteryDate = document.getElementById('smallBatteryDate').value;
+    const smallBatteryConnected = document.getElementById('smallBatteryConnected').value;
+    const noteText = document.getElementById('vehicleNote').value.trim();
+
+    if (!chassis || !model) {
+        alert('Lütfen Şase No ve Marka/Model alanlarını doldurunuz.');
+        return;
+    }
+
+    const timeStamp = getCurrentDateTimeFormatted();
+    const rawDate = getCurrentISOShortDate();
+    const newNoteObj = noteText ? { id: Date.now().toString(), date: timeStamp, rawDate: rawDate, note: noteText } : null;
+
+    if (editingVehicleId) {
+        const index = vehicles.findIndex(v => v.id === editingVehicleId);
+        if (index !== -1) {
+            const history = vehicles[index].notesHistory || [];
+            if (newNoteObj) history.unshift(newNoteObj);
+
+            vehicles[index] = {
+                ...vehicles[index],
+                chassis,
+                model,
+                ownership,
+                location,
+                batteryRequired,
+                parkingDate: location === 'parking' ? parkingDate : '',
+                bigBatteryDate: batteryRequired === 'yes' ? bigBatteryDate : '',
+                smallBatteryDate: (batteryRequired === 'yes' && location === 'showroom') ? smallBatteryDate : '',
+                smallBatteryConnected: (batteryRequired === 'yes' && location === 'showroom') ? smallBatteryConnected : 'no',
+                notesHistory: history
+            };
+        }
+    } else {
+        const history = newNoteObj 
+            ? [newNoteObj] 
+            : [{ id: Date.now().toString(), date: timeStamp, rawDate: rawDate, note: 'Sisteme yeni araç kaydı oluşturuldu.' }];
+
+        const newVehicle = {
+            id: Date.now().toString(),
+            chassis,
+            model,
+            ownership,
+            location,
+            batteryRequired,
+            parkingDate: location === 'parking' ? parkingDate : '',
+            bigBatteryDate: batteryRequired === 'yes' ? bigBatteryDate : '',
+            smallBatteryDate: (batteryRequired === 'yes' && location === 'showroom') ? smallBatteryDate : '',
+            smallBatteryConnected: (batteryRequired === 'yes' && location === 'showroom') ? smallBatteryConnected : 'no',
+            isDeleted: false,
+            notesHistory: history
+        };
+        vehicles.push(newVehicle);
+    }
+
+    saveVehicles();
+    render();
+    closeVehicleModal();
+};
+
+window.editVehicle = function(id) {
+    const vehicle = vehicles.find(v => v.id === id);
+    if (!vehicle) return;
+
+    editingVehicleId = id;
+    document.getElementById('modalTitle').innerText = 'Aracı Düzenle / Tarih Güncelle';
+    document.getElementById('vehicleChassis').value = vehicle.chassis;
+    document.getElementById('vehicleModel').value = vehicle.model;
+    document.getElementById('vehicleOwnership').value = vehicle.ownership || 'stok';
+    document.getElementById('vehicleLocation').value = vehicle.location;
+    document.getElementById('batteryRequired').value = vehicle.batteryRequired || 'no';
+    
+    document.getElementById('parkingDate').value = vehicle.parkingDate || '';
+    document.getElementById('bigBatteryDate').value = vehicle.bigBatteryDate || '';
+    document.getElementById('smallBatteryDate').value = vehicle.smallBatteryDate || '';
+    document.getElementById('smallBatteryConnected').value = vehicle.smallBatteryConnected || 'yes';
+    document.getElementById('vehicleNote').value = '';
+
+    handleLocationChangeInModal();
+    toggleBatteryDateInputs();
+
+    const modal = document.getElementById('vehicleModal');
+    if (modal) modal.classList.add('active');
+};
+
+window.deleteVehicle = function(id) {
+    const vehicle = vehicles.find(v => v.id === id);
+    if (!vehicle) return;
+
+    if (confirm(`${vehicle.model} (${vehicle.chassis}) silinecek. Özet raporda [SİLİNDİ] olarak saklanacaktır.`)) {
+        vehicle.isDeleted = true;
+        
+        const timeStamp = getCurrentDateTimeFormatted();
+        const rawDate = getCurrentISOShortDate();
+        
+        if (!vehicle.notesHistory) vehicle.notesHistory = [];
+        vehicle.notesHistory.unshift({
+            id: Date.now().toString(),
+            date: timeStamp,
+            rawDate: rawDate,
+            note: '🚨 [SİSTEM SİLME İŞLEMİ] Araç aktif stok listesinden kaldırıldı.'
+        });
+
+        saveVehicles();
+        render();
+    }
+};
+
+window.openDetailModal = function(id) {
+    const vehicle = vehicles.find(v => v.id === id);
+    if (!vehicle) return;
+
+    document.getElementById('detailChassis').innerText = vehicle.chassis;
+    document.getElementById('detailModel').innerText = vehicle.model;
+    document.getElementById('detailOwnership').innerText = (vehicle.ownership === 'konsinye') ? 'Konsinye Araç' : 'Stok Aracı';
+    document.getElementById('detailLocation').innerText = vehicle.location === 'showroom' ? 'Showroom' : 'Otopark';
+    document.getElementById('detailBigDate').innerText = vehicle.batteryRequired === 'yes' ? formatDateTR(vehicle.bigBatteryDate) : 'Gerekli Değil';
+    document.getElementById('detailSmallDate').innerText = (vehicle.batteryRequired === 'yes' && vehicle.location === 'showroom') ? formatDateTR(vehicle.smallBatteryDate) : 'Gerekli Değil';
+    document.getElementById('detailParkDate').innerText = vehicle.location === 'parking' ? formatDateTR(vehicle.parkingDate) : 'N/A';
+
+    const notesContainer = document.getElementById('detailNotesHistory');
+    notesContainer.innerHTML = '';
+
+    const history = vehicle.notesHistory || [];
+    if (history.length === 0) {
+        notesContainer.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">Kayıtlı not bulunmuyor.</p>`;
+    } else {
+        history.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'historyNoteItem';
+            itemDiv.innerHTML = `
+                <div class="noteDate">${item.date}</div>
+                <div class="noteText">${item.note}</div>
+            `;
+            notesContainer.appendChild(itemDiv);
+        });
+    }
+
+    const modal = document.getElementById('detailModal');
+    if (modal) modal.classList.add('active');
+};
+
+window.closeDetailModal = function() {
+    const modal = document.getElementById('detailModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.openSummaryReportModal = function() {
+    const container = document.getElementById('summaryReportContent');
+    if (!container) return;
+
+    let totalNotes = 0;
+    vehicles.forEach(v => totalNotes += (v.notesHistory ? v.notesHistory.length : 0));
+
+    const activeCount = vehicles.filter(v => !v.isDeleted).length;
+    const deletedCount = vehicles.filter(v => v.isDeleted).length;
+
+    let html = `
+        <div class="summaryReportCard">
+            <h4><i class="fa-solid fa-list-check"></i> Sistem Bütünsel Log İstatistikleri</h4>
+            <p>• Aktif Stok Sayısı: <strong>${activeCount}</strong></p>
+            <p>• Silinen / Arşivdeki Araç Sayısı: <strong>${deletedCount}</strong></p>
+            <p>• Sistemde Kayıtlı Toplam İşlem Log Sayısı: <strong>${totalNotes}</strong></p>
+        </div>
+        <hr style="margin: 15px 0; border:0; border-top:1px solid var(--border-color);">
+        <h4><i class="fa-solid fa-history"></i> Bütün Araç Geçmişi & Yapılan İşlemler</h4>
+    `;
+
+    vehicles.forEach(v => {
+        const deletedBadge = v.isDeleted 
+            ? `<span style="background:rgba(225, 29, 72, 0.15); color:#e11d48; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">SİLİNDİ</span>` 
+            : `<span style="background:rgba(16, 185, 129, 0.15); color:#10b981; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">AKTİF</span>`;
+
+        const ownershipBadge = (v.ownership === 'konsinye') ? ' [KONSİNYE]' : ' [STOK]';
+
+        html += `
+            <div style="margin-top:12px; padding:10px; background:var(--bg-main); border-radius:8px; border:1px solid var(--border-color);">
+                <strong style="color:var(--bmw-blue);">${v.model} (${v.chassis})</strong> ${ownershipBadge} - <em>${v.location.toUpperCase()}</em> ${deletedBadge}
+                <div style="font-size:12px; margin-top:6px;">
+        `;
+        if (v.notesHistory && v.notesHistory.length > 0) {
+            v.notesHistory.forEach(nh => {
+                html += `<div style="padding: 2px 0;">⏱️ <strong>${nh.date}:</strong> ${nh.note}</div>`;
+            });
+        } else {
+            html += `<div>İşlem geçmişi bulunmuyor.</div>`;
+        }
+        html += `</div></div>`;
+    });
+
+    container.innerHTML = html;
+    document.getElementById('summaryReportModal').classList.add('active');
+};
+
+window.closeSummaryReportModal = function() {
+    document.getElementById('summaryReportModal').classList.remove('active');
+};
+
+/* EXCEL MODAL İŞLEMLERİ */
+window.openExcelFilterModal = function() {
+    const today = getCurrentISOShortDate();
+    document.getElementById('excelStartDate').value = getDaysAgoDate(30);
+    document.getElementById('excelEndDate').value = today;
+    document.getElementById('excelFilterModal').classList.add('active');
+};
+
+window.closeExcelFilterModal = function() {
+    document.getElementById('excelFilterModal').classList.remove('active');
+};
+
+window.exportInventoryToExcelWithDates = function() {
+    const startDate = document.getElementById('excelStartDate').value;
+    const endDate = document.getElementById('excelEndDate').value;
+
+    if (!startDate || !endDate) {
+        alert('Lütfen geçerli bir tarih aralığı seçiniz.');
+        return;
+    }
+
+    const exportRows = [];
+
+    vehicles.forEach(v => {
+        const historyList = v.notesHistory || [];
+        const filteredLogs = historyList.filter(h => {
+            if (!h.rawDate) return true;
+            return h.rawDate >= startDate && h.rawDate <= endDate;
+        });
+
+        if (filteredLogs.length > 0) {
+            const logsCombined = filteredLogs.map(l => `[${l.date}] ${l.note}`).join(' || ');
+
+            exportRows.push({
+                "Şase No (VIN)": v.chassis,
+                "Marka Model": v.model,
+                "Mülkiyet Durumu": (v.ownership === 'konsinye') ? 'Konsinye' : 'Stok',
+                "Sistem Durumu": v.isDeleted ? 'SİLİNDİ / ARŞİV' : 'AKTİF STOK',
+                "Son Konum": v.location === 'showroom' ? 'Showroom' : 'Otopark',
+                "Akü Bağlantı Gerekli mi": v.batteryRequired === 'yes' ? 'Evet' : 'Hayır',
+                "Büyük Akü Tarihi": v.batteryRequired === 'yes' ? formatDateTR(v.bigBatteryDate) : 'Gerekli Değil',
+                "Tarih Aralığındaki İşlem Logları": logsCombined
+            });
+        }
+    });
+
+    if (exportRows.length === 0) {
+        alert('Seçilen tarih aralığında herhangi bir araç işlem kaydı bulunamadı.');
+        return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(exportRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Islem_Raporu");
+
+    const fileName = `Inciroglu_BMW_Detayli_Rapor_${startDate}_ile_${endDate}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+
+    closeExcelFilterModal();
+};
+
+/* ==========================================================================
+   ADMIN PANELİ MANTIĞI & KALICI SİLME YÖNETİMİ
+   ========================================================================== */
+
+window.openAdminModal = function() {
+    document.getElementById('adminModal').classList.add('active');
+    if (isAdminLoggedIn) {
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderAdminDeletedList();
+    } else {
+        document.getElementById('adminLoginForm').classList.remove('hidden');
+        document.getElementById('adminDashboard').classList.add('hidden');
+    }
+};
+
+window.closeAdminModal = function() {
+    document.getElementById('adminModal').classList.remove('active');
+};
+
+window.handleAdminLogin = function() {
+    const password = document.getElementById('adminPasswordInput').value;
+    if (password === 'admin123') { // Varsayılan Şifre
+        isAdminLoggedIn = true;
+        document.getElementById('adminPasswordInput').value = '';
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderAdminDeletedList();
+    } else {
+        alert('Hatalı Admin Şifresi! (Varsayılan: admin123)');
+    }
+};
+
+window.handleAdminLogout = function() {
+    isAdminLoggedIn = false;
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+    document.getElementById('adminDashboard').classList.add('hidden');
+};
+
+function renderAdminDeletedList() {
+    const container = document.getElementById('adminDeletedVehiclesList');
+    if (!container) return;
+
+    const deletedVehicles = vehicles.filter(v => v.isDeleted);
+
+    if (deletedVehicles.length === 0) {
+        container.innerHTML = `<div style="padding:10px; color:var(--text-muted); font-size:12px;">Silinmiş araç veya işlem kaydı bulunmuyor.</div>`;
+        return;
+    }
+
+    let html = '';
+    deletedVehicles.forEach(v => {
+        html += `
+            <div class="adminLogItem">
+                <div>
+                    <strong>${v.model} (${v.chassis})</strong>
+                    <div style="font-size:11px; color:var(--text-muted);">Mülkiyet: ${v.ownership.toUpperCase()} | Konum: ${v.location.toUpperCase()}</div>
+                </div>
+                <button class="cancelButton" style="color:#ef4444; border-color:#fca5a5; font-size:11px;" onclick="permanentlyDeleteVehicle('${v.id}')">
+                    <i class="fa-solid fa-trash-can"></i> Tamamen Sil (Kalıcı)
+                </button>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
 }
 
-.bmwBtnAdmin {
-    background: #8b5cf6;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+// ADMIN YETKİSİYLE KALICI SİLME
+window.permanentlyDeleteVehicle = function(id) {
+    if (confirm('Bu araç ve ona ait tüm özet rapor notları KALICI OLARAK veritabanından silinecektir. Emin misiniz?')) {
+        vehicles = vehicles.filter(v => v.id !== id);
+        saveVehicles();
+        render();
+        renderAdminDeletedList();
+    }
+};
 
-/* Dashboard Kartları */
-.dashboardCards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
-    margin-bottom: 24px;
-}
+// ADMIN YEDEK ALMA VE SIFIRLAMA
+window.exportSystemBackupJSON = function() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vehicles, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `Inciroglu_BMW_Sistem_Yedegi_${getCurrentISOShortDate()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+};
 
-.card {
-    background: var(--card-bg);
-    border-radius: 14px;
-    padding: 20px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.cardIcon {
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-}
-.cardIcon.blue { background: rgba(2, 132, 199, 0.15); color: #38bdf8; }
-.cardIcon.green { background: rgba(22, 163, 74, 0.15); color: #4ade80; }
-.cardIcon.yellow { background: rgba(217, 119, 6, 0.15); color: #fbbf24; }
-.cardIcon.red { background: rgba(225, 29, 72, 0.15); color: #f87171; }
-
-.cardContent h2 { font-size: 24px; font-weight: 700; color: var(--text-primary); }
-.cardContent span { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-.cardContent small { font-size: 11px; color: var(--text-muted); }
-
-/* Tablolar */
-.vehicleSection {
-    background: var(--card-bg);
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    padding: 24px;
-    margin-bottom: 24px;
-}
-
-.sectionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.sectionHeader h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-.sectionHeader p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-
-.tableArea { overflow-x: auto; }
-
-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-
-th {
-    padding: 12px 16px;
-    background: var(--bg-main);
-    color: var(--text-secondary);
-    font-weight: 600;
-    border-bottom: 1px solid var(--border-color);
-}
-
-td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-}
-
-tr.rowDanger { background: rgba(225, 29, 72, 0.1); }
-
-/* Durum Rozetleri */
-.statusBadge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.statusBadge.healthy { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.statusBadge.needCharge { background: rgba(225, 29, 72, 0.15); color: #f87171; }
-
-.smallBatteryBadge {
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-.smallBatteryBadge.connected { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.smallBatteryBadge.disconnected { background: rgba(225, 29, 72, 0.15); color: #f87171; }
-
-/* Tablo Butonları */
-.tableButtons { display: flex; gap: 6px; }
-.tableButtons button {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.tableButtons button:hover { background: var(--border-color); }
-
-/* Bildirim Paneli */
-.notificationSection {
-    background: var(--card-bg);
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    padding: 20px;
-    margin-bottom: 24px;
-}
-
-.notificationCard {
-    padding: 12px 16px;
-    border-radius: 10px;
-    background: rgba(225, 29, 72, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(225, 29, 72, 0.2);
-    font-size: 13px;
-    margin-top: 10px;
-}
-
-/* Kaydırılabilir Modallar */
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-.modal.active { display: flex; }
-
-.modalContent {
-    background: var(--card-bg);
-    color: var(--text-primary);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 550px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--border-color);
-}
-
-.modalHeader {
-    padding: 20px 24px 14px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-}
-.modalHeader button { border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--text-muted); }
-
-.modalBody {
-    padding: 20px 24px;
-    overflow-y: auto;
-}
-
-.inputGroup {
-    margin-bottom: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.inputGroup.full { width: 100%; }
-.inputGroup label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
-.inputGroup input, .inputGroup select, .inputGroup textarea {
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-main);
-    color: var(--text-primary);
-    font-size: 13px;
-    outline: none;
-}
-
-.chargeInputsGroup {
-    background: var(--bg-main);
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px dashed var(--border-color);
-    margin-bottom: 14px;
-}
-
-.hidden { display: none !important; }
-
-.modalFooter {
-    padding: 14px 24px 20px 24px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    border-top: 1px solid var(--border-color);
-}
-
-.cancelButton {
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-primary);
-    cursor: pointer;
-}
-.saveButton {
-    padding: 10px 18px;
-    border-radius: 8px;
-    border: none;
-    background: var(--bmw-blue);
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* Detay Grid */
-.detailGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    background: var(--bg-main);
-    padding: 16px;
-    border-radius: 10px;
-}
-.detailGrid div span { display: block; font-size: 11px; color: var(--text-muted); }
-.detailGrid div strong { font-size: 13px; color: var(--text-primary); }
-
-.notesHistoryContainer {
-    max-height: 200px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.historyNoteItem {
-    background: var(--bg-main);
-    border-left: 3px solid var(--bmw-blue);
-    padding: 10px 12px;
-    border-radius: 6px;
-}
-
-.historyNoteItem .noteDate { font-size: 11px; font-weight: 700; color: var(--bmw-blue); }
-.historyNoteItem .noteText { font-size: 13px; color: var(--text-primary); }
-
-/* Özet Rapor */
-.summaryReportArea { font-size: 13px; line-height: 1.6; }
-.summaryReportCard {
-    background: var(--bg-main);
-    padding: 14px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    border: 1px solid var(--border-color);
-}
-
-/* Admin Özel Stilleri */
-.adminTabHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(139, 92, 246, 0.1);
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    font-size: 12px;
-}
-
-.adminCard {
-    background: var(--bg-main);
-    border: 1px solid var(--border-color);
-    padding: 14px;
-    border-radius: 10px;
-}
-.adminCard h3 { font-size: 14px; margin-bottom: 6px; }
-
-.adminLogList {
-    max-height: 220px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.adminLogItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-}
-
-/* Footer */
-.footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 16px 0;
-    color: var(--text-muted);
-    font-size: 12px;
-    border-top: 1px solid var(--border-color);
-    margin-top: 20px;
-}
-.mColorBadge { font-weight: 700; color: var(--bmw-blue); }
+window.clearAllData = function() {
+    if (confirm('DİKKAT! Sistemdeki TÜM araçlar, geçmiş notlar ve loglar tamamen silinecektir. Devam edilsin mi?')) {
+        vehicles = [];
+        saveVehicles();
+        render();
+        renderAdminDeletedList();
+        alert('Sistem tamamen sıfırlandı.');
+    }
+};
