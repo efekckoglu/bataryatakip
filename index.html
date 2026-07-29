@@ -37,11 +37,15 @@
             </div>
 
             <div class="headerRight">
+                <button id="summaryReportBtn" class="bmwBtnPrimary" style="background-color: #475569;" onclick="openSummaryReportModal()">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Özet İşlem Raporu</span>
+                </button>
                 <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="exportInventoryToExcel()">
                     <i class="fa-solid fa-file-excel"></i>
                     <span>Stok Excel Raporu İndir</span>
                 </button>
-                <button id="openVehicleModalHeader" class="bmwBtnPrimary">
+                <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
                     <i class="fa-solid fa-circle-plus"></i>
                     <span>Yeni Araç Ekle</span>
                 </button>
@@ -160,7 +164,7 @@
             <div class="modalContent">
                 <div class="modalHeader">
                     <h2 id="modalTitle">Yeni Araç Ekle</h2>
-                    <button id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="closeVehicleModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
                     <div class="inputGroup">
@@ -181,13 +185,23 @@
                         </select>
                     </div>
 
+                    <!-- AKÜ BAĞLANTISI GEREKİYOR MU SORUSU -->
+                    <div class="inputGroup">
+                        <label>Akü Bağlantısı Yapıldı mı / Gerekiyor mu? *</label>
+                        <select id="batteryRequired" onchange="toggleBatteryDateInputs()">
+                            <option value="no">Hayır (Gerekli Değil)</option>
+                            <option value="yes">Evet (Bağlantı Yapıldı)</option>
+                        </select>
+                    </div>
+
                     <!-- Otopark Seçildiğinde Görünür -->
-                    <div class="inputGroup" id="parkingDateGroup">
+                    <div class="inputGroup hidden" id="parkingDateGroup">
                         <label>Otoparka Çekilme Tarihi</label>
                         <input type="date" id="parkingDate">
                     </div>
 
-                    <div class="chargeInputsGroup">
+                    <!-- Akü Bağlantısı EVET seçildiğinde görünür -->
+                    <div class="chargeInputsGroup hidden" id="batteryDatesWrapper">
                         <div class="inputGroup">
                             <label>Büyük Akü Bağlanma Tarihi</label>
                             <input type="date" id="bigBatteryDate">
@@ -208,14 +222,13 @@
                     </div>
 
                     <div class="inputGroup full">
-                        <label>Yeni İşlem / Araç Notu Girin *</label>
+                        <label>Yeni İşlem / Araç Notu Girin</label>
                         <textarea id="vehicleNote" rows="2" placeholder="Yapılan işlemi veya durumu giriniz..."></textarea>
-                        <small style="color: var(--text-muted); font-size:11px;">Girilen her not tarih/saat damgasıyla geçmiş notlara eklenir.</small>
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" id="cancelVehicle">Vazgeç</button>
-                    <button class="saveButton" id="saveVehicle">
+                    <button class="cancelButton" onclick="closeVehicleModal()">Vazgeç</button>
+                    <button class="saveButton" onclick="handleSaveVehicle()">
                         <i class="fa-solid fa-floppy-disk"></i> Kaydet
                     </button>
                 </div>
@@ -227,7 +240,7 @@
             <div class="modalContent">
                 <div class="modalHeader">
                     <h2>Araç Detayı ve Geçmiş Notlar</h2>
-                    <button id="closeDetailModal"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="closeDetailModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
                     <div class="detailCard">
@@ -249,7 +262,23 @@
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" id="closeDetail">Kapat</button>
+                    <button class="cancelButton" onclick="closeDetailModal()">Kapat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÖZET İŞLEM RAPORU MODALI -->
+        <div class="modal" id="summaryReportModal">
+            <div class="modalContent">
+                <div class="modalHeader">
+                    <h2><i class="fa-solid fa-chart-pie"></i> Sistem Özet İşlem Raporu</h2>
+                    <button onclick="closeSummaryReportModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modalBody">
+                    <div id="summaryReportContent" class="summaryReportArea"></div>
+                </div>
+                <div class="modalFooter">
+                    <button class="cancelButton" onclick="closeSummaryReportModal()">Kapat</button>
                 </div>
             </div>
         </div>
