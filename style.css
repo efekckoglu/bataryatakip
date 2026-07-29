@@ -1,126 +1,136 @@
-/* BMW & İnciroğlu Modern Corporate Dark/Light Theme Styles */
-:root {
-    --bmw-blue: #1c69d4;
-    --bmw-dark-blue: #0653b6;
-    --m-red: #e11d48;
-    --m-light-blue: #00a0e9;
-    --m-dark-blue: #002244;
-    
-    --status-green: #10b981;
-    --status-green-bg: #d1fae5;
-    --status-yellow: #f59e0b;
-    --status-yellow-bg: #fef3c7;
-    --status-red: #ef4444;
-    --status-red-bg: #fee2e2;
+/* ==========================================================================
+   İNCİROĞLU BMW - STOK & AKÜ TAKİP SİSTEMİ STİL DOSYASI
+   ========================================================================== */
 
-    --bg-main: #f8fafc;
+:root {
+    /* BMW Brand & Theme Colors */
+    --bmw-blue: #0066b1;
+    --bmw-dark-blue: #003366;
+    --bmw-red: #e11d48;
+    --bmw-m-light-blue: #15803d;
+    
+    /* Status Colors */
+    --status-green: #10b981;
+    --status-green-bg: rgba(16, 185, 129, 0.12);
+    --status-yellow: #f59e0b;
+    --status-yellow-bg: rgba(245, 158, 11, 0.12);
+    --status-red: #ef4444;
+    --status-red-bg: rgba(239, 68, 68, 0.12);
+
+    /* Light Theme Defaults */
+    --bg-primary: #f8fafc;
     --bg-card: #ffffff;
-    --bg-header: #ffffff;
+    --bg-input: #f1f5f9;
     --text-primary: #0f172a;
     --text-secondary: #64748b;
     --border-color: #e2e8f0;
-    --table-hover: #f1f5f9;
-    --input-bg: #f8fafc;
-    --modal-bg: #ffffff;
-    --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --modal-overlay: rgba(15, 23, 42, 0.6);
 }
 
+/* Dark Theme Overrides */
 body.dark-theme {
-    --bg-main: #0f172a;
-    --bg-card: #1e293b;
-    --bg-header: #1e293b;
+    --bg-primary: #0b0f17;
+    --bg-card: #151c28;
+    --bg-input: #1e293b;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --border-color: #334155;
-    --table-hover: #334155;
-    --input-bg: #0f172a;
-    --modal-bg: #1e293b;
-    --shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
-    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --modal-overlay: rgba(0, 0, 0, 0.8);
 }
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
-    background-color: var(--bg-main);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding-bottom: 40px;
 }
 
+/* BMW M Stripe Top Bar */
 .bmw-m-stripe {
-    height: 4px;
+    height: 5px;
     width: 100%;
-    background: linear-gradient(90deg, #00a0e9 0%, #00a0e9 33%, #002244 33%, #002244 66%, #e11d48 66%, #e11d48 100%);
+    background: linear-gradient(90deg, #0066b1 0%, #0066b1 33%, #003366 33%, #003366 66%, #e11d48 66%, #e11d48 100%);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .container-fluid {
-    padding: 24px 32px;
-    max-width: 1600px;
+    max-width: 1440px;
     margin: 0 auto;
+    padding: 20px 24px;
 }
 
-/* Header */
+/* Header Component */
 .bmw-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-header);
+    background: var(--bg-card);
     padding: 20px 28px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
+    border-radius: 16px;
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
     margin-bottom: 24px;
     flex-wrap: wrap;
     gap: 16px;
 }
 
-.headerLeft {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
 .brandBadge {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .bmwLogoIcon {
-    font-size: 28px;
-    color: var(--bmw-blue);
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--bmw-blue), var(--bmw-dark-blue));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(0, 102, 177, 0.3);
 }
 
 .bmwSeriesTitle {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 2px;
-    color: var(--text-secondary);
+    color: var(--bmw-blue);
+    text-transform: uppercase;
 }
 
 .brandBadge h1 {
     font-size: 22px;
     font-weight: 700;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    line-height: 1.2;
 }
 
-.mTextColorful .c1 { color: #00a0e9; }
-.mTextColorful .c2 { color: #002244; }
+.mTextColorful .c1 { color: #0066b1; }
+.mTextColorful .c2 { color: #003366; }
 .mTextColorful .c3 { color: #e11d48; }
 
 .headerSubtitle {
     font-size: 13px;
     color: var(--text-secondary);
+    margin-top: 4px;
 }
 
 .headerRight {
@@ -130,77 +140,67 @@ body {
     flex-wrap: wrap;
 }
 
-.themeToggleBtn {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    cursor: pointer;
+.todayDate {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    background: var(--bg-input);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Button Styles */
+.bmwBtnPrimary, .bmwBtnSecondary, .themeToggleBtn {
+    border: none;
+    outline: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.bmwBtnPrimary {
+    background-color: var(--bmw-blue);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 102, 177, 0.25);
+}
+
+.bmwBtnPrimary:hover {
+    background-color: #00528e;
+    transform: translateY(-1px);
+}
+
+.bmwBtnSecondary {
+    background-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.bmwBtnSecondary:hover {
+    background-color: #0d9668;
+    transform: translateY(-1px);
+}
+
+.themeToggleBtn {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    padding: 10px 14px;
     font-size: 16px;
-    transition: all 0.2s;
 }
 
 .themeToggleBtn:hover {
     background-color: var(--border-color);
 }
 
-.bmwBtnPrimary {
-    background-color: var(--bmw-blue);
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-}
-
-.bmwBtnPrimary:hover {
-    background-color: var(--bmw-dark-blue);
-}
-
-.bmwBtnSecondary {
-    background-color: #10b981;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-}
-
-.bmwBtnSecondary:hover {
-    background-color: #059669;
-}
-
-.todayDate {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background-color: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-
-/* Dashboard Cards */
+/* Dashboard Summary Cards */
 .dashboardCards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -209,48 +209,49 @@ body {
 }
 
 .card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
+    background: var(--bg-card);
+    border-radius: 14px;
     padding: 20px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .cardIcon {
     width: 52px;
     height: 52px;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
 }
 
-.cardIcon.blue { background-color: rgba(28, 105, 212, 0.15); color: var(--bmw-blue); }
-.cardIcon.green { background-color: rgba(16, 185, 129, 0.15); color: var(--status-green); }
-.cardIcon.yellow { background-color: rgba(245, 158, 11, 0.15); color: var(--status-yellow); }
-.cardIcon.red { background-color: rgba(239, 68, 68, 0.15); color: var(--status-red); }
+.cardIcon.blue { background: rgba(0, 102, 177, 0.12); color: var(--bmw-blue); }
+.cardIcon.green { background: rgba(16, 185, 129, 0.12); color: var(--status-green); }
+.cardIcon.yellow { background: rgba(245, 158, 11, 0.12); color: var(--status-yellow); }
+.cardIcon.red { background: rgba(239, 68, 68, 0.12); color: var(--status-red); }
 
 .cardContent span {
     font-size: 12px;
+    font-weight: 600;
     color: var(--text-secondary);
-    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .cardContent h2 {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.1;
-    margin: 4px 0;
+    margin: 2px 0;
 }
 
 .cardContent small {
@@ -258,13 +259,17 @@ body {
     color: var(--text-secondary);
 }
 
-/* Tables Section */
+.border-green { border-left: 4px solid var(--status-green); }
+.border-yellow { border-left: 4px solid var(--status-yellow); }
+.border-red { border-left: 4px solid var(--status-red); }
+
+/* Section & Table Styling */
 .vehicleSection {
-    background-color: var(--bg-card);
+    background: var(--bg-card);
+    border-radius: 16px;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
     padding: 24px;
-    box-shadow: var(--shadow);
     margin-bottom: 28px;
 }
 
@@ -277,7 +282,7 @@ body {
 
 .sectionHeader h2 {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -290,6 +295,7 @@ body {
 }
 
 .tableArea {
+    width: 100%;
     overflow-x: auto;
 }
 
@@ -297,32 +303,32 @@ table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    font-size: 13px;
+    font-size: 13.5px;
 }
 
 th {
-    padding: 12px 16px;
-    background-color: var(--input-bg);
+    background-color: var(--bg-input);
     color: var(--text-secondary);
     font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
 }
 
 td {
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-color);
-    color: var(--text-primary);
     vertical-align: middle;
 }
 
-tr:hover {
-    background-color: var(--table-hover);
+tbody tr:hover {
+    background-color: rgba(0, 102, 177, 0.03);
 }
 
-/* Status Badges */
+/* Badges & Statuses */
 .badge {
     padding: 5px 10px;
     border-radius: 20px;
@@ -330,89 +336,125 @@ tr:hover {
     font-weight: 600;
     display: inline-flex;
     align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.badge-green { background: var(--status-green-bg); color: var(--status-green); }
+.badge-yellow { background: var(--status-yellow-bg); color: #d97706; }
+.badge-red { background: var(--status-red-bg); color: var(--status-red); }
+.badge-blue { background: rgba(0, 102, 177, 0.12); color: var(--bmw-blue); }
+
+.badge-stok { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-konsinye { background: rgba(147, 51, 234, 0.1); color: #9333ea; border: 1px solid rgba(147, 51, 234, 0.2); }
+
+/* Table Action Buttons */
+.actionBtns {
+    display: flex;
     gap: 6px;
 }
 
-.badge-green { background-color: var(--status-green-bg); color: #065f46; }
-.badge-yellow { background-color: var(--status-yellow-bg); color: #92400e; }
-.badge-red { background-color: var(--status-red-bg); color: #991b1b; }
-
-.actionBtns {
-    display: flex;
-    gap: 8px;
-}
-
-.btnAction {
-    background: none;
-    border: 1px solid var(--border-color);
+.tblBtn {
+    border: none;
+    background: var(--bg-input);
     color: var(--text-primary);
-    padding: 6px 10px;
-    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: 12px;
     transition: all 0.2s;
+    font-size: 13px;
 }
 
-.btnAction:hover {
-    background-color: var(--border-color);
+.tblBtn:hover {
+    background: var(--bmw-blue);
+    color: #ffffff;
 }
 
-/* Notifications */
+.tblBtn.delete:hover {
+    background: var(--status-red);
+    color: #ffffff;
+}
+
+/* Notification Section */
 .notificationSection {
-    background-color: var(--bg-card);
+    background: var(--bg-card);
+    border-radius: 16px;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
     padding: 24px;
-    box-shadow: var(--shadow);
     margin-bottom: 28px;
 }
 
-.notificationCard {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background-color: var(--input-bg);
+.notificationGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+.notifItem {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--bg-input);
     border-left: 4px solid var(--status-red);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.notificationCard.warning {
-    border-left-color: var(--status-yellow);
+.notifItem h4 {
+    font-size: 14px;
+    font-weight: 700;
 }
 
-.notificationCard.info {
-    border-left-color: var(--bmw-blue);
+.notifItem p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
 }
 
-/* Modal */
+/* Modal Styling */
 .modal {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    z-index: 1000;
+    width: 100vw;
+    height: 100vh;
+    background: var(--modal-overlay);
+    backdrop-filter: blur(4px);
+    display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
 }
 
 .modal.active {
-    display: flex;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .modalContent {
-    background-color: var(--modal-bg);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 520px;
-    box-shadow: var(--shadow-lg);
+    background: var(--bg-card);
+    width: 90%;
+    max-width: 580px;
+    border-radius: 18px;
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.25s ease;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal.active .modalContent {
+    transform: translateY(0);
 }
 
 .modalHeader {
@@ -424,29 +466,44 @@ tr:hover {
 }
 
 .modalHeader h2 {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 700;
 }
 
 .modalHeader button {
     background: none;
     border: none;
-    font-size: 18px;
     color: var(--text-secondary);
+    font-size: 18px;
     cursor: pointer;
 }
 
 .modalBody {
     padding: 20px 24px;
-    max-height: 75vh;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
+.modalFooter {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: var(--bg-primary);
+}
+
+/* Form Inputs */
 .inputGroup {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-bottom: 14px;
+}
+
+.inputGroup.full {
+    grid-column: 1 / -1;
 }
 
 .inputGroup label {
@@ -456,65 +513,115 @@ tr:hover {
 }
 
 .inputGroup input, .inputGroup select, .inputGroup textarea {
-    padding: 10px 12px;
-    border-radius: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
-    background-color: var(--input-bg);
+    background-color: var(--bg-input);
     color: var(--text-primary);
-    font-size: 13px;
+    font-size: 13.5px;
     outline: none;
+    transition: border-color 0.2s;
 }
 
 .inputGroup input:focus, .inputGroup select:focus, .inputGroup textarea:focus {
     border-color: var(--bmw-blue);
 }
 
-.modalFooter {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
+.chargeInputsGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
-}
-
-.cancelButton {
-    background: none;
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 9px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.saveButton {
-    background-color: var(--bmw-blue);
-    color: white;
-    border: none;
-    padding: 9px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
 }
 
 .hidden {
     display: none !important;
 }
 
-.adminActionBox {
-    background-color: var(--input-bg);
+/* Cancel / Save Buttons */
+.cancelButton {
+    background: transparent;
     border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 9px 18px;
     border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.saveButton {
+    background: var(--bmw-blue);
+    border: none;
+    color: #ffffff;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Details & Notes History */
+.detailGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    background: var(--bg-input);
     padding: 16px;
-    margin-bottom: 16px;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.detailGrid span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.detailGrid strong {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.notesHistoryContainer {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.noteItemCard {
+    background: var(--bg-input);
+    padding: 10px 14px;
+    border-radius: 8px;
+    border-left: 3px solid var(--bmw-blue);
+    font-size: 12.5px;
+}
+
+.noteItemHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+/* Admin Actions Box */
+.adminActionBox {
+    background: var(--bg-input);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
 }
 
 .adminActionBox h4 {
     font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .adminActionBox p {
@@ -523,81 +630,51 @@ tr:hover {
 }
 
 .adminActionBox.danger {
-    border-left: 4px solid var(--status-red);
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.05);
 }
 
-.detailCard {
-    background-color: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 16px;
+/* Excel Import Drop Zone */
+.excelDropZone {
+    border: 2px dashed var(--bmw-blue);
+    background: rgba(0, 102, 177, 0.04);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.detailGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+.excelDropZone:hover {
+    background: rgba(0, 102, 177, 0.08);
+}
+
+/* Footer */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
     font-size: 12px;
-}
-
-.detailGrid span {
     color: var(--text-secondary);
-    display: block;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.detailGrid strong {
-    font-size: 13px;
-    color: var(--text-primary);
-}
-
-.notesHistoryContainer {
-    max-height: 180px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
-    background-color: var(--input-bg);
-}
-
-.noteItem {
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--border-color);
-    font-size: 12px;
-}
-
-.noteItem:last-child {
-    border-bottom: none;
-}
-
-.noteDate {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-bottom: 2px;
-}
-
-.summaryReportArea {
-    font-size: 12px;
-    color: var(--text-primary);
+.mColorBadge {
+    color: var(--bmw-blue);
+    font-weight: 700;
 }
 
 .adminLink {
     color: var(--text-secondary);
     text-decoration: none;
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: 600;
+    transition: color 0.2s;
 }
 
 .adminLink:hover {
     color: var(--bmw-blue);
-}
-
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 0;
-    border-top: 1px solid var(--border-color);
-    margin-top: 20px;
-    font-size: 12px;
-    color: var(--text-secondary);
 }
