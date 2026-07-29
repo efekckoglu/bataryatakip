@@ -7,24 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İnciroğlu BMW | Akü Takip Sistemi</title>
 
-    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
-    <!-- SheetJS (Excel Export) -->
+    
+    <!-- SheetJS Excel Kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="light-theme">
 
-    <!-- BMW M Stripe Top Accent -->
     <div class="bmw-m-stripe"></div>
 
     <main class="mainContent container-fluid">
@@ -33,21 +27,19 @@
         <header class="bmw-header">
             <div class="headerLeft">
                 <div class="brandBadge">
-                    <div class="bmwLogoIcon">
-                        <i class="fa-solid fa-car-side"></i>
-                    </div>
+                    <div class="bmwLogoIcon"><i class="fa-solid fa-car-side"></i></div>
                     <div>
                         <div class="bmwSeriesTitle">İNCİROĞLU BMW</div>
                         <h1>BMW | MINI Akü Takip <span class="mTextColorful"><span class="c1">/</span><span class="c2">/</span><span class="c3">M</span></span></h1>
                     </div>
                 </div>
-                <p class="headerSubtitle">Showroom ve Stok Araçları Şarj & Akü Operasyon Paneli</p>
+                <p class="headerSubtitle">Showroom ve Otopark Araçları Akü Takip ve Kontrol Paneli</p>
             </div>
 
             <div class="headerRight">
-                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="exportAuditLogToExcel()">
+                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="exportInventoryToExcel()">
                     <i class="fa-solid fa-file-excel"></i>
-                    <span>İşlem Geçmişi Excel (XLSX)</span>
+                    <span>Canlı Envanter Excel (XLSX)</span>
                 </button>
                 <button id="openVehicleModalHeader" class="bmwBtnPrimary">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -60,46 +52,63 @@
             </div>
         </header>
 
-        <!-- Dashboard Cards -->
+        <!-- Dashboard Kartları -->
         <section class="dashboardCards">
             <div class="card">
                 <div class="cardIcon blue"><i class="fa-solid fa-car"></i></div>
                 <div class="cardContent">
                     <span>Toplam Araç</span>
                     <h2 id="totalVehicle">0</h2>
-                    <small>Sistemde kayıtlı</small>
+                    <small>Showroom + Otopark</small>
                 </div>
             </div>
 
             <div class="card border-green">
-                <div class="cardIcon green"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="cardIcon green"><i class="fa-solid fa-store"></i></div>
                 <div class="cardContent">
-                    <span>Sağlıklı</span>
-                    <h2 id="normalVehicle">0</h2>
-                    <small>Şarj durumu iyi</small>
+                    <span>Showroom Araçları</span>
+                    <h2 id="showroomCount">0</h2>
+                    <small>Teşhir Alanında</small>
+                </div>
+            </div>
+
+            <div class="card border-yellow">
+                <div class="cardIcon yellow"><i class="fa-solid fa-warehouse"></i></div>
+                <div class="cardContent">
+                    <span>Otopark Araçları</span>
+                    <h2 id="parkingCount">0</h2>
+                    <small>Stok Alanında</small>
                 </div>
             </div>
 
             <div class="card border-red">
-                <div class="cardIcon red"><i class="fa-solid fa-battery-quarter"></i></div>
+                <div class="cardIcon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
                 <div class="cardContent">
-                    <span>Şarj Gerekli</span>
+                    <span>Akü İkazlı Araçlar</span>
                     <h2 id="dangerVehicle">0</h2>
-                    <small>HV %20 Altı veya Şarj İstiyor</small>
+                    <small>Acil Müdahale</small>
                 </div>
             </div>
         </section>
 
-        <!-- Araç Listesi -->
+        <!-- UYARI VE BİLDİRİMLER -->
+        <section class="notificationSection">
+            <div class="sectionHeader">
+                <div>
+                    <h2>Akü İkazları & Bildirimler</h2>
+                    <p>Büyük akü (>5 gün / Otopark >7 gün) ve küçük akü bağlanma uyarıları</p>
+                </div>
+            </div>
+            <div id="notificationArea"></div>
+        </section>
+
+        <!-- 1. SHOWROOM ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
-                    <h2>İnciroğlu Stok Araç Listesi</h2>
-                    <p>BMW & MINI araçlarının anlık batarya ve şarj durumları</p>
+                    <h2><i class="fa-solid fa-store" style="color: var(--bmw-blue);"></i> Showroom Araç Listesi</h2>
+                    <p>Sergilenen araçların büyük ve küçük akü durumları</p>
                 </div>
-                <button id="newVehicleButton" class="bmwBtnPrimary">
-                    <i class="fa-solid fa-plus"></i> Yeni Araç
-                </button>
             </div>
 
             <div class="tableArea">
@@ -108,32 +117,47 @@
                         <tr>
                             <th>Şase No (VIN)</th>
                             <th>Model</th>
-                            <th>Şarj İhtiyacı</th>
-                            <th>Büyük Akü (HV)</th>
-                            <th>Küçük Akü (12V)</th>
-                            <th>Sisteme Kayıt Tarihi</th>
+                            <th>Akü Bağlantısı</th>
+                            <th>Büyük Akü Tarihi</th>
+                            <th>Büyük Akü Süre</th>
+                            <th>Küçük Akü Durumu</th>
+                            <th>Kayıt Tarihi</th>
                             <th>İşlem</th>
                         </tr>
                     </thead>
-                    <tbody id="vehicleTable">
-                        <!-- JS ile doldurulacak -->
-                    </tbody>
+                    <tbody id="showroomTableBody"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Bildirimler -->
-        <section class="notificationSection">
+        <!-- 2. OTOPARK ARAÇ LİSTESİ -->
+        <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
-                    <h2>Akü & Şarj Uyarıları</h2>
-                    <p>Acil müdahale gerektiren araçlar</p>
+                    <h2><i class="fa-solid fa-warehouse" style="color: var(--status-yellow);"></i> Otopark / Stok Araç Listesi</h2>
+                    <p>Otoparkta bekleyen araçların haftalık kontrol durumları</p>
                 </div>
             </div>
-            <div id="notificationArea"></div>
+
+            <div class="tableArea">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Şase No (VIN)</th>
+                            <th>Model</th>
+                            <th>Akü Bağlantısı</th>
+                            <th>Büyük Akü Tarihi</th>
+                            <th>Geçen Süre</th>
+                            <th>Kayıt Tarihi</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parkingTableBody"></tbody>
+                </table>
+            </div>
         </section>
 
-        <!-- Modal: Araç Ekle / Düzenle -->
+        <!-- MODAL: YENİ ARAÇ EKLE / DÜZENLE -->
         <div class="modal" id="vehicleModal">
             <div class="modalContent">
                 <div class="modalHeader">
@@ -142,61 +166,72 @@
                 </div>
                 <div class="modalBody">
                     <div class="inputGroup">
-                        <label>Araç Şase No (VIN) *</label>
+                        <label>Şase No (VIN) *</label>
                         <input type="text" id="vehicleChassis" placeholder="WBAXXXXXXXXXXXXXXX">
                     </div>
 
                     <div class="inputGroup">
-                        <label>Araç Modeli *</label>
-                        <input type="text" id="vehicleModel" placeholder="BMW i4 M50 / MINI Cooper EV">
+                        <label>Marka & Model *</label>
+                        <input type="text" id="vehicleModel" placeholder="BMW i4 M50 / MINI Cooper">
                     </div>
 
-                    <!-- Şarj İhtiyacı Sorusu -->
-                    <div class="inputGroup full">
-                        <label>Şarj İhtiyacı Var mı?</label>
-                        <select id="needsChargeSelect" onchange="toggleChargeInputs()">
-                            <option value="no">Hayır (Şarj Gerekmiyor / Sağlıklı)</option>
-                            <option value="yes">Evet (Şarj İhtiyacı Var)</option>
+                    <div class="inputGroup">
+                        <label>Araç Konumu *</label>
+                        <select id="vehicleLocation" onchange="toggleSmallBatteryOption()">
+                            <option value="showroom">Showroom</option>
+                            <option value="parking">Otopark / Stok</option>
                         </select>
                     </div>
 
-                    <!-- Şarj İhtiyacı Evetse Açılan Alanlar -->
-                    <div id="chargeInputsContainer" class="chargeInputsGroup hidden">
+                    <div class="inputGroup">
+                        <label>Akü Bağlantısı Gerekiyor mu? *</label>
+                        <select id="needsBatterySelect" onchange="toggleBatteryDatesGroup()">
+                            <option value="no">Hayır</option>
+                            <option value="yes">Evet</option>
+                        </select>
+                    </div>
+
+                    <!-- Evet Seçildiğinde Açılan Tarih Ve Durum Giriş Alanları -->
+                    <div id="batteryDatesGroup" class="chargeInputsGroup hidden">
                         <div class="inputGroup">
-                            <label>Büyük Akü Şarj Seviyesi (% SOC)</label>
-                            <input type="number" id="batterySoc" min="0" max="100" placeholder="Örn: 15 (%20 altı kırmızı uyarır)">
+                            <label>Büyük Akü Bağlanma Tarihi</label>
+                            <input type="date" id="bigBatteryDate">
                         </div>
 
-                        <div class="inputGroup">
-                            <label>Küçük Akü Durumu (12V)</label>
-                            <select id="smallBatteryStatus">
-                                <option value="connected">Bağlı (Yeşil)</option>
-                                <option value="disconnected">Bağlı Değil (Kırmızı)</option>
+                        <div class="inputGroup" id="smallBatteryDateGroup">
+                            <label>Küçük Akü Bağlanma Tarihi</label>
+                            <input type="date" id="smallBatteryDate">
+                        </div>
+
+                        <div class="inputGroup" id="smallBatteryStatusGroup">
+                            <label>Küçük Akü Bağlantı Durumu (Showroom)</label>
+                            <select id="smallBatteryConnected">
+                                <option value="yes">Bağlı (Yeşil)</option>
+                                <option value="no">Bağlı Değil (Kırmızı)</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Düzenleme Sırasında Görünür Olacak Oluşturulma Tarihi -->
                     <div class="inputGroup full hidden" id="createdAtGroup">
-                        <label>Sisteme Kayıt Tarihi ve Saati</label>
-                        <input type="text" id="vehicleCreatedAtDisplay" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                        <label>Sisteme Kayıt Tarihi</label>
+                        <input type="text" id="vehicleCreatedAtDisplay" readonly style="background: #f1f5f9;">
                     </div>
 
                     <div class="inputGroup full">
                         <label>Araç Notu</label>
-                        <textarea id="vehicleNote" rows="3" placeholder="Lokasyon veya özel not ekleyin..."></textarea>
+                        <textarea id="vehicleNote" rows="2" placeholder="Not ekleyebilirsiniz..."></textarea>
                     </div>
                 </div>
                 <div class="modalFooter">
                     <button class="cancelButton" id="cancelVehicle">Vazgeç</button>
                     <button class="saveButton" id="saveVehicle">
-                        <i class="fa-solid fa-floppy-disk"></i> Aracı Kaydet
+                        <i class="fa-solid fa-floppy-disk"></i> Kaydet
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Detay Modalı -->
+        <!-- DETAY MODALI -->
         <div class="modal" id="detailModal">
             <div class="modalContent">
                 <div class="modalHeader">
@@ -208,13 +243,15 @@
                         <div class="detailGrid">
                             <div><span>Şase No</span><strong id="detailChassis">-</strong></div>
                             <div><span>Model</span><strong id="detailModel">-</strong></div>
-                            <div><span>Şarj Durumu</span><strong id="detailNeed">-</strong></div>
-                            <div><span>Kayıt Tarihi</span><strong id="detailCreated">-</strong></div>
+                            <div><span>Konum</span><strong id="detailLocation">-</strong></div>
+                            <div><span>Akü Bağlantısı</span><strong id="detailNeeds">-</strong></div>
+                            <div><span>Büyük Akü Tarihi</span><strong id="detailBigDate">-</strong></div>
+                            <div><span>Küçük Akü Tarihi</span><strong id="detailSmallDate">-</strong></div>
                         </div>
                     </div>
-                    <div class="historyCard" style="margin-top: 15px;">
-                        <h3>Araç Notu</h3>
-                        <p id="detailNoteText" style="color: #475569; font-size: 14px;">-</p>
+                    <div style="margin-top: 15px;">
+                        <strong>Araç Notu:</strong>
+                        <p id="detailNoteText" style="color: #475569; margin-top: 5px;">-</p>
                     </div>
                 </div>
                 <div class="modalFooter">
@@ -223,11 +260,9 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="footerLeft">
                 <strong>İnciroğlu BMW Akü Takip Paneli</strong>
-                <span>© 2026 Tüm Hakları Saklıdır</span>
             </div>
             <div class="footerRight">
                 <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
