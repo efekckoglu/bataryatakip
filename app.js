@@ -1,5 +1,5 @@
 /* ==========================================================================
-   İnciroğlu BMW | Stok & Akü Takip JS Engine (Kalıcı Log & Konsinye Entegreli)
+   İnciroğlu BMW | Stok & Akü Takip JS Engine (Admin & Tema Destekli)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +11,7 @@ const defaultVehicles = [
         id: '1',
         chassis: 'WBA11AB000XXXX123',
         model: 'BMW i4 M50',
-        ownership: 'stok', // stok veya konsinye
+        ownership: 'stok',
         location: 'showroom',
         batteryRequired: 'yes',
         bigBatteryDate: getDaysAgoDate(6),
@@ -20,21 +20,58 @@ const defaultVehicles = [
         parkingDate: '',
         isDeleted: false,
         notesHistory: [
-            { date: '28.07.2026 09:00', rawDate: '2026-07-28', note: 'Showroom sergi alanına alındı.' },
-            { date: '28.07.2026 14:20', rawDate: '2026-07-28', note: 'Büyük akü şarja bağlandı.' }
+            { id: 'n1', date: '28.07.2026 09:00', rawDate: '2026-07-28', note: 'Showroom sergi alanına alındı.' },
+            { id: 'n2', date: '28.07.2026 14:20', rawDate: '2026-07-28', note: 'Büyük akü şarja bağlandı.' }
         ]
     }
 ];
 
 let vehicles = [];
 let editingVehicleId = null;
+let isAdminLoggedIn = false;
 
 function initApp() {
+    loadTheme();
     loadVehicles();
     updateTodayDate();
     render();
 }
 
+/* TEMA İŞLEMLERİ (KOYU / BEYAZ) */
+function loadTheme() {
+    const savedTheme = localStorage.getItem('inciroglu_theme') || 'light';
+    const body = document.getElementById('appBody');
+    const icon = document.getElementById('themeIcon');
+    
+    if (savedTheme === 'dark') {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+        if (icon) icon.className = 'fa-solid fa-sun';
+    } else {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        if (icon) icon.className = 'fa-solid fa-moon';
+    }
+}
+
+window.toggleTheme = function() {
+    const body = document.getElementById('appBody');
+    const icon = document.getElementById('themeIcon');
+    
+    if (body.classList.contains('light-theme')) {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+        if (icon) icon.className = 'fa-solid fa-sun';
+        localStorage.setItem('inciroglu_theme', 'dark');
+    } else {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        if (icon) icon.className = 'fa-solid fa-moon';
+        localStorage.setItem('inciroglu_theme', 'light');
+    }
+};
+
+/* YARDIMCI TARIH VE FORMAT FONKSİYONLARI */
 function getDaysAgoDate(days) {
     const d = new Date();
     d.setDate(d.getDate() - days);
@@ -74,7 +111,7 @@ function getCurrentISOShortDate() {
 }
 
 function loadVehicles() {
-    const saved = localStorage.getItem('inciroglu_bmw_v5_vehicles');
+    const saved = localStorage.getItem('inciroglu_bmw_v6_vehicles');
     if (saved) {
         try { vehicles = JSON.parse(saved); } catch (e) { vehicles = defaultVehicles; }
     } else {
@@ -84,7 +121,7 @@ function loadVehicles() {
 }
 
 function saveVehicles() {
-    localStorage.setItem('inciroglu_bmw_v5_vehicles', JSON.stringify(vehicles));
+    localStorage.setItem('inciroglu_bmw_v6_vehicles', JSON.stringify(vehicles));
 }
 
 window.toggleBatteryDateInputs = function() {
@@ -121,7 +158,6 @@ function render() {
     renderNotifications();
 }
 
-// 1. SHOWROOM TABLOSU (Sadece Silinmemiş / Aktif Araçlar)
 function renderShowroomTable() {
     const body = document.getElementById('showroomTableBody');
     if (!body) return;
@@ -171,7 +207,6 @@ function renderShowroomTable() {
     });
 }
 
-// 2. OTOPARK TABLOSU (Sadece Silinmemiş / Aktif Araçlar)
 function renderParkingTable() {
     const body = document.getElementById('parkingTableBody');
     if (!body) return;
@@ -263,7 +298,7 @@ function renderNotifications() {
 
     if (notifications.length === 0) {
         area.innerHTML = `
-            <div style="background: #dcfce7; color: #15803d; padding: 12px 16px; border-radius: 10px; font-size: 13px;">
+            <div style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 12px 16px; border-radius: 10px; font-size: 13px;">
                 <i class="fa-solid fa-circle-check"></i> İkaz gerektiren bir araç bulunmuyor. Tüm akü durumları stabil.
             </div>
         `;
@@ -324,7 +359,7 @@ window.handleSaveVehicle = function() {
 
     const timeStamp = getCurrentDateTimeFormatted();
     const rawDate = getCurrentISOShortDate();
-    const newNoteObj = noteText ? { date: timeStamp, rawDate: rawDate, note: noteText } : null;
+    const newNoteObj = noteText ? { id: Date.now().toString(), date: timeStamp, rawDate: rawDate, note: noteText } : null;
 
     if (editingVehicleId) {
         const index = vehicles.findIndex(v => v.id === editingVehicleId);
@@ -349,7 +384,7 @@ window.handleSaveVehicle = function() {
     } else {
         const history = newNoteObj 
             ? [newNoteObj] 
-            : [{ date: timeStamp, rawDate: rawDate, note: 'Sisteme yeni araç kaydı oluşturuldu.' }];
+            : [{ id: Date.now().toString(), date: timeStamp, rawDate: rawDate, note: 'Sisteme yeni araç kaydı oluşturuldu.' }];
 
         const newVehicle = {
             id: Date.now().toString(),
@@ -398,12 +433,11 @@ window.editVehicle = function(id) {
     if (modal) modal.classList.add('active');
 };
 
-// ARAÇ SİLME (TAMAMEN SİLMEZ, SİLİNDİ OLARAK İŞARETLER VE LOG TUTAR)
 window.deleteVehicle = function(id) {
     const vehicle = vehicles.find(v => v.id === id);
     if (!vehicle) return;
 
-    if (confirm(`${vehicle.model} (${vehicle.chassis}) silinecek. Raporlarda kalıcı geçmiş olarak tutulacaktır. Onaylıyor musunuz?`)) {
+    if (confirm(`${vehicle.model} (${vehicle.chassis}) silinecek. Özet raporda [SİLİNDİ] olarak saklanacaktır.`)) {
         vehicle.isDeleted = true;
         
         const timeStamp = getCurrentDateTimeFormatted();
@@ -411,6 +445,7 @@ window.deleteVehicle = function(id) {
         
         if (!vehicle.notesHistory) vehicle.notesHistory = [];
         vehicle.notesHistory.unshift({
+            id: Date.now().toString(),
             date: timeStamp,
             rawDate: rawDate,
             note: '🚨 [SİSTEM SİLME İŞLEMİ] Araç aktif stok listesinden kaldırıldı.'
@@ -460,7 +495,6 @@ window.closeDetailModal = function() {
     if (modal) modal.classList.remove('active');
 };
 
-// ÖZET İŞLEM RAPORU MODALI (SİLİNEN ARAÇLAR DAHİL HEPSİ)
 window.openSummaryReportModal = function() {
     const container = document.getElementById('summaryReportContent');
     if (!container) return;
@@ -478,19 +512,19 @@ window.openSummaryReportModal = function() {
             <p>• Silinen / Arşivdeki Araç Sayısı: <strong>${deletedCount}</strong></p>
             <p>• Sistemde Kayıtlı Toplam İşlem Log Sayısı: <strong>${totalNotes}</strong></p>
         </div>
-        <hr style="margin: 15px 0; border:0; border-top:1px solid #e2e8f0;">
+        <hr style="margin: 15px 0; border:0; border-top:1px solid var(--border-color);">
         <h4><i class="fa-solid fa-history"></i> Bütün Araç Geçmişi & Yapılan İşlemler</h4>
     `;
 
     vehicles.forEach(v => {
         const deletedBadge = v.isDeleted 
-            ? `<span style="background:#ffe4e6; color:#e11d48; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">SİLİNDİ</span>` 
-            : `<span style="background:#dcfce7; color:#16a34a; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">AKTİF</span>`;
+            ? `<span style="background:rgba(225, 29, 72, 0.15); color:#e11d48; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">SİLİNDİ</span>` 
+            : `<span style="background:rgba(16, 185, 129, 0.15); color:#10b981; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">AKTİF</span>`;
 
         const ownershipBadge = (v.ownership === 'konsinye') ? ' [KONSİNYE]' : ' [STOK]';
 
         html += `
-            <div style="margin-top:12px; padding:10px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+            <div style="margin-top:12px; padding:10px; background:var(--bg-main); border-radius:8px; border:1px solid var(--border-color);">
                 <strong style="color:var(--bmw-blue);">${v.model} (${v.chassis})</strong> ${ownershipBadge} - <em>${v.location.toUpperCase()}</em> ${deletedBadge}
                 <div style="font-size:12px; margin-top:6px;">
         `;
@@ -512,7 +546,7 @@ window.closeSummaryReportModal = function() {
     document.getElementById('summaryReportModal').classList.remove('active');
 };
 
-// TARİHLİ EXCEL RAPORU MODAL İŞLEMLERİ
+/* EXCEL MODAL İŞLEMLERİ */
 window.openExcelFilterModal = function() {
     const today = getCurrentISOShortDate();
     document.getElementById('excelStartDate').value = getDaysAgoDate(30);
@@ -524,7 +558,6 @@ window.closeExcelFilterModal = function() {
     document.getElementById('excelFilterModal').classList.remove('active');
 };
 
-// BELİRLİ TARİH ARALIĞINDAKİ İŞLEMLERİ VE SİLİNENLERİ EXCEL'E DÖKME
 window.exportInventoryToExcelWithDates = function() {
     const startDate = document.getElementById('excelStartDate').value;
     const endDate = document.getElementById('excelEndDate').value;
@@ -538,8 +571,6 @@ window.exportInventoryToExcelWithDates = function() {
 
     vehicles.forEach(v => {
         const historyList = v.notesHistory || [];
-        
-        // Seçilen tarih aralığına uyan loglar
         const filteredLogs = historyList.filter(h => {
             if (!h.rawDate) return true;
             return h.rawDate >= startDate && h.rawDate <= endDate;
@@ -574,4 +605,102 @@ window.exportInventoryToExcelWithDates = function() {
     XLSX.writeFile(workbook, fileName);
 
     closeExcelFilterModal();
+};
+
+/* ==========================================================================
+   ADMIN PANELİ MANTIĞI & KALICI SİLME YÖNETİMİ
+   ========================================================================== */
+
+window.openAdminModal = function() {
+    document.getElementById('adminModal').classList.add('active');
+    if (isAdminLoggedIn) {
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderAdminDeletedList();
+    } else {
+        document.getElementById('adminLoginForm').classList.remove('hidden');
+        document.getElementById('adminDashboard').classList.add('hidden');
+    }
+};
+
+window.closeAdminModal = function() {
+    document.getElementById('adminModal').classList.remove('active');
+};
+
+window.handleAdminLogin = function() {
+    const password = document.getElementById('adminPasswordInput').value;
+    if (password === 'admin123') { // Varsayılan Şifre
+        isAdminLoggedIn = true;
+        document.getElementById('adminPasswordInput').value = '';
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderAdminDeletedList();
+    } else {
+        alert('Hatalı Admin Şifresi! (Varsayılan: admin123)');
+    }
+};
+
+window.handleAdminLogout = function() {
+    isAdminLoggedIn = false;
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+    document.getElementById('adminDashboard').classList.add('hidden');
+};
+
+function renderAdminDeletedList() {
+    const container = document.getElementById('adminDeletedVehiclesList');
+    if (!container) return;
+
+    const deletedVehicles = vehicles.filter(v => v.isDeleted);
+
+    if (deletedVehicles.length === 0) {
+        container.innerHTML = `<div style="padding:10px; color:var(--text-muted); font-size:12px;">Silinmiş araç veya işlem kaydı bulunmuyor.</div>`;
+        return;
+    }
+
+    let html = '';
+    deletedVehicles.forEach(v => {
+        html += `
+            <div class="adminLogItem">
+                <div>
+                    <strong>${v.model} (${v.chassis})</strong>
+                    <div style="font-size:11px; color:var(--text-muted);">Mülkiyet: ${v.ownership.toUpperCase()} | Konum: ${v.location.toUpperCase()}</div>
+                </div>
+                <button class="cancelButton" style="color:#ef4444; border-color:#fca5a5; font-size:11px;" onclick="permanentlyDeleteVehicle('${v.id}')">
+                    <i class="fa-solid fa-trash-can"></i> Tamamen Sil (Kalıcı)
+                </button>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+// ADMIN YETKİSİYLE KALICI SİLME
+window.permanentlyDeleteVehicle = function(id) {
+    if (confirm('Bu araç ve ona ait tüm özet rapor notları KALICI OLARAK veritabanından silinecektir. Emin misiniz?')) {
+        vehicles = vehicles.filter(v => v.id !== id);
+        saveVehicles();
+        render();
+        renderAdminDeletedList();
+    }
+};
+
+// ADMIN YEDEK ALMA VE SIFIRLAMA
+window.exportSystemBackupJSON = function() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vehicles, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `Inciroglu_BMW_Sistem_Yedegi_${getCurrentISOShortDate()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+};
+
+window.clearAllData = function() {
+    if (confirm('DİKKAT! Sistemdeki TÜM araçlar, geçmiş notlar ve loglar tamamen silinecektir. Devam edilsin mi?')) {
+        vehicles = [];
+        saveVehicles();
+        render();
+        renderAdminDeletedList();
+        alert('Sistem tamamen sıfırlandı.');
+    }
 };
