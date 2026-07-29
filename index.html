@@ -41,9 +41,9 @@
                     <i class="fa-solid fa-file-lines"></i>
                     <span>Özet İşlem Raporu</span>
                 </button>
-                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="exportInventoryToExcel()">
+                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="openExcelFilterModal()">
                     <i class="fa-solid fa-file-excel"></i>
-                    <span>Stok Excel Raporu İndir</span>
+                    <span>Tarihli Excel Raporu İndir</span>
                 </button>
                 <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -61,7 +61,7 @@
             <div class="card">
                 <div class="cardIcon blue"><i class="fa-solid fa-car"></i></div>
                 <div class="cardContent">
-                    <span>Toplam Stok</span>
+                    <span>Toplam Aktif Stok</span>
                     <h2 id="totalVehicle">0</h2>
                     <small>Showroom + Otopark</small>
                 </div>
@@ -178,6 +178,14 @@
                     </div>
 
                     <div class="inputGroup">
+                        <label>Mülkiyet Durumu *</label>
+                        <select id="vehicleOwnership">
+                            <option value="stok">Stok Aracı</option>
+                            <option value="konsinye">Konsinye Araç</option>
+                        </select>
+                    </div>
+
+                    <div class="inputGroup">
                         <label>Araç Konumu *</label>
                         <select id="vehicleLocation" onchange="handleLocationChangeInModal()">
                             <option value="showroom">Showroom</option>
@@ -185,7 +193,6 @@
                         </select>
                     </div>
 
-                    <!-- AKÜ BAĞLANTISI GEREKİYOR MU SORUSU -->
                     <div class="inputGroup">
                         <label>Akü Bağlantısı Yapıldı mı / Gerekiyor mu? *</label>
                         <select id="batteryRequired" onchange="toggleBatteryDateInputs()">
@@ -194,13 +201,11 @@
                         </select>
                     </div>
 
-                    <!-- Otopark Seçildiğinde Görünür -->
                     <div class="inputGroup hidden" id="parkingDateGroup">
                         <label>Otoparka Çekilme Tarihi</label>
                         <input type="date" id="parkingDate">
                     </div>
 
-                    <!-- Akü Bağlantısı EVET seçildiğinde görünür -->
                     <div class="chargeInputsGroup hidden" id="batteryDatesWrapper">
                         <div class="inputGroup">
                             <label>Büyük Akü Bağlanma Tarihi</label>
@@ -247,6 +252,7 @@
                         <div class="detailGrid">
                             <div><span>Şase No</span><strong id="detailChassis">-</strong></div>
                             <div><span>Model</span><strong id="detailModel">-</strong></div>
+                            <div><span>Mülkiyet Durumu</span><strong id="detailOwnership" style="color:var(--bmw-blue);">-</strong></div>
                             <div><span>Konum</span><strong id="detailLocation">-</strong></div>
                             <div><span>Büyük Akü Tarihi</span><strong id="detailBigDate">-</strong></div>
                             <div><span>Küçük Akü Tarihi</span><strong id="detailSmallDate">-</strong></div>
@@ -256,7 +262,7 @@
                     
                     <div style="margin-top: 18px;">
                         <h3 style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Araç Not Geçmişi
+                            <i class="fa-solid fa-clock-rotate-left"></i> Araç Not & İşlem Geçmişi
                         </h3>
                         <div id="detailNotesHistory" class="notesHistoryContainer"></div>
                     </div>
@@ -271,7 +277,7 @@
         <div class="modal" id="summaryReportModal">
             <div class="modalContent">
                 <div class="modalHeader">
-                    <h2><i class="fa-solid fa-chart-pie"></i> Sistem Özet İşlem Raporu</h2>
+                    <h2><i class="fa-solid fa-chart-pie"></i> Sistem Tüm İşlem Raporu (Silinenler Dahil)</h2>
                     <button onclick="closeSummaryReportModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
@@ -279,6 +285,35 @@
                 </div>
                 <div class="modalFooter">
                     <button class="cancelButton" onclick="closeSummaryReportModal()">Kapat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARİHLİ EXCEL İNDİRME MODALI -->
+        <div class="modal" id="excelFilterModal">
+            <div class="modalContent" style="max-width: 420px;">
+                <div class="modalHeader">
+                    <h2><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Excel Raporu İndir</h2>
+                    <button onclick="closeExcelFilterModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modalBody">
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+                        Belirttiğiniz tarihler arasında yapılan tüm işlemleri ve silinen araç detaylarını Excel dosyasına aktarır.
+                    </p>
+                    <div class="inputGroup">
+                        <label>Başlangıç Tarihi</label>
+                        <input type="date" id="excelStartDate">
+                    </div>
+                    <div class="inputGroup">
+                        <label>Bitiş Tarihi</label>
+                        <input type="date" id="excelEndDate">
+                    </div>
+                </div>
+                <div class="modalFooter">
+                    <button class="cancelButton" onclick="closeExcelFilterModal()">Vazgeç</button>
+                    <button class="saveButton" style="background-color: #10b981;" onclick="exportInventoryToExcelWithDates()">
+                        <i class="fa-solid fa-download"></i> Raporu Oluştur & İndir
+                    </button>
                 </div>
             </div>
         </div>
