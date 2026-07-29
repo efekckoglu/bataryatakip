@@ -50,10 +50,6 @@
                     <i class="fa-solid fa-file-excel"></i>
                     <span>Tarihli Excel Raporu İndir</span>
                 </button>
-                <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    <span>Yeni Araç Ekle</span>
-                </button>
                 <div class="todayDate">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span id="todayDate">-</span>
@@ -164,17 +160,17 @@
             <div id="notificationArea"></div>
         </section>
 
-        <!-- MODAL: YENİ ARAÇ EKLE / DÜZENLE -->
+        <!-- MODAL: ARAÇ DÜZENLE -->
         <div class="modal" id="vehicleModal">
             <div class="modalContent">
                 <div class="modalHeader">
-                    <h2 id="modalTitle">Yeni Araç Ekle</h2>
+                    <h2 id="modalTitle">Araç Düzenle</h2>
                     <button onclick="closeVehicleModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
                     <div class="inputGroup">
                         <label>Şase No (VIN) *</label>
-                        <input type="text" id="vehicleChassis" placeholder="WBAXXXXXXXXXXXXXXX">
+                        <input type="text" id="vehicleChassis" readonly style="background-color: var(--bg-body); cursor: not-allowed;">
                     </div>
 
                     <div class="inputGroup">
@@ -333,7 +329,7 @@
                 <div class="modalBody">
                     <div class="inputGroup">
                         <label>Yönetici Şifresi</label>
-                        <input type="password" id="adminPasswordInput" placeholder="Şifrenizi giriniz...">
+                        <input type="password" id="adminPasswordInput" placeholder="Şifrenizi giriniz... (Varsayılan: admin)">
                     </div>
                 </div>
                 <div class="modalFooter">
@@ -343,16 +339,34 @@
             </div>
         </div>
 
-        <!-- ADMIN PANEL MODALI -->
+        <!-- ADMIN PANEL MODALI (EXCEL YÜKLEME VE YÖNETİM) -->
         <div class="modal" id="adminPanelModal">
-            <div class="modalContent" style="max-width: 500px;">
+            <div class="modalContent" style="max-width: 580px;">
                 <div class="modalHeader">
-                    <h2><i class="fa-solid fa-sliders" style="color: var(--bmw-blue);"></i> Yönetici Paneli</h2>
+                    <h2><i class="fa-solid fa-sliders" style="color: var(--bmw-blue);"></i> Yönetici & Veri Yükleme Paneli</h2>
                     <button onclick="closeAdminPanelModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
+                    
+                    <!-- Excel Yükleme Kutusu -->
+                    <div class="adminActionBox" style="border-left: 4px solid #10b981;">
+                        <h4 style="color: #10b981;"><i class="fa-solid fa-file-excel"></i> Excel Veri Tablosu Yükle (Otomatik Analiz)</h4>
+                        <p>Hazırladığınız stok listesi Excel dosyasını (.xlsx / .xls) yükleyin. Sistem verileri otomatik olarak işleyip analiz paneline yansıtacaktır.</p>
+                        
+                        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                            <label class="bmwBtnPrimary" style="background-color: #10b981; text-align: center; cursor: pointer; padding: 10px;">
+                                <i class="fa-solid fa-file-import"></i> Excel Dosyası Seç & Otomatik Yükle
+                                <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" onchange="handleExcelImport(event)" style="display:none;">
+                            </label>
+                            <small style="color: var(--text-secondary); font-size: 11px;">
+                                * Örnek Sütunlar: Sasi No, Model, Konum (Showroom/Otopark), Mulkiyet (Stok/Konsinye), Buyuk Aku Tarihi, Kucuk Aku Tarihi, Otopark Tarihi
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Yedekleme & Geri Yükleme Kutusu -->
                     <div class="adminActionBox">
-                        <h4><i class="fa-solid fa-database"></i> Sistem Yedekleme & Geri Yükleme</h4>
+                        <h4><i class="fa-solid fa-database"></i> Sistem JSON Yedekleme & Geri Yükleme</h4>
                         <p>Tüm araç kayıtları, geçmiş işlemler ve silinen veri loglarını yedekleyebilir veya geri yükleyebilirsiniz.</p>
                         
                         <div style="display: flex; gap: 10px; margin-top: 12px;">
@@ -366,6 +380,7 @@
                         </div>
                     </div>
 
+                    <!-- Veri Sıfırlama Kutusu -->
                     <div class="adminActionBox danger">
                         <h4><i class="fa-solid fa-trash-can"></i> Rapor ve Veri Sıfırlama</h4>
                         <p>Tüm araç stok verilerini, işlem loglarını ve silinmiş geçmiş raporları kalıcı olarak temizler.</p>
@@ -373,6 +388,7 @@
                             <i class="fa-solid fa-triangle-exclamation"></i> Tüm Verileri ve Logları Sıfırla
                         </button>
                     </div>
+
                 </div>
                 <div class="modalFooter">
                     <button class="cancelButton" onclick="closeAdminPanelModal()">Kapat</button>
@@ -388,7 +404,7 @@
                 <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
                 <span style="margin: 0 8px; color: var(--border-color);">|</span>
                 <a href="javascript:void(0)" onclick="openAdminLoginModal()" class="adminLink">
-                    <i class="fa-solid fa-lock"></i> Yönetici Girişi
+                    <i class="fa-solid fa-lock"></i> Yönetici Girişi & Excel Yükle
                 </a>
             </div>
         </footer>
