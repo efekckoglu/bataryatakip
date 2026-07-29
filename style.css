@@ -1,54 +1,56 @@
 /* ==========================================================================
-   İNCİROĞLU BMW - STOK & AKÜ TAKİP SİSTEMİ STİL DOSYASI
+   İNCİROĞLU BMW - AKÜ & STOK TAKİP SİSTEMİ STİLLERİ
    ========================================================================== */
 
 :root {
-    /* BMW Brand & Theme Colors */
-    --bmw-blue: #0066b1;
-    --bmw-dark-blue: #003366;
-    --bmw-red: #e11d48;
-    --bmw-m-light-blue: #15803d;
-    
-    /* Status Colors */
-    --status-green: #10b981;
-    --status-green-bg: rgba(16, 185, 129, 0.12);
-    --status-yellow: #f59e0b;
-    --status-yellow-bg: rgba(245, 158, 11, 0.12);
-    --status-red: #ef4444;
-    --status-red-bg: rgba(239, 68, 68, 0.12);
-
-    /* Light Theme Defaults */
+    /* Renk Paleti - Light Theme */
     --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
     --bg-card: #ffffff;
-    --bg-input: #f1f5f9;
     --text-primary: #0f172a;
     --text-secondary: #64748b;
     --border-color: #e2e8f0;
+    
+    /* BMW Marka Renkleri */
+    --bmw-blue: #0066b1;
+    --bmw-dark-blue: #002663;
+    --bmw-m-cyan: #00a3e0;
+    --bmw-m-blue: #00205b;
+    --bmw-m-red: #e30613;
+
+    /* Durum Renkleri */
+    --status-green: #10b981;
+    --status-green-bg: #ecfdf5;
+    --status-yellow: #f59e0b;
+    --status-yellow-bg: #fffbe6;
+    --status-red: #ef4444;
+    --status-red-bg: #fef2f2;
+
+    /* Gölgeler */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --modal-overlay: rgba(15, 23, 42, 0.6);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
-/* Dark Theme Overrides */
+/* Dark Theme Değişkenleri */
 body.dark-theme {
     --bg-primary: #0b0f17;
-    --bg-card: #151c28;
-    --bg-input: #1e293b;
+    --bg-secondary: #161e2e;
+    --bg-card: #1e293b;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --border-color: #334155;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    --modal-overlay: rgba(0, 0, 0, 0.8);
+
+    --status-green-bg: rgba(16, 185, 129, 0.15);
+    --status-yellow-bg: rgba(245, 158, 11, 0.15);
+    --status-red-bg: rgba(239, 68, 68, 0.15);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Outfit', sans-serif;
 }
 
 body {
@@ -56,31 +58,27 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
-    padding-bottom: 40px;
 }
 
 /* BMW M Stripe Top Bar */
 .bmw-m-stripe {
     height: 5px;
     width: 100%;
-    background: linear-gradient(90deg, #0066b1 0%, #0066b1 33%, #003366 33%, #003366 66%, #e11d48 66%, #e11d48 100%);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: linear-gradient(90deg, var(--bmw-m-cyan) 33.3%, var(--bmw-m-blue) 33.3% 66.6%, var(--bmw-m-red) 66.6%);
 }
 
 .container-fluid {
     max-width: 1440px;
     margin: 0 auto;
-    padding: 20px 24px;
+    padding: 24px;
 }
 
-/* Header Component */
+/* Header */
 .bmw-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--bg-card);
+    background-color: var(--bg-secondary);
     padding: 20px 28px;
     border-radius: 16px;
     border: 1px solid var(--border-color);
@@ -93,39 +91,36 @@ body {
 .brandBadge {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
 .bmwLogoIcon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
     background: linear-gradient(135deg, var(--bmw-blue), var(--bmw-dark-blue));
     color: #fff;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    box-shadow: 0 4px 12px rgba(0, 102, 177, 0.3);
 }
 
 .bmwSeriesTitle {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
     color: var(--bmw-blue);
-    text-transform: uppercase;
 }
 
 .brandBadge h1 {
     font-size: 22px;
     font-weight: 700;
-    line-height: 1.2;
 }
 
-.mTextColorful .c1 { color: #0066b1; }
-.mTextColorful .c2 { color: #003366; }
-.mTextColorful .c3 { color: #e11d48; }
+.mTextColorful .c1 { color: var(--bmw-m-cyan); }
+.mTextColorful .c2 { color: var(--bmw-m-blue); }
+.mTextColorful .c3 { color: var(--bmw-m-red); }
 
 .headerSubtitle {
     font-size: 13px;
@@ -140,67 +135,65 @@ body {
     flex-wrap: wrap;
 }
 
-.todayDate {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg-input);
-    padding: 10px 16px;
+.themeToggleBtn {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
     border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
 }
 
-/* Button Styles */
-.bmwBtnPrimary, .bmwBtnSecondary, .themeToggleBtn {
-    border: none;
-    outline: none;
+.themeToggleBtn:hover {
+    background: var(--border-color);
+}
+
+.bmwBtnPrimary, .bmwBtnSecondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 18px;
     border-radius: 10px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    border: none;
     transition: all 0.2s ease;
 }
 
 .bmwBtnPrimary {
     background-color: var(--bmw-blue);
     color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 102, 177, 0.25);
 }
-
 .bmwBtnPrimary:hover {
-    background-color: #00528e;
-    transform: translateY(-1px);
+    background-color: var(--bmw-dark-blue);
 }
 
 .bmwBtnSecondary {
     background-color: #10b981;
     color: #ffffff;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 }
-
 .bmwBtnSecondary:hover {
-    background-color: #0d9668;
-    transform: translateY(-1px);
+    background-color: #059669;
 }
 
-.themeToggleBtn {
-    background-color: var(--bg-input);
-    color: var(--text-primary);
-    padding: 10px 14px;
-    font-size: 16px;
+.todayDate {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
 }
 
-.themeToggleBtn:hover {
-    background-color: var(--border-color);
-}
-
-/* Dashboard Summary Cards */
+/* Dashboard Özet Kartları */
 .dashboardCards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -209,20 +202,19 @@ body {
 }
 
 .card {
-    background: var(--bg-card);
-    border-radius: 14px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     padding: 20px;
     display: flex;
     align-items: center;
     gap: 16px;
-    border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
 }
 
 .cardIcon {
@@ -235,17 +227,15 @@ body {
     font-size: 22px;
 }
 
-.cardIcon.blue { background: rgba(0, 102, 177, 0.12); color: var(--bmw-blue); }
-.cardIcon.green { background: rgba(16, 185, 129, 0.12); color: var(--status-green); }
-.cardIcon.yellow { background: rgba(245, 158, 11, 0.12); color: var(--status-yellow); }
-.cardIcon.red { background: rgba(239, 68, 68, 0.12); color: var(--status-red); }
+.cardIcon.blue { background-color: rgba(0, 102, 177, 0.12); color: var(--bmw-blue); }
+.cardIcon.green { background-color: rgba(16, 185, 129, 0.12); color: var(--status-green); }
+.cardIcon.yellow { background-color: rgba(245, 158, 11, 0.12); color: var(--status-yellow); }
+.cardIcon.red { background-color: rgba(239, 68, 68, 0.12); color: var(--status-red); }
 
 .cardContent span {
     font-size: 12px;
-    font-weight: 600;
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 500;
 }
 
 .cardContent h2 {
@@ -259,18 +249,14 @@ body {
     color: var(--text-secondary);
 }
 
-.border-green { border-left: 4px solid var(--status-green); }
-.border-yellow { border-left: 4px solid var(--status-yellow); }
-.border-red { border-left: 4px solid var(--status-red); }
-
-/* Section & Table Styling */
+/* Bölümler & Tablolar */
 .vehicleSection {
-    background: var(--bg-card);
-    border-radius: 16px;
+    background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    border-radius: 16px;
     padding: 24px;
     margin-bottom: 28px;
+    box-shadow: var(--shadow-sm);
 }
 
 .sectionHeader {
@@ -283,19 +269,15 @@ body {
 .sectionHeader h2 {
     font-size: 18px;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 .sectionHeader p {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
     margin-top: 2px;
 }
 
 .tableArea {
-    width: 100%;
     overflow-x: auto;
 }
 
@@ -307,130 +289,121 @@ table {
 }
 
 th {
-    background-color: var(--bg-input);
+    padding: 12px 14px;
+    background-color: var(--bg-primary);
     color: var(--text-secondary);
     font-weight: 600;
-    padding: 12px 16px;
     border-bottom: 1px solid var(--border-color);
     white-space: nowrap;
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.5px;
 }
 
 td {
-    padding: 14px 16px;
+    padding: 14px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
 
-tbody tr:hover {
-    background-color: rgba(0, 102, 177, 0.03);
+tr:last-child td {
+    border-bottom: none;
 }
 
-/* Badges & Statuses */
-.badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
+/* Rozetler & Durum Göstergeleri */
+.statusBadge {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-}
-
-.badge-green { background: var(--status-green-bg); color: var(--status-green); }
-.badge-yellow { background: var(--status-yellow-bg); color: #d97706; }
-.badge-red { background: var(--status-red-bg); color: var(--status-red); }
-.badge-blue { background: rgba(0, 102, 177, 0.12); color: var(--bmw-blue); }
-
-.badge-stok { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
-.badge-konsinye { background: rgba(147, 51, 234, 0.1); color: #9333ea; border: 1px solid rgba(147, 51, 234, 0.2); }
-
-/* Table Action Buttons */
-.actionBtns {
-    display: flex;
     gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-.tblBtn {
-    border: none;
-    background: var(--bg-input);
-    color: var(--text-primary);
+.statusBadge.green { background-color: var(--status-green-bg); color: var(--status-green); }
+.statusBadge.yellow { background-color: var(--status-yellow-bg); color: var(--status-yellow); }
+.statusBadge.red { background-color: var(--status-red-bg); color: var(--status-red); }
+
+.actionBtnGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.iconBtn {
     width: 32px;
     height: 32px;
     border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    font-size: 13px;
+    transition: all 0.2s ease;
 }
 
-.tblBtn:hover {
-    background: var(--bmw-blue);
+.iconBtn:hover {
+    background-color: var(--bmw-blue);
     color: #ffffff;
+    border-color: var(--bmw-blue);
 }
 
-.tblBtn.delete:hover {
-    background: var(--status-red);
+.iconBtn.danger:hover {
+    background-color: var(--status-red);
     color: #ffffff;
+    border-color: var(--status-red);
 }
 
-/* Notification Section */
+/* Bildirim Paneli */
 .notificationSection {
-    background: var(--bg-card);
-    border-radius: 16px;
+    background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
+    border-radius: 16px;
     padding: 24px;
     margin-bottom: 28px;
 }
 
-.notificationGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 14px;
-}
-
-.notifItem {
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: var(--bg-input);
-    border-left: 4px solid var(--status-red);
+.notifCard {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background-color: var(--status-red-bg);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    margin-bottom: 10px;
 }
 
-.notifItem h4 {
-    font-size: 14px;
-    font-weight: 700;
+.notifCard.warning {
+    background-color: var(--status-yellow-bg);
+    border-color: rgba(245, 158, 11, 0.2);
 }
 
-.notifItem p {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
+.notifContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Modal Styling */
+.notifContent i {
+    font-size: 18px;
+}
+
+/* Modal Stilleri */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: var(--modal-overlay);
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
+    z-index: 1000;
 }
 
 .modal.active {
@@ -439,30 +412,24 @@ tbody tr:hover {
 }
 
 .modalContent {
-    background: var(--bg-card);
+    background-color: var(--bg-secondary);
     width: 90%;
     max-width: 580px;
-    border-radius: 18px;
+    border-radius: 20px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-lg);
     overflow: hidden;
-    transform: translateY(20px);
-    transition: transform 0.25s ease;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
 }
 
-.modal.active .modalContent {
-    transform: translateY(0);
-}
-
 .modalHeader {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .modalHeader h2 {
@@ -473,37 +440,23 @@ tbody tr:hover {
 .modalHeader button {
     background: none;
     border: none;
-    color: var(--text-secondary);
     font-size: 18px;
+    color: var(--text-secondary);
     cursor: pointer;
 }
 
 .modalBody {
-    padding: 20px 24px;
+    padding: 24px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
-.modalFooter {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    background: var(--bg-primary);
-}
-
-/* Form Inputs */
 .inputGroup {
     display: flex;
     flex-direction: column;
     gap: 6px;
-}
-
-.inputGroup.full {
-    grid-column: 1 / -1;
 }
 
 .inputGroup label {
@@ -513,75 +466,77 @@ tbody tr:hover {
 }
 
 .inputGroup input, .inputGroup select, .inputGroup textarea {
-    width: 100%;
     padding: 10px 14px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
-    background-color: var(--bg-input);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 13.5px;
     outline: none;
-    transition: border-color 0.2s;
+    font-size: 13.5px;
 }
 
 .inputGroup input:focus, .inputGroup select:focus, .inputGroup textarea:focus {
     border-color: var(--bmw-blue);
 }
 
-.chargeInputsGroup {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
 .hidden {
     display: none !important;
 }
 
-/* Cancel / Save Buttons */
+.chargeInputsGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.modalFooter {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background-color: var(--bg-primary);
+}
+
 .cancelButton {
     background: transparent;
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    padding: 9px 18px;
+    padding: 10px 18px;
     border-radius: 10px;
-    font-weight: 600;
     cursor: pointer;
+    font-weight: 600;
 }
 
 .saveButton {
-    background: var(--bmw-blue);
+    background-color: var(--bmw-blue);
+    color: #fff;
     border: none;
-    color: #ffffff;
-    padding: 9px 20px;
+    padding: 10px 20px;
     border-radius: 10px;
-    font-weight: 600;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    font-weight: 600;
 }
 
-/* Details & Notes History */
-.detailGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    background: var(--bg-input);
+/* Detay Kartı ve Rapor Alanları */
+.detailCard {
+    background-color: var(--bg-primary);
     padding: 16px;
     border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.detailGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
     font-size: 13px;
 }
 
 .detailGrid span {
     display: block;
-    font-size: 11px;
     color: var(--text-secondary);
-}
-
-.detailGrid strong {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 11px;
 }
 
 .notesHistoryContainer {
@@ -592,36 +547,28 @@ tbody tr:hover {
     gap: 8px;
 }
 
-.noteItemCard {
-    background: var(--bg-input);
+.noteItem {
+    background: var(--bg-primary);
     padding: 10px 14px;
     border-radius: 8px;
     border-left: 3px solid var(--bmw-blue);
     font-size: 12.5px;
 }
 
-.noteItemHeader {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10.5px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-}
-
-/* Admin Actions Box */
 .adminActionBox {
-    background: var(--bg-input);
+    background: var(--bg-primary);
     padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
+    margin-bottom: 12px;
+}
+.adminActionBox.danger {
+    border-color: rgba(239, 68, 68, 0.3);
 }
 
 .adminActionBox h4 {
     font-size: 14px;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    margin-bottom: 6px;
 }
 
 .adminActionBox p {
@@ -629,52 +576,27 @@ tbody tr:hover {
     color: var(--text-secondary);
 }
 
-.adminActionBox.danger {
-    border-color: rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.05);
-}
-
-/* Excel Import Drop Zone */
-.excelDropZone {
-    border: 2px dashed var(--bmw-blue);
-    background: rgba(0, 102, 177, 0.04);
-    border-radius: 12px;
-    padding: 18px;
-    text-align: center;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.excelDropZone:hover {
-    background: rgba(0, 102, 177, 0.08);
-}
-
 /* Footer */
 .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-    font-size: 12px;
+    padding: 20px 0;
+    margin-top: 20px;
+    font-size: 12.5px;
     color: var(--text-secondary);
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.mColorBadge {
-    color: var(--bmw-blue);
-    font-weight: 700;
+    border-top: 1px solid var(--border-color);
 }
 
 .adminLink {
-    color: var(--text-secondary);
+    color: var(--bmw-blue);
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.2s;
 }
 
-.adminLink:hover {
-    color: var(--bmw-blue);
+/* Responsive */
+@media (max-width: 768px) {
+    .bmw-header { flex-direction: column; align-items: flex-start; }
+    .headerRight { width: 100%; justify-content: space-between; }
+    .chargeInputsGroup { grid-template-columns: 1fr; }
 }
