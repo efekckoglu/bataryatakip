@@ -1,5 +1,5 @@
 /* ==========================================================================
-   İnciroğlu BMW | Stok & Akü Takip JS Engine (Revize Mantık)
+   İnciroğlu BMW | Stok & Akü Takip JS Engine (Kalıcı Log & Konsinye Entegreli)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,29 +11,17 @@ const defaultVehicles = [
         id: '1',
         chassis: 'WBA11AB000XXXX123',
         model: 'BMW i4 M50',
+        ownership: 'stok', // stok veya konsinye
         location: 'showroom',
         batteryRequired: 'yes',
         bigBatteryDate: getDaysAgoDate(6),
         smallBatteryDate: getDaysAgoDate(2),
         smallBatteryConnected: 'yes',
         parkingDate: '',
+        isDeleted: false,
         notesHistory: [
-            { date: '28.07.2026 09:00', note: 'Showroom sergi alanına alındı.' },
-            { date: '28.07.2026 14:20', note: 'Büyük akü şarja bağlandı.' }
-        ]
-    },
-    {
-        id: '2',
-        chassis: 'WMW22CD000XXXX456',
-        model: 'MINI Cooper SE',
-        location: 'showroom',
-        batteryRequired: 'no', // Akü bağlantısı gerekli değil
-        bigBatteryDate: '',
-        smallBatteryDate: '',
-        smallBatteryConnected: 'no',
-        parkingDate: '',
-        notesHistory: [
-            { date: '29.07.2026 10:00', note: 'Sergide statik duruyor, akü bağlantısına gerek görülmedi.' }
+            { date: '28.07.2026 09:00', rawDate: '2026-07-28', note: 'Showroom sergi alanına alındı.' },
+            { date: '28.07.2026 14:20', rawDate: '2026-07-28', note: 'Büyük akü şarja bağlandı.' }
         ]
     }
 ];
@@ -81,8 +69,12 @@ function getCurrentDateTimeFormatted() {
     return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
+function getCurrentISOShortDate() {
+    return new Date().toISOString().split('T')[0];
+}
+
 function loadVehicles() {
-    const saved = localStorage.getItem('inciroglu_bmw_v4_vehicles');
+    const saved = localStorage.getItem('inciroglu_bmw_v5_vehicles');
     if (saved) {
         try { vehicles = JSON.parse(saved); } catch (e) { vehicles = defaultVehicles; }
     } else {
@@ -92,7 +84,7 @@ function loadVehicles() {
 }
 
 function saveVehicles() {
-    localStorage.setItem('inciroglu_bmw_v4_vehicles', JSON.stringify(vehicles));
+    localStorage.setItem('inciroglu_bmw_v5_vehicles', JSON.stringify(vehicles));
 }
 
 window.toggleBatteryDateInputs = function() {
@@ -129,13 +121,13 @@ function render() {
     renderNotifications();
 }
 
-// 1. SHOWROOM TABLOSU
+// 1. SHOWROOM TABLOSU (Sadece Silinmemiş / Aktif Araçlar)
 function renderShowroomTable() {
     const body = document.getElementById('showroomTableBody');
     if (!body) return;
     body.innerHTML = '';
 
-    const showroomVehicles = vehicles.filter(v => v.location === 'showroom');
+    const showroomVehicles = vehicles.filter(v => v.location === 'showroom' && !v.isDeleted);
 
     if (showroomVehicles.length === 0) {
         body.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 18px;">Showroomda araç bulunmuyor.</td></tr>`;
@@ -179,13 +171,13 @@ function renderShowroomTable() {
     });
 }
 
-// 2. OTOPARK TABLOSU
+// 2. OTOPARK TABLOSU (Sadece Silinmemiş / Aktif Araçlar)
 function renderParkingTable() {
     const body = document.getElementById('parkingTableBody');
     if (!body) return;
     body.innerHTML = '';
 
-    const parkingVehicles = vehicles.filter(v => v.location === 'parking');
+    const parkingVehicles = vehicles.filter(v => v.location === 'parking' && !v.isDeleted);
 
     if (parkingVehicles.length === 0) {
         body.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 18px;">Otoparkta araç bulunmuyor.</td></tr>`;
@@ -224,12 +216,13 @@ function renderParkingTable() {
 }
 
 function renderCards() {
-    const total = vehicles.length;
-    const showroom = vehicles.filter(v => v.location === 'showroom').length;
-    const parking = vehicles.filter(v => v.location === 'parking').length;
+    const activeVehicles = vehicles.filter(v => !v.isDeleted);
+    const total = activeVehicles.length;
+    const showroom = activeVehicles.filter(v => v.location === 'showroom').length;
+    const parking = activeVehicles.filter(v => v.location === 'parking').length;
 
     let dangerCount = 0;
-    vehicles.forEach(v => {
+    activeVehicles.forEach(v => {
         if (v.batteryRequired === 'yes') {
             const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
             if (v.location === 'showroom' && (bigDays >= 5 || v.smallBatteryConnected === 'no')) dangerCount++;
@@ -243,7 +236,6 @@ function renderCards() {
     if (document.getElementById('dangerVehicle')) document.getElementById('dangerVehicle').innerText = dangerCount;
 }
 
-// 3. EN ALTTAN BİLDİRİMLER
 function renderNotifications() {
     const area = document.getElementById('notificationArea');
     if (!area) return;
@@ -251,7 +243,7 @@ function renderNotifications() {
 
     const notifications = [];
 
-    vehicles.forEach(v => {
+    vehicles.filter(v => !v.isDeleted).forEach(v => {
         if (v.batteryRequired === 'yes') {
             const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
             if (v.location === 'showroom') {
@@ -291,6 +283,7 @@ window.openVehicleModal = function() {
     document.getElementById('modalTitle').innerText = 'Yeni Araç Ekle';
     document.getElementById('vehicleChassis').value = '';
     document.getElementById('vehicleModel').value = '';
+    document.getElementById('vehicleOwnership').value = 'stok';
     document.getElementById('vehicleLocation').value = 'showroom';
     document.getElementById('batteryRequired').value = 'no';
     
@@ -315,6 +308,7 @@ window.closeVehicleModal = function() {
 window.handleSaveVehicle = function() {
     const chassis = document.getElementById('vehicleChassis').value.trim();
     const model = document.getElementById('vehicleModel').value.trim();
+    const ownership = document.getElementById('vehicleOwnership').value;
     const location = document.getElementById('vehicleLocation').value;
     const batteryRequired = document.getElementById('batteryRequired').value;
     const parkingDate = document.getElementById('parkingDate').value;
@@ -329,7 +323,8 @@ window.handleSaveVehicle = function() {
     }
 
     const timeStamp = getCurrentDateTimeFormatted();
-    const newNoteObj = noteText ? { date: timeStamp, note: noteText } : null;
+    const rawDate = getCurrentISOShortDate();
+    const newNoteObj = noteText ? { date: timeStamp, rawDate: rawDate, note: noteText } : null;
 
     if (editingVehicleId) {
         const index = vehicles.findIndex(v => v.id === editingVehicleId);
@@ -341,6 +336,7 @@ window.handleSaveVehicle = function() {
                 ...vehicles[index],
                 chassis,
                 model,
+                ownership,
                 location,
                 batteryRequired,
                 parkingDate: location === 'parking' ? parkingDate : '',
@@ -351,17 +347,22 @@ window.handleSaveVehicle = function() {
             };
         }
     } else {
-        const history = newNoteObj ? [newNoteObj] : [{ date: timeStamp, note: 'Sisteme araç kaydı oluşturuldu.' }];
+        const history = newNoteObj 
+            ? [newNoteObj] 
+            : [{ date: timeStamp, rawDate: rawDate, note: 'Sisteme yeni araç kaydı oluşturuldu.' }];
+
         const newVehicle = {
             id: Date.now().toString(),
             chassis,
             model,
+            ownership,
             location,
             batteryRequired,
             parkingDate: location === 'parking' ? parkingDate : '',
             bigBatteryDate: batteryRequired === 'yes' ? bigBatteryDate : '',
             smallBatteryDate: (batteryRequired === 'yes' && location === 'showroom') ? smallBatteryDate : '',
             smallBatteryConnected: (batteryRequired === 'yes' && location === 'showroom') ? smallBatteryConnected : 'no',
+            isDeleted: false,
             notesHistory: history
         };
         vehicles.push(newVehicle);
@@ -380,6 +381,7 @@ window.editVehicle = function(id) {
     document.getElementById('modalTitle').innerText = 'Aracı Düzenle / Tarih Güncelle';
     document.getElementById('vehicleChassis').value = vehicle.chassis;
     document.getElementById('vehicleModel').value = vehicle.model;
+    document.getElementById('vehicleOwnership').value = vehicle.ownership || 'stok';
     document.getElementById('vehicleLocation').value = vehicle.location;
     document.getElementById('batteryRequired').value = vehicle.batteryRequired || 'no';
     
@@ -396,12 +398,24 @@ window.editVehicle = function(id) {
     if (modal) modal.classList.add('active');
 };
 
+// ARAÇ SİLME (TAMAMEN SİLMEZ, SİLİNDİ OLARAK İŞARETLER VE LOG TUTAR)
 window.deleteVehicle = function(id) {
     const vehicle = vehicles.find(v => v.id === id);
     if (!vehicle) return;
 
-    if (confirm(`${vehicle.model} (${vehicle.chassis}) silinecek. Onaylıyor musunuz?`)) {
-        vehicles = vehicles.filter(v => v.id !== id);
+    if (confirm(`${vehicle.model} (${vehicle.chassis}) silinecek. Raporlarda kalıcı geçmiş olarak tutulacaktır. Onaylıyor musunuz?`)) {
+        vehicle.isDeleted = true;
+        
+        const timeStamp = getCurrentDateTimeFormatted();
+        const rawDate = getCurrentISOShortDate();
+        
+        if (!vehicle.notesHistory) vehicle.notesHistory = [];
+        vehicle.notesHistory.unshift({
+            date: timeStamp,
+            rawDate: rawDate,
+            note: '🚨 [SİSTEM SİLME İŞLEMİ] Araç aktif stok listesinden kaldırıldı.'
+        });
+
         saveVehicles();
         render();
     }
@@ -413,6 +427,7 @@ window.openDetailModal = function(id) {
 
     document.getElementById('detailChassis').innerText = vehicle.chassis;
     document.getElementById('detailModel').innerText = vehicle.model;
+    document.getElementById('detailOwnership').innerText = (vehicle.ownership === 'konsinye') ? 'Konsinye Araç' : 'Stok Aracı';
     document.getElementById('detailLocation').innerText = vehicle.location === 'showroom' ? 'Showroom' : 'Otopark';
     document.getElementById('detailBigDate').innerText = vehicle.batteryRequired === 'yes' ? formatDateTR(vehicle.bigBatteryDate) : 'Gerekli Değil';
     document.getElementById('detailSmallDate').innerText = (vehicle.batteryRequired === 'yes' && vehicle.location === 'showroom') ? formatDateTR(vehicle.smallBatteryDate) : 'Gerekli Değil';
@@ -445,7 +460,7 @@ window.closeDetailModal = function() {
     if (modal) modal.classList.remove('active');
 };
 
-// ÖZET İŞLEM RAPORU MODALI
+// ÖZET İŞLEM RAPORU MODALI (SİLİNEN ARAÇLAR DAHİL HEPSİ)
 window.openSummaryReportModal = function() {
     const container = document.getElementById('summaryReportContent');
     if (!container) return;
@@ -453,22 +468,30 @@ window.openSummaryReportModal = function() {
     let totalNotes = 0;
     vehicles.forEach(v => totalNotes += (v.notesHistory ? v.notesHistory.length : 0));
 
+    const activeCount = vehicles.filter(v => !v.isDeleted).length;
+    const deletedCount = vehicles.filter(v => v.isDeleted).length;
+
     let html = `
         <div class="summaryReportCard">
-            <h4><i class="fa-solid fa-list-check"></i> Genel Stok İstatistikleri</h4>
-            <p>• Toplam Kayıtlı Araç: <strong>${vehicles.length}</strong></p>
-            <p>• Showroom Araç Sayısı: <strong>${vehicles.filter(v=>v.location==='showroom').length}</strong></p>
-            <p>• Otopark Araç Sayısı: <strong>${vehicles.filter(v=>v.location==='parking').length}</strong></p>
-            <p>• Toplam İşlem Log Sayısı: <strong>${totalNotes}</strong></p>
+            <h4><i class="fa-solid fa-list-check"></i> Sistem Bütünsel Log İstatistikleri</h4>
+            <p>• Aktif Stok Sayısı: <strong>${activeCount}</strong></p>
+            <p>• Silinen / Arşivdeki Araç Sayısı: <strong>${deletedCount}</strong></p>
+            <p>• Sistemde Kayıtlı Toplam İşlem Log Sayısı: <strong>${totalNotes}</strong></p>
         </div>
         <hr style="margin: 15px 0; border:0; border-top:1px solid #e2e8f0;">
-        <h4><i class="fa-solid fa-history"></i> Tüm Araçların Detaylı İşlem Geçmişi</h4>
+        <h4><i class="fa-solid fa-history"></i> Bütün Araç Geçmişi & Yapılan İşlemler</h4>
     `;
 
     vehicles.forEach(v => {
+        const deletedBadge = v.isDeleted 
+            ? `<span style="background:#ffe4e6; color:#e11d48; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">SİLİNDİ</span>` 
+            : `<span style="background:#dcfce7; color:#16a34a; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:6px;">AKTİF</span>`;
+
+        const ownershipBadge = (v.ownership === 'konsinye') ? ' [KONSİNYE]' : ' [STOK]';
+
         html += `
             <div style="margin-top:12px; padding:10px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-                <strong style="color:var(--bmw-blue);">${v.model} (${v.chassis})</strong> - <em>${v.location.toUpperCase()}</em>
+                <strong style="color:var(--bmw-blue);">${v.model} (${v.chassis})</strong> ${ownershipBadge} - <em>${v.location.toUpperCase()}</em> ${deletedBadge}
                 <div style="font-size:12px; margin-top:6px;">
         `;
         if (v.notesHistory && v.notesHistory.length > 0) {
@@ -489,33 +512,66 @@ window.closeSummaryReportModal = function() {
     document.getElementById('summaryReportModal').classList.remove('active');
 };
 
-// EXCEL DIŞA AKTARMA
-window.exportInventoryToExcel = function() {
-    if (vehicles.length === 0) {
-        alert('İndirilecek araç kaydı bulunmuyor.');
+// TARİHLİ EXCEL RAPORU MODAL İŞLEMLERİ
+window.openExcelFilterModal = function() {
+    const today = getCurrentISOShortDate();
+    document.getElementById('excelStartDate').value = getDaysAgoDate(30);
+    document.getElementById('excelEndDate').value = today;
+    document.getElementById('excelFilterModal').classList.add('active');
+};
+
+window.closeExcelFilterModal = function() {
+    document.getElementById('excelFilterModal').classList.remove('active');
+};
+
+// BELİRLİ TARİH ARALIĞINDAKİ İŞLEMLERİ VE SİLİNENLERİ EXCEL'E DÖKME
+window.exportInventoryToExcelWithDates = function() {
+    const startDate = document.getElementById('excelStartDate').value;
+    const endDate = document.getElementById('excelEndDate').value;
+
+    if (!startDate || !endDate) {
+        alert('Lütfen geçerli bir tarih aralığı seçiniz.');
         return;
     }
 
-    const exportData = vehicles.map(v => {
-        const historyText = v.notesHistory 
-            ? v.notesHistory.map(h => `[${h.date}] ${h.note}`).join(' | ')
-            : '-';
+    const exportRows = [];
 
-        return {
-            "Şase No": v.chassis,
-            "Marka Model": v.model,
-            "Konum": v.location === 'showroom' ? 'Showroom' : 'Otopark',
-            "Akü Bağlantısı Gerekli mi": v.batteryRequired === 'yes' ? 'Evet' : 'Hayır',
-            "Büyük Aküye Bağlandığı Tarih": v.batteryRequired === 'yes' ? formatDateTR(v.bigBatteryDate) : 'Gerekli Değil',
-            "Küçük Aküye Bağlandığı Tarih": (v.batteryRequired === 'yes' && v.location === 'showroom') ? formatDateTR(v.smallBatteryDate) : 'Gerekli Değil',
-            "Eklenilen Geçmiş Notlar": historyText
-        };
+    vehicles.forEach(v => {
+        const historyList = v.notesHistory || [];
+        
+        // Seçilen tarih aralığına uyan loglar
+        const filteredLogs = historyList.filter(h => {
+            if (!h.rawDate) return true;
+            return h.rawDate >= startDate && h.rawDate <= endDate;
+        });
+
+        if (filteredLogs.length > 0) {
+            const logsCombined = filteredLogs.map(l => `[${l.date}] ${l.note}`).join(' || ');
+
+            exportRows.push({
+                "Şase No (VIN)": v.chassis,
+                "Marka Model": v.model,
+                "Mülkiyet Durumu": (v.ownership === 'konsinye') ? 'Konsinye' : 'Stok',
+                "Sistem Durumu": v.isDeleted ? 'SİLİNDİ / ARŞİV' : 'AKTİF STOK',
+                "Son Konum": v.location === 'showroom' ? 'Showroom' : 'Otopark',
+                "Akü Bağlantı Gerekli mi": v.batteryRequired === 'yes' ? 'Evet' : 'Hayır',
+                "Büyük Akü Tarihi": v.batteryRequired === 'yes' ? formatDateTR(v.bigBatteryDate) : 'Gerekli Değil',
+                "Tarih Aralığındaki İşlem Logları": logsCombined
+            });
+        }
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Guncel_Stok_Aku_Listesi");
+    if (exportRows.length === 0) {
+        alert('Seçilen tarih aralığında herhangi bir araç işlem kaydı bulunamadı.');
+        return;
+    }
 
-    const fileName = `Inciroglu_BMW_Guncel_Stok_Aku_${new Date().toISOString().split('T')[0]}.xlsx`;
+    const worksheet = XLSX.utils.json_to_sheet(exportRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Islem_Raporu");
+
+    const fileName = `Inciroglu_BMW_Detayli_Rapor_${startDate}_ile_${endDate}.xlsx`;
     XLSX.writeFile(workbook, fileName);
+
+    closeExcelFilterModal();
 };
