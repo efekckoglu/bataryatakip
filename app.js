@@ -1,5 +1,5 @@
 /* ==========================================================================
-   İnciroğlu BMW | Showroom & Otopark Akü Takip JS Engine
+   İnciroğlu BMW | Stok & Akü Takip JS Engine
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,36 +12,40 @@ const defaultVehicles = [
         chassis: 'WBA11AB000XXXX123',
         model: 'BMW i4 M50',
         location: 'showroom', // showroom | parking
-        needsBattery: 'yes',
-        bigBatteryDate: getDaysAgoDate(6), // >5 gün ikaz
+        bigBatteryDate: getDaysAgoDate(6), // >5 gün uyarısı
         smallBatteryDate: getDaysAgoDate(2),
         smallBatteryConnected: 'yes',
-        createdAt: '28.07.2026 09:00',
-        note: 'Showroom ana sergi alanında.'
+        parkingDate: '',
+        notesHistory: [
+            { date: '28.07.2026 09:00', note: 'Araç showroom alanına yerleştirildi.' },
+            { date: '28.07.2026 14:20', note: 'Büyük akü şarja takıldı.' }
+        ]
     },
     {
         id: '2',
         chassis: 'WMW22CD000XXXX456',
         model: 'MINI Countryman SE',
         location: 'showroom',
-        needsBattery: 'yes',
         bigBatteryDate: getDaysAgoDate(2),
         smallBatteryDate: getDaysAgoDate(1),
-        smallBatteryConnected: 'no', // Kırmızı uyarı verecek
-        createdAt: '28.07.2026 10:30',
-        note: 'Küçük akü takılması gerekiyor.'
+        smallBatteryConnected: 'no', // Küçük akü uyarısı
+        parkingDate: '',
+        notesHistory: [
+            { date: '28.07.2026 10:30', note: 'Showroom sergi alanında. Küçük akü takviyesi bekleniyor.' }
+        ]
     },
     {
         id: '3',
         chassis: 'WBA33EF000XXXX789',
         model: 'BMW X5 xDrive40i',
         location: 'parking',
-        needsBattery: 'yes',
-        bigBatteryDate: getDaysAgoDate(8), // Otopark >7 gün ikaz
+        bigBatteryDate: getDaysAgoDate(12), // >10 gün uyarısı
         smallBatteryDate: '',
         smallBatteryConnected: 'no',
-        createdAt: '27.07.2026 14:00',
-        note: 'A Blok otopark alanında.'
+        parkingDate: getDaysAgoDate(15),
+        notesHistory: [
+            { date: '27.07.2026 11:00', note: 'A Blok otoparka çekildi.' }
+        ]
     }
 ];
 
@@ -90,7 +94,7 @@ function getCurrentDateTimeFormatted() {
 }
 
 function loadVehicles() {
-    const saved = localStorage.getItem('inciroglu_bmw_v2_vehicles');
+    const saved = localStorage.getItem('inciroglu_bmw_v3_vehicles');
     if (saved) {
         try { vehicles = JSON.parse(saved); } catch (e) { vehicles = defaultVehicles; }
     } else {
@@ -100,18 +104,16 @@ function loadVehicles() {
 }
 
 function saveVehicles() {
-    localStorage.setItem('inciroglu_bmw_v2_vehicles', JSON.stringify(vehicles));
+    localStorage.setItem('inciroglu_bmw_v3_vehicles', JSON.stringify(vehicles));
 }
 
 function setupEventListeners() {
-    const openBtn1 = document.getElementById('newVehicleButton');
-    const openBtn2 = document.getElementById('openVehicleModalHeader');
+    const openBtn1 = document.getElementById('openVehicleModalHeader');
     const closeBtn = document.getElementById('closeModal');
     const cancelBtn = document.getElementById('cancelVehicle');
     const saveBtn = document.getElementById('saveVehicle');
 
     if (openBtn1) openBtn1.addEventListener('click', openVehicleModal);
-    if (openBtn2) openBtn2.addEventListener('click', openVehicleModal);
     if (closeBtn) closeBtn.addEventListener('click', closeVehicleModal);
     if (cancelBtn) cancelBtn.addEventListener('click', closeVehicleModal);
     if (saveBtn) saveBtn.addEventListener('click', handleSaveVehicle);
@@ -122,31 +124,20 @@ function setupEventListeners() {
     if (closeDetailBtn) closeDetailBtn.addEventListener('click', closeDetailModal);
 }
 
-// Modal Alan Kontrolleri
-window.toggleBatteryDatesGroup = function() {
-    const select = document.getElementById('needsBatterySelect');
-    const group = document.getElementById('batteryDatesGroup');
-    if (select && group) {
-        if (select.value === 'yes') {
-            group.classList.remove('hidden');
-        } else {
-            group.classList.add('hidden');
-        }
-    }
-    toggleSmallBatteryOption();
-};
-
-window.toggleSmallBatteryOption = function() {
+window.handleLocationChangeInModal = function() {
     const location = document.getElementById('vehicleLocation').value;
+    const parkingGroup = document.getElementById('parkingDateGroup');
     const smallGroup1 = document.getElementById('smallBatteryDateGroup');
     const smallGroup2 = document.getElementById('smallBatteryStatusGroup');
 
-    if (location === 'showroom') {
-        if (smallGroup1) smallGroup1.classList.remove('hidden');
-        if (smallGroup2) smallGroup2.classList.remove('hidden');
-    } else {
+    if (location === 'parking') {
+        if (parkingGroup) parkingGroup.classList.remove('hidden');
         if (smallGroup1) smallGroup1.classList.add('hidden');
         if (smallGroup2) smallGroup2.classList.add('hidden');
+    } else {
+        if (parkingGroup) parkingGroup.classList.add('hidden');
+        if (smallGroup1) smallGroup1.classList.remove('hidden');
+        if (smallGroup2) smallGroup2.classList.remove('hidden');
     }
 };
 
@@ -157,7 +148,7 @@ function render() {
     renderNotifications();
 }
 
-// 1. Showroom Tablosu
+// 1. SHOWROOM TABLOSU
 function renderShowroomTable() {
     const body = document.getElementById('showroomTableBody');
     if (!body) return;
@@ -166,41 +157,36 @@ function renderShowroomTable() {
     const showroomVehicles = vehicles.filter(v => v.location === 'showroom');
 
     if (showroomVehicles.length === 0) {
-        body.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted); padding: 18px;">Showroomda araç bulunmuyor.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 18px;">Showroomda araç bulunmuyor.</td></tr>`;
         return;
     }
 
     showroomVehicles.forEach(vehicle => {
         const bigDays = vehicle.bigBatteryDate ? calculateDaysDiff(vehicle.bigBatteryDate) : 0;
-        const isBigBatteryAlert = vehicle.needsBattery === 'yes' && bigDays > 5;
-        const isSmallDisconnected = vehicle.needsBattery === 'yes' && vehicle.smallBatteryConnected === 'no';
-        const isCritical = isBigBatteryAlert || isSmallDisconnected;
+        const needsCharge = bigDays >= 5; // 5 gün oldu ise bağlanması gerekli
 
         const tr = document.createElement('tr');
-        if (isCritical) tr.classList.add('rowDanger');
+        if (needsCharge || vehicle.smallBatteryConnected === 'no') tr.classList.add('rowDanger');
 
         tr.innerHTML = `
             <td style="font-family: monospace; font-weight: 600;">${vehicle.chassis}</td>
             <td style="font-weight: 600;">${vehicle.model}</td>
-            <td>
-                ${vehicle.needsBattery === 'yes' 
-                    ? `<span class="statusBadge needCharge"><i class="fa-solid fa-bolt"></i> Gerekiyor</span>` 
-                    : `<span class="statusBadge healthy"><i class="fa-solid fa-check"></i> Gerekmiyor</span>`}
-            </td>
             <td>${formatDateTR(vehicle.bigBatteryDate)}</td>
-            <td>
-                <span class="smallBatteryBadge ${bigDays > 5 ? 'disconnected' : 'connected'}">${bigDays} Gün</span>
-            </td>
+            <td><strong>${bigDays} Gün</strong></td>
             <td>
                 ${vehicle.smallBatteryConnected === 'yes'
                     ? `<span class="smallBatteryBadge connected"><i class="fa-solid fa-circle"></i> Bağlı</span>`
-                    : `<span class="smallBatteryBadge disconnected"><i class="fa-solid fa-triangle-exclamation"></i> Bağlı Değil</span>`}
+                    : `<span class="smallBatteryBadge disconnected"><i class="fa-solid fa-unlink"></i> Bağlı Değil</span>`}
             </td>
-            <td style="font-size:12px; color: var(--text-secondary);">${vehicle.createdAt || '-'}</td>
+            <td>
+                ${needsCharge 
+                    ? `<span class="statusBadge needCharge"><i class="fa-solid fa-triangle-exclamation"></i> Bağlanması Gerekli</span>` 
+                    : `<span class="statusBadge healthy"><i class="fa-solid fa-check"></i> İhtiyacı Yok</span>`}
+            </td>
             <td>
                 <div class="tableButtons">
-                    <button onclick="openDetailModal('${vehicle.id}')" title="Detay"><i class="fa-solid fa-eye"></i></button>
-                    <button onclick="editVehicle('${vehicle.id}')" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="openDetailModal('${vehicle.id}')" title="Detay & Not Geçmişi"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editVehicle('${vehicle.id}')" title="Düzenle / Tarih Güncelle"><i class="fa-solid fa-pen"></i></button>
                     <button onclick="deleteVehicle('${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash" style="color: #ef4444;"></i></button>
                 </div>
             </td>
@@ -209,7 +195,7 @@ function renderShowroomTable() {
     });
 }
 
-// 2. Otopark Tablosu
+// 2. OTOPARK TABLOSU
 function renderParkingTable() {
     const body = document.getElementById('parkingTableBody');
     if (!body) return;
@@ -218,34 +204,31 @@ function renderParkingTable() {
     const parkingVehicles = vehicles.filter(v => v.location === 'parking');
 
     if (parkingVehicles.length === 0) {
-        body.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 18px;">Otoparkta kayıtlı araç bulunmuyor.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 18px;">Otoparkta araç bulunmuyor.</td></tr>`;
         return;
     }
 
     parkingVehicles.forEach(vehicle => {
         const bigDays = vehicle.bigBatteryDate ? calculateDaysDiff(vehicle.bigBatteryDate) : 0;
-        const isParkingAlert = vehicle.needsBattery === 'yes' && bigDays >= 7; // 1 haftayı geçtiyse
+        const needsCharge = bigDays > 10; // 10 günü geçti ise uyarı
 
         const tr = document.createElement('tr');
-        if (isParkingAlert) tr.classList.add('rowDanger');
+        if (needsCharge) tr.classList.add('rowDanger');
 
         tr.innerHTML = `
             <td style="font-family: monospace; font-weight: 600;">${vehicle.chassis}</td>
             <td style="font-weight: 600;">${vehicle.model}</td>
-            <td>
-                ${vehicle.needsBattery === 'yes' 
-                    ? `<span class="statusBadge needCharge"><i class="fa-solid fa-bolt"></i> Gerekiyor</span>` 
-                    : `<span class="statusBadge healthy"><i class="fa-solid fa-check"></i> Gerekmiyor</span>`}
-            </td>
+            <td>${formatDateTR(vehicle.parkingDate)}</td>
             <td>${formatDateTR(vehicle.bigBatteryDate)}</td>
             <td>
-                <span class="smallBatteryBadge ${bigDays >= 7 ? 'disconnected' : 'connected'}">${bigDays} Gün</span>
+                ${needsCharge 
+                    ? `<span class="statusBadge needCharge"><i class="fa-solid fa-clock-rotate-left"></i> 10 Günü Geçti - Uyarı</span>` 
+                    : `<span class="statusBadge healthy"><i class="fa-solid fa-check"></i> Durum İyi (${bigDays} Gün)</span>`}
             </td>
-            <td style="font-size:12px; color: var(--text-secondary);">${vehicle.createdAt || '-'}</td>
             <td>
                 <div class="tableButtons">
-                    <button onclick="openDetailModal('${vehicle.id}')" title="Detay"><i class="fa-solid fa-eye"></i></button>
-                    <button onclick="editVehicle('${vehicle.id}')" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="openDetailModal('${vehicle.id}')" title="Detay & Not Geçmişi"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editVehicle('${vehicle.id}')" title="Düzenle / Tarih Güncelle"><i class="fa-solid fa-pen"></i></button>
                     <button onclick="deleteVehicle('${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash" style="color: #ef4444;"></i></button>
                 </div>
             </td>
@@ -263,13 +246,9 @@ function renderCards() {
     vehicles.forEach(v => {
         const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
         if (v.location === 'showroom') {
-            if ((v.needsBattery === 'yes' && bigDays > 5) || (v.needsBattery === 'yes' && v.smallBatteryConnected === 'no')) {
-                dangerCount++;
-            }
+            if (bigDays >= 5 || v.smallBatteryConnected === 'no') dangerCount++;
         } else if (v.location === 'parking') {
-            if (v.needsBattery === 'yes' && bigDays >= 7) {
-                dangerCount++;
-            }
+            if (bigDays > 10) dangerCount++;
         }
     });
 
@@ -279,6 +258,7 @@ function renderCards() {
     if (document.getElementById('dangerVehicle')) document.getElementById('dangerVehicle').innerText = dangerCount;
 }
 
+// 3. EN ALTTAN BİLDİRİMLER PANANELİ
 function renderNotifications() {
     const area = document.getElementById('notificationArea');
     if (!area) return;
@@ -289,15 +269,15 @@ function renderNotifications() {
     vehicles.forEach(v => {
         const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
         if (v.location === 'showroom') {
-            if (v.needsBattery === 'yes' && bigDays > 5) {
-                notifications.push(`⚠️ <strong>${v.model} (${v.chassis})</strong>: Showroom büyük akü şarj/bağlantı süresi 5 günü geçti (${bigDays} gün)!`);
+            if (bigDays >= 5) {
+                notifications.push(`🔌 <strong>${v.model} (${v.chassis})</strong>: Showroom büyük akü bağlanalı <strong>${bigDays} gün</strong> oldu. Şarj / Akü bağlanması gerekli!`);
             }
-            if (v.needsBattery === 'yes' && v.smallBatteryConnected === 'no') {
-                notifications.push(`🔌 <strong>${v.model} (${v.chassis})</strong>: Showroom aracı, <strong>Küçüğe Bağla Uyarısı!</strong>`);
+            if (v.smallBatteryConnected === 'no') {
+                notifications.push(`⚠️ <strong>${v.model} (${v.chassis})</strong>: Showroom aracı küçük akü <strong>bağlı değil!</strong>`);
             }
         } else if (v.location === 'parking') {
-            if (v.needsBattery === 'yes' && bigDays >= 7) {
-                notifications.push(`🚨 <strong>${v.model} (${v.chassis})</strong>: Otopark aracı, 1 haftalık akü kontrol uyarısı (${bigDays} gündür bağlı değil)!`);
+            if (bigDays > 10) {
+                notifications.push(`🚨 <strong>${v.model} (${v.chassis})</strong>: Otopark aracı büyük aküye bağlanalı <strong>${bigDays} gün (10 günü geçti)</strong>! Kontrol edilmesi gerekiyor.`);
             }
         }
     });
@@ -305,7 +285,7 @@ function renderNotifications() {
     if (notifications.length === 0) {
         area.innerHTML = `
             <div style="background: #dcfce7; color: #15803d; padding: 12px 16px; border-radius: 10px; font-size: 13px;">
-                <i class="fa-solid fa-circle-check"></i> Şu an ikaz veya akü uyarısı veren araç bulunmamaktadır.
+                <i class="fa-solid fa-circle-check"></i> Şu an ikaz gerektiren bir araç bulunmuyor. Tüm akü durumları stabil.
             </div>
         `;
         return;
@@ -325,16 +305,15 @@ function openVehicleModal() {
     document.getElementById('vehicleChassis').value = '';
     document.getElementById('vehicleModel').value = '';
     document.getElementById('vehicleLocation').value = 'showroom';
-    document.getElementById('needsBatterySelect').value = 'no';
     
     const today = new Date().toISOString().split('T')[0];
+    document.getElementById('parkingDate').value = today;
     document.getElementById('bigBatteryDate').value = today;
     document.getElementById('smallBatteryDate').value = today;
     document.getElementById('smallBatteryConnected').value = 'yes';
     document.getElementById('vehicleNote').value = '';
 
-    document.getElementById('createdAtGroup').classList.add('hidden');
-    toggleBatteryDatesGroup();
+    handleLocationChangeInModal();
 
     const modal = document.getElementById('vehicleModal');
     if (modal) modal.classList.add('active');
@@ -349,44 +328,52 @@ function handleSaveVehicle() {
     const chassis = document.getElementById('vehicleChassis').value.trim();
     const model = document.getElementById('vehicleModel').value.trim();
     const location = document.getElementById('vehicleLocation').value;
-    const needsBattery = document.getElementById('needsBatterySelect').value;
+    const parkingDate = document.getElementById('parkingDate').value;
     const bigBatteryDate = document.getElementById('bigBatteryDate').value;
     const smallBatteryDate = document.getElementById('smallBatteryDate').value;
     const smallBatteryConnected = document.getElementById('smallBatteryConnected').value;
-    const note = document.getElementById('vehicleNote').value.trim();
+    const noteText = document.getElementById('vehicleNote').value.trim();
 
     if (!chassis || !model) {
         alert('Lütfen Şase No ve Marka/Model alanlarını doldurunuz.');
         return;
     }
 
+    const timeStamp = getCurrentDateTimeFormatted();
+    const newNoteObj = noteText ? { date: timeStamp, note: noteText } : null;
+
     if (editingVehicleId) {
+        // Düzenleme
         const index = vehicles.findIndex(v => v.id === editingVehicleId);
         if (index !== -1) {
+            const history = vehicles[index].notesHistory || [];
+            if (newNoteObj) history.unshift(newNoteObj); // Yeni notu başa ekle
+
             vehicles[index] = {
                 ...vehicles[index],
                 chassis,
                 model,
                 location,
-                needsBattery,
-                bigBatteryDate: needsBattery === 'yes' ? bigBatteryDate : '',
-                smallBatteryDate: (needsBattery === 'yes' && location === 'showroom') ? smallBatteryDate : '',
+                parkingDate: location === 'parking' ? parkingDate : '',
+                bigBatteryDate,
+                smallBatteryDate: location === 'showroom' ? smallBatteryDate : '',
                 smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no',
-                note
+                notesHistory: history
             };
         }
     } else {
+        // Yeni Kayıt
+        const history = newNoteObj ? [newNoteObj] : [{ date: timeStamp, note: 'Sisteme araç kaydı oluşturuldu.' }];
         const newVehicle = {
             id: Date.now().toString(),
             chassis,
             model,
             location,
-            needsBattery,
-            bigBatteryDate: needsBattery === 'yes' ? bigBatteryDate : '',
-            smallBatteryDate: (needsBattery === 'yes' && location === 'showroom') ? smallBatteryDate : '',
+            parkingDate: location === 'parking' ? parkingDate : '',
+            bigBatteryDate,
+            smallBatteryDate: location === 'showroom' ? smallBatteryDate : '',
             smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no',
-            createdAt: getCurrentDateTimeFormatted(),
-            note
+            notesHistory: history
         };
         vehicles.push(newVehicle);
     }
@@ -401,26 +388,19 @@ window.editVehicle = function(id) {
     if (!vehicle) return;
 
     editingVehicleId = id;
-    document.getElementById('modalTitle').innerText = 'Aracı Düzenle';
+    document.getElementById('modalTitle').innerText = 'Aracı Düzenle / Akü Tarihi Güncelle';
     document.getElementById('vehicleChassis').value = vehicle.chassis;
     document.getElementById('vehicleModel').value = vehicle.model;
     document.getElementById('vehicleLocation').value = vehicle.location;
-    document.getElementById('needsBatterySelect').value = vehicle.needsBattery;
     
     const today = new Date().toISOString().split('T')[0];
+    document.getElementById('parkingDate').value = vehicle.parkingDate || today;
     document.getElementById('bigBatteryDate').value = vehicle.bigBatteryDate || today;
     document.getElementById('smallBatteryDate').value = vehicle.smallBatteryDate || today;
     document.getElementById('smallBatteryConnected').value = vehicle.smallBatteryConnected || 'yes';
-    document.getElementById('vehicleNote').value = vehicle.note || '';
+    document.getElementById('vehicleNote').value = '';
 
-    const createdAtField = document.getElementById('vehicleCreatedAtDisplay');
-    const createdAtGroup = document.getElementById('createdAtGroup');
-    if (createdAtField && createdAtGroup) {
-        createdAtField.value = vehicle.createdAt || '-';
-        createdAtGroup.classList.remove('hidden');
-    }
-
-    toggleBatteryDatesGroup();
+    handleLocationChangeInModal();
 
     const modal = document.getElementById('vehicleModal');
     if (modal) modal.classList.add('active');
@@ -443,11 +423,28 @@ window.openDetailModal = function(id) {
 
     document.getElementById('detailChassis').innerText = vehicle.chassis;
     document.getElementById('detailModel').innerText = vehicle.model;
-    document.getElementById('detailLocation').innerText = vehicle.location === 'showroom' ? 'Showroom' : 'Otopark / Stok';
-    document.getElementById('detailNeeds').innerText = vehicle.needsBattery === 'yes' ? 'Akü Bağlantısı Var' : 'Yok';
+    document.getElementById('detailLocation').innerText = vehicle.location === 'showroom' ? 'Showroom' : 'Otopark';
     document.getElementById('detailBigDate').innerText = formatDateTR(vehicle.bigBatteryDate);
     document.getElementById('detailSmallDate').innerText = vehicle.location === 'showroom' ? formatDateTR(vehicle.smallBatteryDate) : 'N/A';
-    document.getElementById('detailNoteText').innerText = vehicle.note || 'Not bulunmuyor.';
+    document.getElementById('detailParkDate').innerText = vehicle.location === 'parking' ? formatDateTR(vehicle.parkingDate) : 'N/A';
+
+    const notesContainer = document.getElementById('detailNotesHistory');
+    notesContainer.innerHTML = '';
+
+    const history = vehicle.notesHistory || [];
+    if (history.length === 0) {
+        notesContainer.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">Kayıtlı not bulunmuyor.</p>`;
+    } else {
+        history.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'historyNoteItem';
+            itemDiv.innerHTML = `
+                <div class="noteDate">${item.date}</div>
+                <div class="noteText">${item.note}</div>
+            `;
+            notesContainer.appendChild(itemDiv);
+        });
+    }
 
     const modal = document.getElementById('detailModal');
     if (modal) modal.classList.add('active');
@@ -458,44 +455,32 @@ function closeDetailModal() {
     if (modal) modal.classList.remove('active');
 }
 
-// CANLI ENVANTER EXCEL (XLSX) DIŞA AKTARMA
+// İSTENİLEN REVEZE EDİLMİŞ EXCEL DIŞA AKTARMA
 window.exportInventoryToExcel = function() {
     if (vehicles.length === 0) {
-        alert('Sistemde indirilecek araç verisi bulunmuyor.');
+        alert('İndirilecek araç kaydı bulunmuyor.');
         return;
     }
 
-    // O anki tüm veriyi detaylı tablo objesine çevirme
     const exportData = vehicles.map(v => {
-        const bigDays = v.bigBatteryDate ? calculateDaysDiff(v.bigBatteryDate) : 0;
-        let ikazDurumu = 'Sağlıklı';
-
-        if (v.location === 'showroom') {
-            if (v.needsBattery === 'yes' && bigDays > 5) ikazDurumu = 'Büyük Akü İkazı (>5 Gün)';
-            if (v.needsBattery === 'yes' && v.smallBatteryConnected === 'no') ikazDurumu = 'Küçük Akü Bağlı Değil';
-        } else {
-            if (v.needsBattery === 'yes' && bigDays >= 7) ikazDurumu = 'Otopark Kontrol Uyarısı (>=7 Gün)';
-        }
+        // Tüm geçmiş notları birleştirme
+        const historyText = v.notesHistory 
+            ? v.notesHistory.map(h => `[${h.date}] ${h.note}`).join(' | ')
+            : '-';
 
         return {
-            "Şase No (VIN)": v.chassis,
+            "Şase No": v.chassis,
             "Marka Model": v.model,
-            "Araç Konumu": v.location === 'showroom' ? 'Showroom' : 'Otopark / Stok',
-            "Akü Bağlantısı Var Mı": v.needsBattery === 'yes' ? 'Evet' : 'Hayır',
-            "Büyük Akü Bağlantı Tarihi": formatDateTR(v.bigBatteryDate),
-            "Büyük Akü Geçen Gün": bigDays,
-            "Küçük Akü Durumu (Showroom)": v.location === 'showroom' ? (v.smallBatteryConnected === 'yes' ? 'Bağlı' : 'Bağlı Değil') : 'N/A',
-            "Küçük Akü Tarihi": v.location === 'showroom' ? formatDateTR(v.smallBatteryDate) : 'N/A',
-            "Genel İkaz Durumu": ikazDurumu,
-            "Sisteme Kayıt Tarihi": v.createdAt || '-',
-            "Araç Notu": v.note || '-'
+            "Büyük Aküye Bağlandığı Tarih": formatDateTR(v.bigBatteryDate),
+            "Küçük Aküye Bağlandığı Tarih": v.location === 'showroom' ? formatDateTR(v.smallBatteryDate) : 'N/A',
+            "Eklenilen Geçmiş Notlar": historyText
         };
     });
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Canlı Araç Envanteri");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Guncel_Stok_Aku_Listesi");
 
-    const fileName = `Inciroglu_BMW_Canli_Envanter_${new Date().toISOString().split('T')[0]}.xlsx`;
+    const fileName = `Inciroglu_BMW_Guncel_Stok_Aku_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(workbook, fileName);
 };
