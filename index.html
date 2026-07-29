@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="light-theme" id="appBody">
+<body class="light-theme">
 
     <div class="bmw-m-stripe"></div>
 
@@ -38,23 +38,17 @@
 
             <div class="headerRight">
                 <!-- Tema Değiştirme Butonu -->
-                <button class="themeToggleBtn" onclick="toggleTheme()" title="Karanlık/Aydınlık Tema Geçişi">
+                <button id="themeToggleBtn" class="themeToggleBtn" onclick="toggleTheme()" title="Temayı Değiştir">
                     <i class="fa-solid fa-moon" id="themeIcon"></i>
                 </button>
-
-                <!-- Admin Paneli Butonu -->
-                <button class="bmwBtnAdmin" onclick="openAdminModal()">
-                    <i class="fa-solid fa-user-shield"></i>
-                    <span>Admin Paneli</span>
-                </button>
-
+                
                 <button id="summaryReportBtn" class="bmwBtnPrimary" style="background-color: #475569;" onclick="openSummaryReportModal()">
                     <i class="fa-solid fa-file-lines"></i>
                     <span>Özet İşlem Raporu</span>
                 </button>
                 <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="openExcelFilterModal()">
                     <i class="fa-solid fa-file-excel"></i>
-                    <span>Tarihli Excel Raporu</span>
+                    <span>Tarihli Excel Raporu İndir</span>
                 </button>
                 <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -106,7 +100,7 @@
             </div>
         </section>
 
-        <!-- SHOWROOM ARAÇ LİSTESİ -->
+        <!-- 1. EN ÜST: SHOWROOM ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
@@ -133,7 +127,7 @@
             </div>
         </section>
 
-        <!-- OTOPARK ARAÇ LİSTESİ -->
+        <!-- 2. ORTADA: OTOPARK ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
@@ -159,7 +153,7 @@
             </div>
         </section>
 
-        <!-- BİLDİRİMLER EKRANI -->
+        <!-- 3. EN ALTTAN: BİLDİRİMLER EKRANI -->
         <section class="notificationSection">
             <div class="sectionHeader">
                 <div>
@@ -329,60 +323,59 @@
             </div>
         </div>
 
-        <!-- ADMIN PANELI MODALI (GİRİŞ VE LOG TEMİZLEME YÖNETİMİ) -->
-        <div class="modal" id="adminModal">
-            <div class="modalContent" style="max-width: 650px;">
+        <!-- YÖNETİCİ GİRİŞ / ADMIN MODALI -->
+        <div class="modal" id="adminLoginModal">
+            <div class="modalContent" style="max-width: 380px;">
                 <div class="modalHeader">
-                    <h2><i class="fa-solid fa-user-shield" style="color: #8b5cf6;"></i> Admin Yönetim Paneli</h2>
-                    <button onclick="closeAdminModal()"><i class="fa-solid fa-xmark"></i></button>
+                    <h2><i class="fa-solid fa-user-shield" style="color: var(--bmw-blue);"></i> Yönetici Girişi</h2>
+                    <button onclick="closeAdminLoginModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
-                    <!-- Giriş Yapılmamışsa Ekranı -->
-                    <div id="adminLoginForm">
-                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
-                            Yönetici paneline erişmek için lütfen admin şifrenizi giriniz.
-                        </p>
-                        <div class="inputGroup">
-                            <label>Admin Şifresi</label>
-                            <input type="password" id="adminPasswordInput" placeholder="Varsayılan Şifre: admin123">
-                        </div>
-                        <button class="saveButton" style="width: 100%; margin-top: 10px; background-color: #8b5cf6;" onclick="handleAdminLogin()">
-                            <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
-                        </button>
-                    </div>
-
-                    <!-- Giriş Yapıldıktan Sonraki Admin Yetki Ekranı -->
-                    <div id="adminDashboard" class="hidden">
-                        <div class="adminTabHeader">
-                            <span>Hoş Geldiniz, <strong>Sistem Yöneticisi</strong></span>
-                            <button class="cancelButton" style="padding: 4px 10px; font-size: 11px;" onclick="handleAdminLogout()">Çıkış Yap</button>
-                        </div>
-
-                        <!-- Silinmiş Araçları Temizleme Bölümü -->
-                        <div class="adminCard">
-                            <h3><i class="fa-solid fa-trash-can-arrow-up"></i> Silinen Araç & Log Yönetimi (Kalıcı Temizleme)</h3>
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                                Aşağıda silinmiş araçların geçmiş kayıtları yer almaktadır. Buradan kalıcı olarak veritabanından silebilirsiniz.
-                            </p>
-                            <div id="adminDeletedVehiclesList" class="adminLogList"></div>
-                        </div>
-
-                        <!-- Yedekleme & Sıfırlama Bölümü -->
-                        <div class="adminCard" style="margin-top: 16px;">
-                            <h3><i class="fa-solid fa-sliders"></i> Sistem Araçları & Veri Yedeği</h3>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button class="bmwBtnSecondary" style="font-size: 11px;" onclick="exportSystemBackupJSON()">
-                                    <i class="fa-solid fa-file-export"></i> Sistem Yedeği İndir (JSON)
-                                </button>
-                                <button class="cancelButton" style="font-size: 11px; color: #ef4444; border-color: #fca5a5;" onclick="clearAllData()">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> Tüm Verileri Sıfırla
-                                </button>
-                            </div>
-                        </div>
+                    <div class="inputGroup">
+                        <label>Yönetici Şifresi</label>
+                        <input type="password" id="adminPasswordInput" placeholder="Şifrenizi giriniz...">
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeAdminModal()">Kapat</button>
+                    <button class="cancelButton" onclick="closeAdminLoginModal()">İptal</button>
+                    <button class="saveButton" onclick="handleAdminLogin()">Giriş Yap</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL MODALI -->
+        <div class="modal" id="adminPanelModal">
+            <div class="modalContent" style="max-width: 500px;">
+                <div class="modalHeader">
+                    <h2><i class="fa-solid fa-sliders" style="color: var(--bmw-blue);"></i> Yönetici Paneli</h2>
+                    <button onclick="closeAdminPanelModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modalBody">
+                    <div class="adminActionBox">
+                        <h4><i class="fa-solid fa-database"></i> Sistem Yedekleme & Geri Yükleme</h4>
+                        <p>Tüm araç kayıtları, geçmiş işlemler ve silinen veri loglarını yedekleyebilir veya geri yükleyebilirsiniz.</p>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 12px;">
+                            <button class="bmwBtnPrimary" style="flex:1;" onclick="downloadBackupJSON()">
+                                <i class="fa-solid fa-download"></i> Yedeği İndir
+                            </button>
+                            <label class="bmwBtnSecondary" style="flex:1; text-align:center; cursor:pointer;">
+                                <i class="fa-solid fa-upload"></i> Yedek Yükle
+                                <input type="file" id="backupFileInput" accept=".json" onchange="uploadBackupJSON(event)" style="display:none;">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="adminActionBox danger">
+                        <h4><i class="fa-solid fa-trash-can"></i> Rapor ve Veri Sıfırlama</h4>
+                        <p>Tüm araç stok verilerini, işlem loglarını ve silinmiş geçmiş raporları kalıcı olarak temizler.</p>
+                        <button class="saveButton" style="background:#ef4444; width:100%; margin-top:12px;" onclick="resetAllData()">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Tüm Verileri ve Logları Sıfırla
+                        </button>
+                    </div>
+                </div>
+                <div class="modalFooter">
+                    <button class="cancelButton" onclick="closeAdminPanelModal()">Kapat</button>
                 </div>
             </div>
         </div>
@@ -393,6 +386,10 @@
             </div>
             <div class="footerRight">
                 <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
+                <span style="margin: 0 8px; color: var(--border-color);">|</span>
+                <a href="javascript:void(0)" onclick="openAdminLoginModal()" class="adminLink">
+                    <i class="fa-solid fa-lock"></i> Yönetici Girişi
+                </a>
             </div>
         </footer>
 
