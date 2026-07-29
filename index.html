@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İnciroğlu BMW | Stok & Akü Takip Sistemi</title>
 
-    <!-- Font & Icon Kütüphaneleri -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,6 +15,30 @@
     <!-- SheetJS Excel Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDK Entegrasyonu -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0Tsq47AP0hHOE07Zx7eRrhbKM_mRExBQ",
+            authDomain: "akutakipsistemi.firebaseapp.com",
+            projectId: "akutakipsistemi",
+            storageBucket: "akutakipsistemi.firebasestorage.app",
+            messagingSenderId: "695694258769",
+            appId: "1:695694258769:web:98ef6b20834ae0d2c4be70",
+            measurementId: "G-NVEKV77R8W"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        // app.js içerisinden erişmek isterseniz window nesnesine atayabilirsiniz
+        window.firebaseApp = app;
+        window.firebaseAnalytics = analytics;
+    </script>
 </head>
 
 <body class="light-theme">
@@ -24,7 +47,7 @@
 
     <main class="mainContent container-fluid">
 
-        <!-- HEADER / ÜST BAR -->
+        <!-- Header -->
         <header class="bmw-header">
             <div class="headerLeft">
                 <div class="brandBadge">
@@ -62,7 +85,7 @@
             </div>
         </header>
 
-        <!-- DASHBOARD ÖZET KARTLARI -->
+        <!-- Dashboard Özet Kartları -->
         <section class="dashboardCards">
             <div class="card">
                 <div class="cardIcon blue"><i class="fa-solid fa-car"></i></div>
@@ -101,7 +124,7 @@
             </div>
         </section>
 
-        <!-- 1. SHOWROOM ARAÇ LİSTESİ -->
+        <!-- 1. EN ÜST: SHOWROOM ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
@@ -128,7 +151,7 @@
             </div>
         </section>
 
-        <!-- 2. OTOPARK ARAÇ LİSTESİ -->
+        <!-- 2. ORTADA: OTOPARK ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
@@ -154,7 +177,7 @@
             </div>
         </section>
 
-        <!-- 3. BİLDİRİMLER & AKÜ İKAZ PANELİ -->
+        <!-- 3. EN ALTTAN: BİLDİRİMLER EKRANI -->
         <section class="notificationSection">
             <div class="sectionHeader">
                 <div>
@@ -234,7 +257,7 @@
 
                     <div class="inputGroup full">
                         <label>Yeni İşlem / Araç Notu Girin</label>
-                        <textarea id="vehicleNote" rows="2" placeholder="Yapılan işlemi veya notu giriniz..."></textarea>
+                        <textarea id="vehicleNote" rows="2" placeholder="Yapılan işlemi veya durumu giriniz..."></textarea>
                     </div>
                 </div>
                 <div class="modalFooter">
@@ -246,7 +269,7 @@
             </div>
         </div>
 
-        <!-- MODAL: DETAY & GEÇMİŞ NOTLAR -->
+        <!-- DETAY & GEÇMİŞ NOTLAR MODALI -->
         <div class="modal" id="detailModal">
             <div class="modalContent">
                 <div class="modalHeader">
@@ -268,7 +291,7 @@
                     
                     <div style="margin-top: 18px;">
                         <h3 style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Araç Not & İşlem Geçmişi (Cloud Saklanan)
+                            <i class="fa-solid fa-clock-rotate-left"></i> Araç Not & İşlem Geçmişi
                         </h3>
                         <div id="detailNotesHistory" class="notesHistoryContainer"></div>
                     </div>
@@ -279,7 +302,7 @@
             </div>
         </div>
 
-        <!-- MODAL: ÖZET İŞLEM RAPORU -->
+        <!-- ÖZET İŞLEM RAPORU MODALI -->
         <div class="modal" id="summaryReportModal">
             <div class="modalContent">
                 <div class="modalHeader">
@@ -295,7 +318,7 @@
             </div>
         </div>
 
-        <!-- MODAL: TARİHLİ EXCEL İNDİRME -->
+        <!-- TARİHLİ EXCEL İNDİRME MODALI -->
         <div class="modal" id="excelFilterModal">
             <div class="modalContent" style="max-width: 420px;">
                 <div class="modalHeader">
@@ -304,7 +327,7 @@
                 </div>
                 <div class="modalBody">
                     <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-                        Belirttiğiniz tarihler arasında yapılan işlemleri ve araç detaylarını Excel dosyasına aktarır.
+                        Belirttiğiniz tarihler arasında yapılan tüm işlemleri ve silinen araç detaylarını Excel dosyasına aktarır.
                     </p>
                     <div class="inputGroup">
                         <label>Başlangıç Tarihi</label>
@@ -324,7 +347,7 @@
             </div>
         </div>
 
-        <!-- MODAL: YÖNETİCİ GİRİŞİ (HİÇBİR İPUCU GÖSTERİLMEZ) -->
+        <!-- YÖNETİCİ GİRİŞ / ADMIN MODALI -->
         <div class="modal" id="adminLoginModal">
             <div class="modalContent" style="max-width: 380px;">
                 <div class="modalHeader">
@@ -344,7 +367,7 @@
             </div>
         </div>
 
-        <!-- MODAL: ADMIN PANELİ (EXCEL İTHALAT & SIFIRLAMA) -->
+        <!-- ADMIN PANEL MODALI -->
         <div class="modal" id="adminPanelModal">
             <div class="modalContent" style="max-width: 500px;">
                 <div class="modalHeader">
@@ -367,7 +390,7 @@
                         </div>
                     </div>
 
-                    <div class="adminActionBox danger" style="margin-top: 12px;">
+                    <div class="adminActionBox danger">
                         <h4><i class="fa-solid fa-trash-can"></i> Rapor ve Veri Sıfırlama</h4>
                         <p>Tüm araç stok verilerini, işlem loglarını ve silinmiş geçmiş raporları kalıcı olarak temizler.</p>
                         <button class="saveButton" style="background:#ef4444; width:100%; margin-top:12px;" onclick="resetAllData()">
@@ -381,7 +404,6 @@
             </div>
         </div>
 
-        <!-- FOOTER -->
         <footer class="footer">
             <div class="footerLeft">
                 <strong>İnciroğlu BMW Akü Takip Paneli</strong>
