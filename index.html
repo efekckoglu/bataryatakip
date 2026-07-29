@@ -1,404 +1,398 @@
 <!DOCTYPE html>
-<html lang="tr">
-
+<html lang="tr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İnciroğlu BMW | Stok & Akü Takip Sistemi</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    
-    <!-- SheetJS Excel Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>Batarya Takip Sistemi</title>
+    <!-- Tailwind CSS & DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Iconlar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .transition-theme { transition: background-color 0.3s ease, color 0.3s ease; }
+    </style>
 </head>
+<body class="bg-base-200 min-h-screen transition-theme text-base-content">
 
-<body class="light-theme" id="appBody">
-
-    <div class="bmw-m-stripe"></div>
-
-    <main class="mainContent container-fluid">
-
-        <!-- Header -->
-        <header class="bmw-header">
-            <div class="headerLeft">
-                <div class="brandBadge">
-                    <div class="bmwLogoIcon"><i class="fa-solid fa-car-side"></i></div>
-                    <div>
-                        <div class="bmwSeriesTitle">İNCİROĞLU BMW</div>
-                        <h1>Stok & Akü Takip Panel <span class="mTextColorful"><span class="c1">/</span><span class="c2">/</span><span class="c3">M</span></span></h1>
-                    </div>
-                </div>
-                <p class="headerSubtitle">Anlık Showroom ve Otopark Araç Akü Yönetimi</p>
+    <!-- Header / Navigasyon -->
+    <div class="navbar bg-base-100 shadow-lg px-4 sm:px-8">
+        <div class="flex-1">
+            <a class="btn btn-ghost normal-case text-xl gap-2">
+                <i class="fa-solid fa-battery-half text-primary text-2xl"></i>
+                <span class="font-bold tracking-wide">Batarya Takip</span>
+            </a>
+        </div>
+        <div class="flex-none gap-2">
+            <!-- Admin durumunu gösteren bilgi rozeti -->
+            <div id="adminBadge" class="hidden badge badge-secondary gap-1 p-3">
+                <i class="fa-solid fa-user-shield"></i> Admin Modu
+                <button onclick="adminCikis()" class="btn btn-xs btn-circle btn-ghost ml-1">✕</button>
             </div>
+        </div>
+    </div>
 
-            <div class="headerRight">
-                <!-- Tema Değiştirme Butonu -->
-                <button class="themeToggleBtn" onclick="toggleTheme()" title="Karanlık/Aydınlık Tema Geçişi">
-                    <i class="fa-solid fa-moon" id="themeIcon"></i>
-                </button>
-
-                <!-- Admin Paneli Butonu -->
-                <button class="bmwBtnAdmin" onclick="openAdminModal()">
-                    <i class="fa-solid fa-user-shield"></i>
-                    <span>Admin Paneli</span>
-                </button>
-
-                <button id="summaryReportBtn" class="bmwBtnPrimary" style="background-color: #475569;" onclick="openSummaryReportModal()">
-                    <i class="fa-solid fa-file-lines"></i>
-                    <span>Özet İşlem Raporu</span>
-                </button>
-                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="openExcelFilterModal()">
-                    <i class="fa-solid fa-file-excel"></i>
-                    <span>Tarihli Excel Raporu</span>
-                </button>
-                <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    <span>Yeni Araç Ekle</span>
-                </button>
-                <div class="todayDate">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <span id="todayDate">-</span>
+    <!-- Ana Konteyner -->
+    <div class="container mx-auto p-4 max-w-5xl">
+        
+        <!-- YÖNETİCİ GİRİŞ EKRANI (Sadece /admin adresiyle erişildiğinde görünür) -->
+        <div id="adminLoginSection" class="hidden card bg-base-100 shadow-xl max-w-md mx-auto my-12 border border-primary/20">
+            <div class="card-body">
+                <h2 class="card-title justify-center text-2xl font-bold gap-2 text-primary">
+                    <i class="fa-solid fa-lock"></i> Yönetici Girişi
+                </h2>
+                <p class="text-xs text-center opacity-60">Lütfen devam etmek için admin şifresini giriniz.</p>
+                <div class="form-control mt-4">
+                    <label class="label"><span class="label-text font-semibold">Giriş Şifresi</span></label>
+                    <input type="password" id="adminPasswordInput" placeholder="••••••••" class="input input-bordered w-full" onkeyup="if(event.key==='Enter') adminGirisYap()">
                 </div>
-            </div>
-        </header>
-
-        <!-- Dashboard Özet Kartları -->
-        <section class="dashboardCards">
-            <div class="card">
-                <div class="cardIcon blue"><i class="fa-solid fa-car"></i></div>
-                <div class="cardContent">
-                    <span>Toplam Aktif Stok</span>
-                    <h2 id="totalVehicle">0</h2>
-                    <small>Showroom + Otopark</small>
-                </div>
-            </div>
-
-            <div class="card border-green">
-                <div class="cardIcon green"><i class="fa-solid fa-store"></i></div>
-                <div class="cardContent">
-                    <span>Showroom</span>
-                    <h2 id="showroomCount">0</h2>
-                    <small>Teşhir Araçları</small>
-                </div>
-            </div>
-
-            <div class="card border-yellow">
-                <div class="cardIcon yellow"><i class="fa-solid fa-warehouse"></i></div>
-                <div class="cardContent">
-                    <span>Otopark</span>
-                    <h2 id="parkingCount">0</h2>
-                    <small>Stok Araçları</small>
-                </div>
-            </div>
-
-            <div class="card border-red">
-                <div class="cardIcon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                <div class="cardContent">
-                    <span>İkazlı Araçlar</span>
-                    <h2 id="dangerVehicle">0</h2>
-                    <small>Akü Şarj / Bağlantı İhtiyacı</small>
-                </div>
-            </div>
-        </section>
-
-        <!-- SHOWROOM ARAÇ LİSTESİ -->
-        <section class="vehicleSection">
-            <div class="sectionHeader">
-                <div>
-                    <h2><i class="fa-solid fa-store" style="color: var(--bmw-blue);"></i> Showroom Araç Listesi</h2>
-                    <p>Showroom alanındaki araçların büyük ve küçük akü durumları</p>
-                </div>
-            </div>
-
-            <div class="tableArea">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Şase No (VIN)</th>
-                            <th>Araç Marka Model</th>
-                            <th>Büyük Akü Bağlanma Tarihi</th>
-                            <th>Geçen Süre</th>
-                            <th>Küçük Akü Durumu</th>
-                            <th>Büyük Akü Durumu</th>
-                            <th>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody id="showroomTableBody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- OTOPARK ARAÇ LİSTESİ -->
-        <section class="vehicleSection">
-            <div class="sectionHeader">
-                <div>
-                    <h2><i class="fa-solid fa-warehouse" style="color: var(--status-yellow);"></i> Otopark Araç Listesi</h2>
-                    <p>Otopark stok alanındaki araçların 10 günlük akü kontrol durumları</p>
-                </div>
-            </div>
-
-            <div class="tableArea">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Şase No (VIN)</th>
-                            <th>Marka ve Model</th>
-                            <th>Otoparka Çekilme Günü</th>
-                            <th>Büyük Aküye Bağlanma Tarihi</th>
-                            <th>Büyük Akü Durumu</th>
-                            <th>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody id="parkingTableBody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- BİLDİRİMLER EKRANI -->
-        <section class="notificationSection">
-            <div class="sectionHeader">
-                <div>
-                    <h2><i class="fa-solid fa-bell" style="color: #e11d48;"></i> Akü İkazları & Bildirim Paneli</h2>
-                    <p>Müdahale gerektiren Showroom ve Otopark araç bildirimleri</p>
-                </div>
-            </div>
-            <div id="notificationArea"></div>
-        </section>
-
-        <!-- MODAL: YENİ ARAÇ EKLE / DÜZENLE -->
-        <div class="modal" id="vehicleModal">
-            <div class="modalContent">
-                <div class="modalHeader">
-                    <h2 id="modalTitle">Yeni Araç Ekle</h2>
-                    <button onclick="closeVehicleModal()"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="modalBody">
-                    <div class="inputGroup">
-                        <label>Şase No (VIN) *</label>
-                        <input type="text" id="vehicleChassis" placeholder="WBAXXXXXXXXXXXXXXX">
-                    </div>
-
-                    <div class="inputGroup">
-                        <label>Marka & Model *</label>
-                        <input type="text" id="vehicleModel" placeholder="BMW i4 M50 / MINI Cooper">
-                    </div>
-
-                    <div class="inputGroup">
-                        <label>Mülkiyet Durumu *</label>
-                        <select id="vehicleOwnership">
-                            <option value="stok">Stok Aracı</option>
-                            <option value="konsinye">Konsinye Araç</option>
-                        </select>
-                    </div>
-
-                    <div class="inputGroup">
-                        <label>Araç Konumu *</label>
-                        <select id="vehicleLocation" onchange="handleLocationChangeInModal()">
-                            <option value="showroom">Showroom</option>
-                            <option value="parking">Otopark</option>
-                        </select>
-                    </div>
-
-                    <div class="inputGroup">
-                        <label>Akü Bağlantısı Yapıldı mı / Gerekiyor mu? *</label>
-                        <select id="batteryRequired" onchange="toggleBatteryDateInputs()">
-                            <option value="no">Hayır (Gerekli Değil)</option>
-                            <option value="yes">Evet (Bağlantı Yapıldı)</option>
-                        </select>
-                    </div>
-
-                    <div class="inputGroup hidden" id="parkingDateGroup">
-                        <label>Otoparka Çekilme Tarihi</label>
-                        <input type="date" id="parkingDate">
-                    </div>
-
-                    <div class="chargeInputsGroup hidden" id="batteryDatesWrapper">
-                        <div class="inputGroup">
-                            <label>Büyük Akü Bağlanma Tarihi</label>
-                            <input type="date" id="bigBatteryDate">
-                        </div>
-
-                        <div class="inputGroup" id="smallBatteryDateGroup">
-                            <label>Küçük Akü Bağlanma Tarihi</label>
-                            <input type="date" id="smallBatteryDate">
-                        </div>
-
-                        <div class="inputGroup" id="smallBatteryStatusGroup">
-                            <label>Küçük Akü Bağlı mı?</label>
-                            <select id="smallBatteryConnected">
-                                <option value="yes">Bağlı (Yeşil)</option>
-                                <option value="no">Bağlı Değil (Kırmızı)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="inputGroup full">
-                        <label>Yeni İşlem / Araç Notu Girin</label>
-                        <textarea id="vehicleNote" rows="2" placeholder="Yapılan işlemi veya durumu giriniz..."></textarea>
-                    </div>
-                </div>
-                <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeVehicleModal()">Vazgeç</button>
-                    <button class="saveButton" onclick="handleSaveVehicle()">
-                        <i class="fa-solid fa-floppy-disk"></i> Kaydet
+                <div class="card-actions justify-end mt-6">
+                    <button onclick="adminGirisYap()" class="btn btn-primary w-full">
+                        <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- DETAY & GEÇMİŞ NOTLAR MODALI -->
-        <div class="modal" id="detailModal">
-            <div class="modalContent">
-                <div class="modalHeader">
-                    <h2>Araç Detayı ve Geçmiş Notlar</h2>
-                    <button onclick="closeDetailModal()"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="modalBody">
-                    <div class="detailCard">
-                        <div class="detailGrid">
-                            <div><span>Şase No</span><strong id="detailChassis">-</strong></div>
-                            <div><span>Model</span><strong id="detailModel">-</strong></div>
-                            <div><span>Mülkiyet Durumu</span><strong id="detailOwnership" style="color:var(--bmw-blue);">-</strong></div>
-                            <div><span>Konum</span><strong id="detailLocation">-</strong></div>
-                            <div><span>Büyük Akü Tarihi</span><strong id="detailBigDate">-</strong></div>
-                            <div><span>Küçük Akü Tarihi</span><strong id="detailSmallDate">-</strong></div>
-                            <div><span>Otopark Tarihi</span><strong id="detailParkDate">-</strong></div>
+        <!-- KULLANICI ANA EKRANI -->
+        <div id="mainAppSection">
+            
+            <!-- Tarih ve Tema Seçim Alanı -->
+            <div class="card bg-base-100 shadow-md mb-6">
+                <div class="card-body p-6">
+                    <!-- 1. Tarih Seçimi -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-bold text-base flex items-center gap-2">
+                                <i class="fa-regular fa-calendar-days text-primary"></i> İşlem Tarihi Seçin
+                            </span>
+                        </label>
+                        <input type="date" id="selectedDate" class="input input-bordered w-full" onchange="tarihDegisti()">
+                    </div>
+
+                    <div class="divider my-2"></div>
+
+                    <!-- 2. Tema Seçimi (Tarihin Hemen Altında) -->
+                    <div class="flex items-center justify-between bg-base-200 p-3 rounded-xl">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-palette text-secondary"></i>
+                            <span class="text-sm font-semibold">Görünüm Teması</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs opacity-70"><i class="fa-solid fa-sun"></i> Açık</span>
+                            <input type="checkbox" id="themeToggle" class="toggle toggle-primary" onchange="temaDegistir(this.checked)">
+                            <span class="text-xs opacity-70"><i class="fa-solid fa-moon"></i> Koyu</span>
                         </div>
                     </div>
-                    
-                    <div style="margin-top: 18px;">
-                        <h3 style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Araç Not & İşlem Geçmişi
-                        </h3>
-                        <div id="detailNotesHistory" class="notesHistoryContainer"></div>
-                    </div>
-                </div>
-                <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeDetailModal()">Kapat</button>
                 </div>
             </div>
-        </div>
 
-        <!-- ÖZET İŞLEM RAPORU MODALI -->
-        <div class="modal" id="summaryReportModal">
-            <div class="modalContent">
-                <div class="modalHeader">
-                    <h2><i class="fa-solid fa-chart-pie"></i> Sistem Tüm İşlem Raporu (Silinenler Dahil)</h2>
-                    <button onclick="closeSummaryReportModal()"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="modalBody">
-                    <div id="summaryReportContent" class="summaryReportArea"></div>
-                </div>
-                <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeSummaryReportModal()">Kapat</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TARİHLİ EXCEL İNDİRME MODALI -->
-        <div class="modal" id="excelFilterModal">
-            <div class="modalContent" style="max-width: 420px;">
-                <div class="modalHeader">
-                    <h2><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Excel Raporu İndir</h2>
-                    <button onclick="closeExcelFilterModal()"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="modalBody">
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-                        Belirttiğiniz tarihler arasında yapılan tüm işlemleri ve silinen araç detaylarını Excel dosyasına aktarır.
-                    </p>
-                    <div class="inputGroup">
-                        <label>Başlangıç Tarihi</label>
-                        <input type="date" id="excelStartDate">
-                    </div>
-                    <div class="inputGroup">
-                        <label>Bitiş Tarihi</label>
-                        <input type="date" id="excelEndDate">
-                    </div>
-                </div>
-                <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeExcelFilterModal()">Vazgeç</button>
-                    <button class="saveButton" style="background-color: #10b981;" onclick="exportInventoryToExcelWithDates()">
-                        <i class="fa-solid fa-download"></i> Raporu Oluştur & İndir
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ADMIN PANELI MODALI (GİRİŞ VE LOG TEMİZLEME YÖNETİMİ) -->
-        <div class="modal" id="adminModal">
-            <div class="modalContent" style="max-width: 650px;">
-                <div class="modalHeader">
-                    <h2><i class="fa-solid fa-user-shield" style="color: #8b5cf6;"></i> Admin Yönetim Paneli</h2>
-                    <button onclick="closeAdminModal()"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="modalBody">
-                    <!-- Giriş Yapılmamışsa Ekranı -->
-                    <div id="adminLoginForm">
-                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
-                            Yönetici paneline erişmek için lütfen admin şifrenizi giriniz.
-                        </p>
-                        <div class="inputGroup">
-                            <label>Admin Şifresi</label>
-                            <input type="password" id="adminPasswordInput" placeholder="Varsayılan Şifre: admin123">
-                        </div>
-                        <button class="saveButton" style="width: 100%; margin-top: 10px; background-color: #8b5cf6;" onclick="handleAdminLogin()">
-                            <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+            <!-- Takip Listesi / Tablo -->
+            <div class="card bg-base-100 shadow-md">
+                <div class="card-body">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="card-title text-lg"> Batarya Takip Kayıtları</h3>
+                        <button id="addBtn" onclick="yeniKayitEkle()" class="btn btn-sm btn-primary">
+                            <i class="fa-solid fa-plus"></i> Yeni Kayıt Ekle
                         </button>
                     </div>
 
-                    <!-- Giriş Yapıldıktan Sonraki Admin Yetki Ekranı -->
-                    <div id="adminDashboard" class="hidden">
-                        <div class="adminTabHeader">
-                            <span>Hoş Geldiniz, <strong>Sistem Yöneticisi</strong></span>
-                            <button class="cancelButton" style="padding: 4px 10px; font-size: 11px;" onclick="handleAdminLogout()">Çıkış Yap</button>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>Cihaz / Seri No</th>
+                                    <th>Durum</th>
+                                    <th>Notlar</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                                <!-- Dinamik Veriler Buraya Gelecek -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Silinmiş Araçları Temizleme Bölümü -->
-                        <div class="adminCard">
-                            <h3><i class="fa-solid fa-trash-can-arrow-up"></i> Silinen Araç & Log Yönetimi (Kalıcı Temizleme)</h3>
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                                Aşağıda silinmiş araçların geçmiş kayıtları yer almaktadır. Buradan kalıcı olarak veritabanından silebilirsiniz.
-                            </p>
-                            <div id="adminDeletedVehiclesList" class="adminLogList"></div>
-                        </div>
+            <!-- ADMIN PANELDEN ERİŞİLEBİLEN YEDEKLEME VE GEÇMİŞ BÖLÜMÜ -->
+            <div id="adminControlPanel" class="hidden mt-8 space-y-6">
+                <div class="divider divider-secondary font-bold">ADMIN YÖNETİM PANELİ</div>
 
-                        <!-- Yedekleme & Sıfırlama Bölümü -->
-                        <div class="adminCard" style="margin-top: 16px;">
-                            <h3><i class="fa-solid fa-sliders"></i> Sistem Araçları & Veri Yedeği</h3>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button class="bmwBtnSecondary" style="font-size: 11px;" onclick="exportSystemBackupJSON()">
-                                    <i class="fa-solid fa-file-export"></i> Sistem Yedeği İndir (JSON)
-                                </button>
-                                <button class="cancelButton" style="font-size: 11px; color: #ef4444; border-color: #fca5a5;" onclick="clearAllData()">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> Tüm Verileri Sıfırla
-                                </button>
-                            </div>
+                <!-- Tam Sistem Yedeği ve Geri Yükleme -->
+                <div class="card bg-base-100 shadow-md border border-secondary/30">
+                    <div class="card-body">
+                        <h3 class="card-title text-secondary">
+                            <i class="fa-solid fa-database"></i> Sistem Yedeği & Geri Yükleme
+                        </h3>
+                        <p class="text-xs opacity-70">Tüm site verilerini indirip yedekleyebilir veya var olan yedeği sisteme aktarabilirsiniz.</p>
+                        
+                        <div class="flex flex-wrap gap-4 mt-4">
+                            <button onclick="tumYedegiIndir()" class="btn btn-outline btn-secondary gap-2">
+                                <i class="fa-solid fa-download"></i> Tüm Site Yedeğini İndir (JSON)
+                            </button>
+                            
+                            <label class="btn btn-outline btn-accent gap-2 cursor-pointer">
+                                <i class="fa-solid fa-upload"></i> Yedekten İçeri Aktar
+                                <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="yedegiIceriAktar(event)">
+                            </label>
                         </div>
                     </div>
                 </div>
-                <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeAdminModal()">Kapat</button>
+
+                <!-- Silinenler Geçmişi / Arşiv -->
+                <div class="card bg-base-100 shadow-md border border-warning/30">
+                    <div class="card-body">
+                        <div class="flex justify-between items-center">
+                            <h3 class="card-title text-warning">
+                                <i class="fa-solid fa-trash-arrow-up"></i> Silinen Veri Arşivi (Arka Plan Yedeği)
+                            </h3>
+                            <button onclick="silinenlerYedeginiIndir()" class="btn btn-xs btn-warning gap-1">
+                                <i class="fa-solid fa-file-arrow-down"></i> Arşivi İndir
+                            </button>
+                        </div>
+                        <p class="text-xs opacity-70">Ana ekrandan silinen tüm ögeler burada saklanır. Her şeyi silseniz dahi yedekler kaybolmaz.</p>
+
+                        <div class="overflow-x-auto mt-4">
+                            <table class="table table-compact w-full">
+                                <thead>
+                                    <tr>
+                                        <th>Silinme Tarihi</th>
+                                        <th>Cihaz / Veri</th>
+                                        <th>Silinen Not</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deletedTableBody">
+                                    <!-- Silinen ögeler buraya listelenir -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
+    </div>
 
-        <footer class="footer">
-            <div class="footerLeft">
-                <strong>İnciroğlu BMW Akü Takip Paneli</strong>
-            </div>
-            <div class="footerRight">
-                <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
-            </div>
-        </footer>
+    <!-- UYGULAMA MANTIĞI & JAVASCRIPT -->
+    <script>
+        // Sabit Admin Şifresi
+        const ADMIN_PASSWORD = "efe123";
+        
+        // State Mantığı
+        let isAdmin = false;
+        let mainData = JSON.parse(localStorage.getItem('bt_main_data') || '[]');
+        let deletedArchive = JSON.parse(localStorage.getItem('bt_deleted_archive') || '[]');
 
-    </main>
+        // Sayfa Yüklendiğinde
+        window.onload = function() {
+            // Bugünün tarihini varsayılan yap
+            document.getElementById('selectedDate').valueAsDate = new Date();
+            
+            // Tema Ayarını Yükle
+            const savedTheme = localStorage.getItem('bt_theme') || 'dark';
+            setTheme(savedTheme);
 
-    <script src="app.js"></script>
+            // Routing Kontrolü (https://efekckoglu.github.io/bataryatakip/admin için)
+            checkAdminRoute();
+
+            // Verileri Listele
+            renderData();
+        };
+
+        // URL Kontrolü (Sadece /admin veya #admin ile girildiğinde admin panelini açar)
+        function checkAdminRoute() {
+            const path = window.location.pathname;
+            const hash = window.location.hash;
+
+            if (path.endsWith('/admin') || path.endsWith('/admin/') || hash === '#admin') {
+                // Şifre kontrol paneline yönlendir
+                document.getElementById('mainAppSection').classList.add('hidden');
+                document.getElementById('adminLoginSection').classList.remove('hidden');
+            }
+        }
+
+        // Admin Giriş İşlemi
+        function adminGirisYap() {
+            const inputPass = document.getElementById('adminPasswordInput').value;
+            if (inputPass === ADMIN_PASSWORD) {
+                isAdmin = true;
+                alert("Giriş Başarılı!");
+                document.getElementById('adminLoginSection').classList.add('hidden');
+                document.getElementById('mainAppSection').classList.remove('hidden');
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('adminControlPanel').classList.remove('hidden');
+                renderDeletedArchive();
+            } else {
+                alert("Hatalı Şifre!");
+            }
+        }
+
+        // Admin Çıkış
+        function adminCikis() {
+            isAdmin = false;
+            document.getElementById('adminBadge').classList.add('hidden');
+            document.getElementById('adminControlPanel').classList.add('hidden');
+            // Eğer URL /admin ise ana sayfaya yönlendir
+            if (window.location.pathname.endsWith('/admin')) {
+                window.location.href = window.location.href.replace('/admin', '');
+            }
+        }
+
+        // Tema Yönetimi
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('bt_theme', theme);
+            document.getElementById('themeToggle').checked = (theme === 'dark');
+        }
+
+        function temaDegistir(isDark) {
+            setTheme(isDark ? 'dark' : 'light');
+        }
+
+        // Veri Listeleme
+        function renderData() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+
+            if (mainData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center opacity-50">Henüz kayıt bulunmuyor.</td></tr>`;
+                return;
+            }
+
+            mainData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-semibold">${item.device}</td>
+                    <td><span class="badge ${item.status === 'Tamamlandı' ? 'badge-success' : 'badge-warning'}">${item.status}</span></td>
+                    <td class="text-sm">${item.note || '-'}</td>
+                    <td>
+                        <button onclick="kayitSil(${index})" class="btn btn-xs btn-error gap-1">
+                            <i class="fa-solid fa-trash"></i> Sil
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Yeni Kayıt Ekleme
+        function yeniKayitEkle() {
+            const device = prompt("Cihaz / Seri No Giriniz:");
+            if (!device) return;
+            const note = prompt("Not Giriniz (İsteğe bağlı):") || "";
+
+            const newRecord = {
+                id: Date.now(),
+                device: device,
+                status: "İşlemde",
+                note: note,
+                date: document.getElementById('selectedDate').value
+            };
+
+            mainData.push(newRecord);
+            saveMainData();
+            renderData();
+        }
+
+        // Kayıt Silme (Silinen veriyi Otomatik Arşive Yollar)
+        function kayitSil(index) {
+            if (!confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
+
+            const deletedItem = mainData.splice(index, 1)[0];
+            deletedItem.deletedAt = new Date().toLocaleString('tr-TR');
+
+            // Silinenler arşivine ekle
+            deletedArchive.push(deletedItem);
+            localStorage.setItem('bt_deleted_archive', JSON.stringify(deletedArchive));
+            
+            saveMainData();
+            renderData();
+            if (isAdmin) renderDeletedArchive();
+        }
+
+        function saveMainData() {
+            localStorage.setItem('bt_main_data', JSON.stringify(mainData));
+        }
+
+        // Silinen Veriler Arşivini Listeleme
+        function renderDeletedArchive() {
+            const tbody = document.getElementById('deletedTableBody');
+            tbody.innerHTML = '';
+
+            if (deletedArchive.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center opacity-50">Silinmiş veri geçmişi bulunmuyor.</td></tr>`;
+                return;
+            }
+
+            deletedArchive.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-xs">${item.deletedAt}</td>
+                    <td class="font-semibold text-xs">${item.device}</td>
+                    <td class="text-xs opacity-70">${item.note || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 1. Silinenler Arşivini JSON İndir
+        function silinenlerYedeginiIndir() {
+            downloadJSON(deletedArchive, `silinen_veriler_yedeği_${new Date().toISOString().slice(0,10)}.json`);
+        }
+
+        // 2. Tüm Site Yedeğini İndir (Ana Veriler + Silinenler)
+        function tumYedegiIndir() {
+            const fullBackup = {
+                mainData: mainData,
+                deletedArchive: deletedArchive,
+                exportDate: new Date().toISOString()
+            };
+            downloadJSON(fullBackup, `batarya_takip_TAM_YEDEK_${new Date().toISOString().slice(0,10)}.json`);
+        }
+
+        // JSON İndirme Yardımcı Fonksiyonu
+        function downloadJSON(dataObj, filename) {
+            const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 3. İçeri Aktar (Yedekten Geri Yükle)
+        function yedegiIceriAktar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.mainData && imported.deletedArchive) {
+                        mainData = imported.mainData;
+                        deletedArchive = imported.deletedArchive;
+                    } else if (Array.isArray(imported)) {
+                        mainData = imported;
+                    }
+                    saveMainData();
+                    localStorage.setItem('bt_deleted_archive', JSON.stringify(deletedArchive));
+                    
+                    renderData();
+                    renderDeletedArchive();
+                    alert("Yedek başarıyla yüklendi ve tüm veriler güncellendi!");
+                } catch (err) {
+                    alert("Geçersiz yedek dosyası!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function tarihDegisti() {
+            // Tarih değiştikçe filtrelenebilir veya işlem yapılabilir
+        }
+    </script>
 </body>
-
 </html>
