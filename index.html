@@ -396,9 +396,11 @@
     </main>
 
     <!-- Firebase SDK Kurulumu -->
+    <!-- Firebase SDK ve Veritabanı Bağlantısı -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCLKYH6bjrUKMgqWMBvlPu6nWXqYSp-kSk",
@@ -410,9 +412,20 @@
             measurementId: "G-KVLFY2B4QH"
         };
 
-        // Firebase Başlatma
+        // Firebase Başlatılıyor
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
+        
+        // Veritabanı Servisini Alıyoruz
+        const db = getFirestore(app);
+
+        // app.js dosyasından erişebilmemiz için pencereye (window) tanımlıyoruz
+        window.db = db;
+        window.fs = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot };
+    </script>
+
+    <!-- Ana Uygulama Kodunuz -->
+    <script src="app.js"></script>
     </script>
 
     <!-- Uygulama Scripti -->
