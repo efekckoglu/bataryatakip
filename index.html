@@ -15,30 +15,6 @@
     <!-- SheetJS Excel Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css">
-
-    <!-- Firebase SDK Entegrasyonu -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0Tsq47AP0hHOE07Zx7eRrhbKM_mRExBQ",
-            authDomain: "akutakipsistemi.firebaseapp.com",
-            projectId: "akutakipsistemi",
-            storageBucket: "akutakipsistemi.firebasestorage.app",
-            messagingSenderId: "695694258769",
-            appId: "1:695694258769:web:98ef6b20834ae0d2c4be70",
-            measurementId: "G-NVEKV77R8W"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-
-        // app.js içerisinden erişmek isterseniz window nesnesine atayabilirsiniz
-        window.firebaseApp = app;
-        window.firebaseAnalytics = analytics;
-    </script>
 </head>
 
 <body class="light-theme">
@@ -419,6 +395,27 @@
 
     </main>
 
+    <!-- Firebase SDK Kurulumu -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLKYH6bjrUKMgqWMBvlPu6nWXqYSp-kSk",
+            authDomain: "bataryatakip-58a40.firebaseapp.com",
+            projectId: "bataryatakip-58a40",
+            storageBucket: "bataryatakip-58a40.firebasestorage.app",
+            messagingSenderId: "519117584749",
+            appId: "1:519117584749:web:71be190b196d0e27640264",
+            measurementId: "G-KVLFY2B4QH"
+        };
+
+        // Firebase Başlatma
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+
+    <!-- Uygulama Scripti -->
     <script src="app.js"></script>
 </body>
 
