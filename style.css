@@ -1,160 +1,566 @@
-/* --- Profesyonel İşlem Butonları (Vazgeç, Kaydet, Sil) --- */
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
+/* ==========================================================================
+   İNCİROĞLU BMW / MINI - Akü Kontrol Paneli Stilleri
+   ========================================================================== */
+
+:root {
+  /* Renk Paleti (Açık Tema) */
+  --bg-color: #f1f5f9;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --input-bg: #f8fafc;
+  
+  /* BMW / MINI Kurumsal Renkler */
+  --bmw-blue: #1c69d4;
+  --bmw-dark-blue: #004098;
+  --m-red: #e00400;
+  --m-light-blue: #00a0e3;
+  --m-dark-blue: #002c6c;
+
+  /* Durum Renkleri */
+  --status-green: #10b981;
+  --status-yellow: #f59e0b;
+  --status-red: #ef4444;
+  --status-blue: #0288d1;
+
+  /* Gölge ve Yuvarlatmalar */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 
-.btn-cancel {
-    background-color: #f1f5f9;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-}
-.btn-cancel:hover {
-    background-color: #e2e8f0;
-    color: #0f172a;
-}
-
-.btn-save {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-.btn-save:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-1px);
+/* Koyu Tema Değişkenleri */
+body.dark-theme {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --input-bg: #0f172a;
 }
 
-.btn-delete {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-}
-.btn-delete:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-1px);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
 }
 
-/* --- Renkli Tablo İşlem İkon İkon Butonları (Düzenle, Görüntüle, Sil) --- */
-.table-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding-bottom: 40px;
 }
 
-.action-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
+/* BMW M Şeridi */
+.bmw-m-stripe {
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, 
+    var(--m-light-blue) 0%, 
+    var(--m-light-blue) 33.3%, 
+    var(--m-dark-blue) 33.3%, 
+    var(--m-dark-blue) 66.6%, 
+    var(--m-red) 66.6%, 
+    var(--m-red) 100%);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.action-btn.edit {
-    background-color: #e0f2fe;
-    color: #0284c7;
-}
-.action-btn.edit:hover {
-    background-color: #0284c7;
-    color: #ffffff;
+/* Konteyner Düzeni */
+.mainContent {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-.action-btn.view {
-    background-color: #fef3c7;
-    color: #d97706;
-}
-.action-btn.view:hover {
-    background-color: #d97706;
-    color: #ffffff;
-}
-
-.action-btn.delete {
-    background-color: #fee2e2;
-    color: #dc2626;
-}
-.action-btn.delete:hover {
-    background-color: #dc2626;
-    color: #ffffff;
+/* Header */
+.bmw-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-/* --- Sade Modern İşlem Raporu --- */
-.modernLogContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 6px;
+.brandBadge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.logItemCard {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 8px;
-    background: var(--bg-card, #f8fafc);
-    border-left: 4px solid #cbd5e1;
-    font-size: 13px;
+.bmwLogoIcon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--bmw-blue), var(--bmw-dark-blue));
+  color: #fff;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: var(--shadow-md);
 }
 
-.logItemCard.add { border-left-color: #10b981; }
-.logItemCard.update { border-left-color: #0284c7; }
-.logItemCard.delete { border-left-color: #ef4444; }
-
-.logBadge {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
+.bmwSeriesTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--bmw-blue);
 }
 
-.logBadge.add { background: #d1fae5; color: #047857; }
-.logBadge.update { background: #e0f2fe; color: #0369a1; }
-.logBadge.delete { background: #fee2e2; color: #b91c1c; }
-
-/* --- Excel / PDF Seçim Modal Butonları --- */
-.exportFormatButtons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
+.bmw-header h1 {
+  font-size: 24px;
+  font-weight: 700;
 }
 
-.exportBtn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 20px 10px;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-    background: #ffffff;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
+.headerSubtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
-.exportBtn i { font-size: 32px; }
-.exportBtn.excel i { color: #10b981; }
-.exportBtn.pdf i { color: #ef4444; }
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-.exportBtn:hover {
-    transform: translateY(-2px);
-    border-color: #0284c7;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+.todayDate {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--card-bg);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* Buton Stilleri */
+.bmwBtnPrimary, .bmwBtnSecondary, .themeToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.bmwBtnPrimary {
+  background: linear-gradient(135deg, var(--bmw-blue), var(--bmw-dark-blue));
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(28, 105, 212, 0.25);
+}
+
+.bmwBtnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(28, 105, 212, 0.35);
+}
+
+.bmwBtnSecondary {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.bmwBtnSecondary:hover {
+  background-color: var(--input-bg);
+  transform: translateY(-2px);
+}
+
+.themeToggleBtn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Dashboard Özet Kartları */
+.dashboardCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card.border-green { border-left: 4px solid var(--status-green); }
+.card.border-yellow { border-left: 4px solid var(--status-yellow); }
+.card.border-red { border-left: 4px solid var(--status-red); }
+
+.cardIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.cardIcon.blue { background-color: rgba(28, 105, 212, 0.12); color: var(--bmw-blue); }
+.cardIcon.green { background-color: rgba(16, 185, 129, 0.12); color: var(--status-green); }
+.cardIcon.yellow { background-color: rgba(245, 158, 11, 0.12); color: var(--status-yellow); }
+.cardIcon.red { background-color: rgba(239, 68, 68, 0.12); color: var(--status-red); }
+
+.cardContent span {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.cardContent h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 2px 0;
+}
+
+.cardContent small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Tablo Bölümleri */
+.vehicleSection {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sectionHeader h2 {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sectionHeader p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.tableArea {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+th {
+  padding: 12px 14px;
+  background-color: var(--input-bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background-color: var(--input-bg);
+}
+
+/* Rozetler (Badges) */
+.badge-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.badge-green { background-color: rgba(16, 185, 129, 0.15); color: #059669; }
+.badge-red { background-color: rgba(239, 68, 68, 0.15); color: #dc2626; }
+.badge-yellow { background-color: rgba(245, 158, 11, 0.15); color: #d97706; }
+.badge-gray { background-color: rgba(148, 163, 184, 0.15); color: #475569; }
+
+/* Bildirim Alanı */
+.notificationSection {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.notifCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--input-bg);
+  border-left: 4px solid var(--status-red);
+  margin-bottom: 10px;
+}
+
+.notifCard:last-child {
+  margin-bottom: 0;
+}
+
+.notifInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notifInfo i {
+  color: var(--status-red);
+  font-size: 16px;
+}
+
+/* Modallar */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: var(--card-bg);
+  width: 100%;
+  max-width: 540px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  animation: modalFadeIn 0.25s ease-out;
+  overflow: hidden;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h2 {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modalHeader button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modalHeader button:hover { color: var(--text-primary); }
+
+.modalBody {
+  padding: 20px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.inputGroup {
+  margin-bottom: 14px;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+  border-color: var(--bmw-blue);
+}
+
+.hidden { display: none !important; }
+
+/* Detay Kartı Grid Yapısı */
+.detailCard {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  padding: 14px;
+  border-radius: var(--radius-sm);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  font-size: 12px;
+}
+
+.detailGrid span {
+  display: block;
+  color: var(--text-secondary);
+}
+
+.detailGrid strong {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.notesHistoryContainer {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  background: var(--input-bg);
+}
+
+.noteItem {
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.noteItem:last-child { border-bottom: none; }
+
+/* Admin Paneli Kutusu */
+.adminActionBox {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 14px;
+  background-color: var(--input-bg);
+}
+
+.adminActionBox.danger {
+  border-color: rgba(239, 68, 68, 0.4);
+  background-color: rgba(239, 68, 68, 0.04);
+}
+
+.adminActionBox h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.adminActionBox p {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 0 0;
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 30px;
+}
+
+.adminLink {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.adminLink:hover {
+  color: var(--bmw-blue);
 }
