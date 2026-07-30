@@ -1,5 +1,5 @@
 /* ==========================================================================
-   İNCİROĞLU BMW - AKÜ & STOK TAKİP SİSTEMİ MANTIĞI (APP.JS)
+   İNCİROĞLU BMW - AKÜ & STOK TAKİP SİSTEMİ MANTIĞI (APP.JS - FIREBASE)
    ========================================================================== */
 
 // --- GLOBAL UYGULAMA DURUMU (STATE) ---
@@ -7,10 +7,12 @@ let vehicles = JSON.parse(localStorage.getItem('bmw_vehicles')) || [];
 let activityLogs = JSON.parse(localStorage.getItem('bmw_logs')) || [];
 let currentEditId = null;
 const ADMIN_PASSWORD = "admin"; // Varsayılan admin şifresi
+let isFirestoreListening = false;
 
 // --- UYGULAMA BAŞLATICI ---
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
+    setupFirebaseListeners();
 });
 
 function initApp() {
@@ -19,6 +21,43 @@ function initApp() {
     renderDashboard();
     renderTables();
     renderNotifications();
+}
+
+// --- FIREBASE CANLI VERİ DİNLEYİCİLERİ ---
+function setupFirebaseListeners() {
+    if (window.db && window.fs && !isFirestoreListening) {
+        isFirestoreListening = true;
+
+        // 1. Araçlar Koleksiyonunu Anlık Dinle
+        window.fs.onSnapshot(window.fs.collection(window.db, "vehicles"), (snapshot) => {
+            vehicles = [];
+            snapshot.forEach((docSnap) => {
+                vehicles.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            localStorage.setItem('bmw_vehicles', JSON.stringify(vehicles));
+            renderDashboard();
+            renderTables();
+            renderNotifications();
+        }, (error) => {
+            console.error("Firebase araç dinleme hatası:", error);
+        });
+
+        // 2. İşlem Loglarını Anlık Dinle
+        window.fs.onSnapshot(window.fs.collection(window.db, "activityLogs"), (snapshot) => {
+            activityLogs = [];
+            snapshot.forEach((docSnap) => {
+                activityLogs.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            // Tarihe göre sırala
+            activityLogs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            localStorage.setItem('bmw_logs', JSON.stringify(activityLogs));
+        }, (error) => {
+            console.error("Firebase log dinleme hatası:", error);
+        });
+    } else if (!window.db) {
+        // Firebase henüz yüklenmediyse kısa süre sonra tekrar dene
+        setTimeout(setupFirebaseListeners, 500);
+    }
 }
 
 // Günün Tarihini Yazdır
@@ -69,7 +108,7 @@ function renderDashboard() {
     const showroomCount = vehicles.filter(v => v.location === 'showroom').length;
     const parkingCount = vehicles.filter(v => v.location === 'parking').length;
     
-    // İkazlı araç hesaplama (Showroom 30 günü aşan veya Akü Bağlı Olmayan / Otopark 10 günü aşan)
+    // İkazlı araç hesaplama
     let dangerCount = 0;
     vehicles.forEach(v => {
         if (v.location === 'showroom') {
@@ -95,6 +134,8 @@ function renderDashboard() {
 function renderTables() {
     const showroomTbody = document.getElementById('showroomTableBody');
     const parkingTbody = document.getElementById('parkingTableBody');
+
+    if (!showroomTbody || !parkingTbody) return;
 
     showroomTbody.innerHTML = '';
     parkingTbody.innerHTML = '';
@@ -122,7 +163,7 @@ function renderTables() {
             showroomTbody.innerHTML += `
                 <tr>
                     <td><strong>${v.chassis}</strong></td>
-                    <td>${v.model} <small style="color:var(--bmw-blue);">(${v.ownership.toUpperCase()})</small></td>
+                    <td>${v.model} <small style="color:var(--bmw-blue);">(${v.ownership ? v.ownership.toUpperCase() : ''})</small></td>
                     <td>${v.bigBatteryDate || '-'}</td>
                     <td>${daysBig !== '-' ? daysBig + ' Gün' : '-'}</td>
                     <td>${smallBadge}</td>
@@ -154,7 +195,7 @@ function renderTables() {
             parkingTbody.innerHTML += `
                 <tr>
                     <td><strong>${v.chassis}</strong></td>
-                    <td>${v.model} <small style="color:var(--bmw-blue);">(${v.ownership.toUpperCase()})</small></td>
+                    <td>${v.model} <small style="color:var(--bmw-blue);">(${v.ownership ? v.ownership.toUpperCase() : ''})</small></td>
                     <td>${v.parkingDate || '-'} <small>(${daysParked} gün önce)</small></td>
                     <td>${v.bigBatteryDate || '-'}</td>
                     <td>${bigBadge}</td>
@@ -174,6 +215,7 @@ function renderTables() {
 // --- BİLDİRİM PANELİ ---
 function renderNotifications() {
     const area = document.getElementById('notificationArea');
+    if (!area) return;
     area.innerHTML = '';
     let hasAlerts = false;
 
@@ -254,6 +296,7 @@ function openVehicleModal(id = null) {
         document.getElementById('bigBatteryDate').value = v.bigBatteryDate || '';
         document.getElementById('smallBatteryDate').value = v.smallBatteryDate || '';
         document.getElementById('smallBatteryConnected').value = v.smallBatteryConnected || 'no';
+        document.getElementById('vehicleNote').value = '';
     } else {
         modalTitle.innerText = "Yeni Araç Ekle";
         document.getElementById('vehicleChassis').value = '';
@@ -305,8 +348,8 @@ function toggleBatteryDateInputs() {
     }
 }
 
-// Araç Kaydet / Güncelle
-function handleSaveVehicle() {
+// --- ARAÇ KAYDET / GÜNCELLE (FIREBASE DESTEKLİ) ---
+async function handleSaveVehicle() {
     const chassis = document.getElementById('vehicleChassis').value.trim().toUpperCase();
     const model = document.getElementById('vehicleModel').value.trim();
     const ownership = document.getElementById('vehicleOwnership').value;
@@ -326,32 +369,49 @@ function handleSaveVehicle() {
     const now = new Date().toLocaleString('tr-TR');
 
     if (currentEditId) {
-        // Güncelleme
-        const index = vehicles.findIndex(v => v.id === currentEditId);
-        if (index !== -1) {
-            vehicles[index] = {
-                ...vehicles[index],
-                chassis,
-                model,
-                ownership,
-                location,
-                batteryRequired,
-                parkingDate: location === 'parking' ? parkingDate : '',
-                bigBatteryDate: batteryRequired === 'yes' ? bigBatteryDate : '',
-                smallBatteryDate: (location === 'showroom' && batteryRequired === 'yes') ? smallBatteryDate : '',
-                smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no'
-            };
+        // GÜNCELLEME İŞLEMİ
+        const existingVehicle = vehicles.find(v => v.id === currentEditId);
+        let updatedNotes = existingVehicle && existingVehicle.notes ? [...existingVehicle.notes] : [];
+        if (noteText) {
+            updatedNotes.unshift({ date: now, text: noteText });
+        }
 
-            if (noteText) {
-                vehicles[index].notes.unshift({ date: now, text: noteText });
+        const vehicleData = {
+            chassis,
+            model,
+            ownership,
+            location,
+            batteryRequired,
+            parkingDate: location === 'parking' ? parkingDate : '',
+            bigBatteryDate: batteryRequired === 'yes' ? bigBatteryDate : '',
+            smallBatteryDate: (location === 'showroom' && batteryRequired === 'yes') ? smallBatteryDate : '',
+            smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no',
+            notes: updatedNotes,
+            updatedAt: Date.now()
+        };
+
+        if (window.db && window.fs) {
+            try {
+                const docRef = window.fs.doc(window.db, "vehicles", currentEditId);
+                await window.fs.updateDoc(docRef, vehicleData);
+                await logActivity('GÜNCELLEME', chassis, model, `Araç bilgileri güncellendi. Konum: ${location.toUpperCase()}`);
+            } catch (e) {
+                console.error("Firebase Güncelleme Hatası:", e);
+                alert("Güncelleme yapılırken hata oluştu!");
             }
-
-            logActivity('GÜNCELLEME', chassis, model, `Araç bilgileri güncellendi. Konum: ${location.toUpperCase()}`);
+        } else {
+            // LocalStorage Fallback
+            const index = vehicles.findIndex(v => v.id === currentEditId);
+            if (index !== -1) {
+                vehicles[index] = { ...vehicles[index], ...vehicleData };
+                logActivity('GÜNCELLEME', chassis, model, `Araç bilgileri güncellendi. Konum: ${location.toUpperCase()}`);
+                saveData();
+                initApp();
+            }
         }
     } else {
-        // Yeni Ekleme
-        const newVehicle = {
-            id: 'v_' + Date.now(),
+        // YENİ ARAÇ EKLEME
+        const newVehicleData = {
             chassis,
             model,
             ownership,
@@ -362,27 +422,51 @@ function handleSaveVehicle() {
             smallBatteryDate: (location === 'showroom' && batteryRequired === 'yes') ? smallBatteryDate : '',
             smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no',
             createdDate: now,
-            notes: noteText ? [{ date: now, text: noteText }] : []
+            notes: noteText ? [{ date: now, text: noteText }] : [],
+            createdAt: Date.now()
         };
-        vehicles.push(newVehicle);
-        logActivity('EKLEME', chassis, model, `Yeni araç eklendi. Konum: ${location.toUpperCase()}`);
+
+        if (window.db && window.fs) {
+            try {
+                await window.fs.addDoc(window.fs.collection(window.db, "vehicles"), newVehicleData);
+                await logActivity('EKLEME', chassis, model, `Yeni araç eklendi. Konum: ${location.toUpperCase()}`);
+            } catch (e) {
+                console.error("Firebase Ekleme Hatası:", e);
+                alert("Araç eklenirken hata oluştu!");
+            }
+        } else {
+            // LocalStorage Fallback
+            const localVehicle = { id: 'v_' + Date.now(), ...newVehicleData };
+            vehicles.push(localVehicle);
+            logActivity('EKLEME', chassis, model, `Yeni araç eklendi. Konum: ${location.toUpperCase()}`);
+            saveData();
+            initApp();
+        }
     }
 
-    saveData();
     closeVehicleModal();
-    initApp();
 }
 
-// Araç Silme
-function deleteVehicle(id) {
+// --- ARAÇ SİLME (FIREBASE DESTEKLİ) ---
+async function deleteVehicle(id) {
     const v = vehicles.find(item => item.id === id);
     if (!v) return;
 
     if (confirm(`${v.chassis} şase numaralı aracı silmek istediğinize emin misiniz?`)) {
-        logActivity('SİLME', v.chassis, v.model, `Araç stoktan silindi.`);
-        vehicles = vehicles.filter(item => item.id !== id);
-        saveData();
-        initApp();
+        if (window.db && window.fs) {
+            try {
+                await window.fs.deleteDoc(window.fs.doc(window.db, "vehicles", id));
+                await logActivity('SİLME', v.chassis, v.model, `Araç stoktan silindi.`);
+            } catch (e) {
+                console.error("Firebase Silme Hatası:", e);
+                alert("Araç silinirken hata oluştu!");
+            }
+        } else {
+            logActivity('SİLME', v.chassis, v.model, `Araç stoktan silindi.`);
+            vehicles = vehicles.filter(item => item.id !== id);
+            saveData();
+            initApp();
+        }
     }
 }
 
@@ -393,8 +477,8 @@ function openDetailModal(id) {
 
     document.getElementById('detailChassis').innerText = v.chassis;
     document.getElementById('detailModel').innerText = v.model;
-    document.getElementById('detailOwnership').innerText = v.ownership.toUpperCase();
-    document.getElementById('detailLocation').innerText = v.location.toUpperCase();
+    document.getElementById('detailOwnership').innerText = v.ownership ? v.ownership.toUpperCase() : '-';
+    document.getElementById('detailLocation').innerText = v.location ? v.location.toUpperCase() : '-';
     document.getElementById('detailBigDate').innerText = v.bigBatteryDate || '-';
     document.getElementById('detailSmallDate').innerText = v.smallBatteryDate || '-';
     document.getElementById('detailParkDate').innerText = v.parkingDate || '-';
@@ -430,7 +514,7 @@ function openSummaryReportModal() {
     if (activityLogs.length === 0) {
         content.innerHTML = `<p style="text-align:center; color:var(--text-secondary);">Henüz bir işlem kaydı oluşmadı.</p>`;
     } else {
-        activityLogs.slice().reverse().forEach(log => {
+        activityLogs.forEach(log => {
             content.innerHTML += `
                 <div class="noteItem" style="margin-bottom:8px;">
                     <strong style="color:var(--bmw-blue);">${log.action}</strong> - 
@@ -472,8 +556,8 @@ function exportInventoryToExcelWithDates() {
     const excelData = filteredVehicles.map(v => ({
         "Şase No (VIN)": v.chassis,
         "Marka & Model": v.model,
-        "Mülkiyet": v.ownership.toUpperCase(),
-        "Konum": v.location.toUpperCase(),
+        "Mülkiyet": v.ownership ? v.ownership.toUpperCase() : '-',
+        "Konum": v.location ? v.location.toUpperCase() : '-',
         "Akü Bağlantısı": v.batteryRequired === 'yes' ? 'Evet' : 'Hayır',
         "Otopark Tarihi": v.parkingDate || '-',
         "Büyük Akü Tarihi": v.bigBatteryDate || '-',
@@ -534,14 +618,28 @@ function uploadBackupJSON(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const parsed = JSON.parse(e.target.result);
             if (parsed.vehicles) vehicles = parsed.vehicles;
             if (parsed.activityLogs) activityLogs = parsed.activityLogs;
-            saveData();
-            initApp();
-            alert("Yedek başarıyla yüklendi ve veriler güncellendi!");
+
+            if (window.db && window.fs) {
+                // Firebase veritabanına toplu aktarım
+                for (const v of vehicles) {
+                    const { id, ...vData } = v;
+                    await window.fs.addDoc(window.fs.collection(window.db, "vehicles"), vData);
+                }
+                for (const l of activityLogs) {
+                    const { id, ...lData } = l;
+                    await window.fs.addDoc(window.fs.collection(window.db, "activityLogs"), lData);
+                }
+            } else {
+                saveData();
+                initApp();
+            }
+
+            alert("Yedek başarıyla yüklendi ve veritabanı güncellendi!");
             closeAdminPanelModal();
         } catch (err) {
             alert("Geçersiz yedek dosyası!");
@@ -550,8 +648,26 @@ function uploadBackupJSON(event) {
     reader.readAsText(file);
 }
 
-function resetAllData() {
+async function resetAllData() {
     if (confirm("TÜM VERİLER VE İŞLEM LOGLARI KALICI OLARAK SİLİNECEKTİR! Emin misiniz?")) {
+        if (window.db && window.fs) {
+            try {
+                // Firebase üzerindeki araçları temizle
+                const vDocs = await window.fs.getDocs(window.fs.collection(window.db, "vehicles"));
+                vDocs.forEach(async (d) => {
+                    await window.fs.deleteDoc(window.fs.doc(window.db, "vehicles", d.id));
+                });
+
+                // Firebase üzerindeki logları temizle
+                const lDocs = await window.fs.getDocs(window.fs.collection(window.db, "activityLogs"));
+                lDocs.forEach(async (d) => {
+                    await window.fs.deleteDoc(window.fs.doc(window.db, "activityLogs", d.id));
+                });
+            } catch (e) {
+                console.error("Firebase temizleme hatası:", e);
+            }
+        }
+
         vehicles = [];
         activityLogs = [];
         saveData();
@@ -561,24 +677,34 @@ function resetAllData() {
     }
 }
 
-// --- YARDIMCI VE YEREL DEPOLAMA FONKSİYONLARI ---
+// --- YARDIMCI VE LOGLAMA FONKSİYONLARI ---
 function calculateDaysAgo(dateString) {
     if (!dateString) return 0;
     const diffTime = Math.abs(new Date() - new Date(dateString));
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
-function logActivity(action, chassis, model, details) {
-    const log = {
-        id: 'log_' + Date.now(),
+async function logActivity(action, chassis, model, details) {
+    const logData = {
         timestamp: new Date().toLocaleString('tr-TR'),
         action,
         chassis,
         model,
-        details
+        details,
+        createdAt: Date.now()
     };
-    activityLogs.push(log);
-    localStorage.setItem('bmw_logs', JSON.stringify(activityLogs));
+
+    if (window.db && window.fs) {
+        try {
+            await window.fs.addDoc(window.fs.collection(window.db, "activityLogs"), logData);
+        } catch (e) {
+            console.error("Log kaydı hatası:", e);
+        }
+    } else {
+        logData.id = 'log_' + Date.now();
+        activityLogs.push(logData);
+        localStorage.setItem('bmw_logs', JSON.stringify(activityLogs));
+    }
 }
 
 function saveData() {
