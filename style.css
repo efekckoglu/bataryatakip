@@ -1,363 +1,160 @@
-:root {
-    --bmw-blue: #0288d1;
-    --bmw-dark-blue: #01579b;
-    --status-green: #10b981;
-    --status-yellow: #f59e0b;
-    --status-red: #ef4444;
-    --bg-primary: #f8fafc;
-    --bg-card: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-}
-
-body.dark-theme {
-    --bg-primary: #0f172a;
-    --bg-card: #1e293b;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --border-color: #334155;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Outfit', sans-serif;
-}
-
-body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background 0.3s, color 0.3s;
-}
-
-.bmw-m-stripe {
-    height: 4px;
-    background: linear-gradient(90deg, #0288d1 33%, #00205b 33%, #00205b 66%, #e11d48 66%);
-}
-
-.container-fluid {
-    padding: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* Header */
-.bmw-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.brandBadge {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.bmwLogoIcon {
-    font-size: 32px;
-    color: var(--bmw-blue);
-}
-
-.bmwSeriesTitle {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--bmw-blue);
-}
-
-.headerLeft h1 {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.headerSubtitle {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-top: 4px;
-}
-
-.headerRight {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.todayDate {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    background: var(--bg-card);
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-/* Buttons */
-.bmwBtnPrimary, .bmwBtnSecondary, .themeToggleBtn {
-    padding: 9px 16px;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
+/* --- Profesyonel İşlem Butonları (Vazgeç, Kaydet, Sil) --- */
+.btn-action {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    transition: opacity 0.2s;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 
-.bmwBtnPrimary { background-color: var(--bmw-blue); color: #fff; }
-.bmwBtnSecondary { background-color: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
-.themeToggleBtn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); padding: 9px 12px; }
-.bmwBtnPrimary:hover, .bmwBtnSecondary:hover { opacity: 0.85; }
-
-/* Dashboard Cards */
-.dashboardCards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
+.btn-cancel {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.btn-cancel:hover {
+    background-color: #e2e8f0;
+    color: #0f172a;
 }
 
-.card {
-    background: var(--bg-card);
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.btn-save {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+.btn-save:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
 }
 
-.cardIcon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+.btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+}
+
+/* --- Renkli Tablo İşlem İkon İkon Butonları (Düzenle, Görüntüle, Sil) --- */
+.table-actions {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    gap: 8px;
 }
 
-.cardIcon.blue { background: rgba(2, 136, 209, 0.1); color: var(--bmw-blue); }
-.cardIcon.green { background: rgba(16, 185, 129, 0.1); color: var(--status-green); }
-.cardIcon.yellow { background: rgba(245, 158, 11, 0.1); color: var(--status-yellow); }
-.cardIcon.red { background: rgba(239, 68, 68, 0.1); color: var(--status-red); }
-
-.cardContent h2 { font-size: 22px; font-weight: 700; }
-.cardContent span { font-size: 12px; color: var(--text-secondary); }
-.cardContent small { font-size: 11px; color: var(--text-secondary); opacity: 0.8; }
-
-/* Sections & Tables */
-.vehicleSection, .notificationSection {
-    background: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    padding: 20px;
-    margin-bottom: 24px;
-}
-
-.sectionHeader { margin-bottom: 16px; }
-.sectionHeader h2 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.sectionHeader p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-
-.tableArea { overflow-x: auto; }
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 13px;
-}
-
-th, td {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-th {
-    color: var(--text-secondary);
-    font-weight: 600;
-    background: rgba(0,0,0,0.02);
-}
-
-/* Status Badges */
-.statusBadge {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
+.action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-}
-
-.statusBadge.green { background: rgba(16, 185, 129, 0.15); color: #059669; }
-.statusBadge.yellow { background: rgba(245, 158, 11, 0.15); color: #d97706; }
-.statusBadge.red { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
-.statusBadge.grey { background: rgba(148, 163, 184, 0.15); color: #64748b; }
-
-/* Action Buttons */
-.actionBtn {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    padding: 6px;
-    font-size: 14px;
-    color: var(--text-secondary);
-    border-radius: 4px;
-}
-
-.actionBtn.edit:hover { color: var(--bmw-blue); }
-.actionBtn.detail:hover { color: var(--status-green); }
-.actionBtn.delete:hover { color: var(--status-red); }
-
-/* Notifications */
-.notifyCard {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background: var(--bg-primary);
-    border-left: 4px solid var(--status-red);
-}
-
-.notifyCard.warning { border-left-color: var(--status-yellow); }
-
-.notifyBody { flex: 1; }
-.notifyBody strong { font-size: 13px; display: block; }
-.notifyBody p { font-size: 12px; color: var(--text-secondary); }
-
-.emptyNotify { font-size: 13px; color: var(--text-secondary); text-align: center; padding: 12px; }
-
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    align-items: center;
     justify-content: center;
-    z-index: 1000;
-    padding: 16px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
 }
 
-.modalContent {
-    background: var(--bg-card);
-    width: 100%;
-    max-width: 550px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    overflow: hidden;
+.action-btn.edit {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+.action-btn.edit:hover {
+    background-color: #0284c7;
+    color: #ffffff;
 }
 
-.modalHeader {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color);
+.action-btn.view {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+.action-btn.view:hover {
+    background-color: #d97706;
+    color: #ffffff;
+}
+
+.action-btn.delete {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+.action-btn.delete:hover {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+/* --- Sade Modern İşlem Raporu --- */
+.modernLogContainer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 6px;
 }
 
-.modalHeader button { border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 16px; }
-
-.modalBody { padding: 20px; max-height: 75vh; overflow-y: auto; }
-
-.modalFooter {
-    padding: 14px 20px;
-    border-top: 1px solid var(--border-color);
+.logItemCard {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-/* Input Fields */
-.inputGroup { margin-bottom: 14px; }
-.inputGroup label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
-.inputGroup input, .inputGroup select, .inputGroup textarea {
-    width: 100%;
-    padding: 9px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--bg-card, #f8fafc);
+    border-left: 4px solid #cbd5e1;
     font-size: 13px;
 }
 
-.hidden { display: none !important; }
+.logItemCard.add { border-left-color: #10b981; }
+.logItemCard.update { border-left-color: #0284c7; }
+.logItemCard.delete { border-left-color: #ef4444; }
 
-/* Excel Preset Buttons */
-.excelPresetButtons {
+.logBadge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.logBadge.add { background: #d1fae5; color: #047857; }
+.logBadge.update { background: #e0f2fe; color: #0369a1; }
+.logBadge.delete { background: #fee2e2; color: #b91c1c; }
+
+/* --- Excel / PDF Seçim Modal Butonları --- */
+.exportFormatButtons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.exportBtn {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-
-.excelPresetButtons button {
-    width: 100%;
-    justify-content: center;
-    padding: 10px;
-}
-
-/* Details & Logs */
-.detailGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    font-size: 12px;
-}
-
-.detailGrid div { background: var(--bg-primary); padding: 8px 12px; border-radius: 6px; }
-.detailGrid span { display: block; color: var(--text-secondary); font-size: 11px; }
-
-.notesHistoryContainer {
-    max-height: 180px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 10px;
-}
-
-.historyItem {
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 6px;
-    margin-bottom: 6px;
-}
-
-.historyItem small { color: var(--text-secondary); font-size: 10px; }
-.historyItem p { font-size: 12px; }
-
-/* Footer */
-.footer {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 12px;
-    color: var(--text-secondary);
-    padding: 16px 0;
-    border-top: 1px solid var(--border-color);
-    margin-top: 20px;
+    gap: 8px;
+    padding: 20px 10px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
 }
 
-.adminLink { color: var(--text-secondary); text-decoration: none; }
-.adminLink:hover { color: var(--bmw-blue); }
+.exportBtn i { font-size: 32px; }
+.exportBtn.excel i { color: #10b981; }
+.exportBtn.pdf i { color: #ef4444; }
 
-.adminActionBox {
-    border: 1px solid var(--border-color);
-    padding: 14px;
-    border-radius: 8px;
-    margin-bottom: 12px;
+.exportBtn:hover {
+    transform: translateY(-2px);
+    border-color: #0284c7;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
-
-.adminActionBox.danger { border-color: rgba(239, 68, 68, 0.4); }
