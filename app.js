@@ -7,8 +7,24 @@ let editingVehicleId = null;
 let currentDetailVehicleId = null;
 let currentTheme = localStorage.getItem('theme') || 'light';
 
+// Pop-up Şifre Onay Modalı Değişkenleri
+let pendingAction = null; // 'delete' veya 'parkingCheck'
+let pendingVehicleId = null;
+
 // Şifre Listesi (Varsayılan efe1 ve meryem1)
 let allowedDeletePasswords = JSON.parse(localStorage.getItem('bmw_passwords')) || ['efe1', 'meryem1'];
+
+// Türkçe Karakter Düzeltme Fonksiyonu (PDF çıktıları için)
+function trFix(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
+        .replace(/Ü/g, 'U').replace(/ü/g, 'u')
+        .replace(/Ş/g, 'S').replace(/ş/g, 's')
+        .replace(/İ/g, 'I').replace(/ı/g, 'i')
+        .replace(/Ö/g, 'O').replace(/ö/g, 'o')
+        .replace(/Ç/g, 'C').replace(/ç/g, 'c');
+}
 
 // Sayfa Yüklendiğinde Başlat
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,7 +60,7 @@ function applyTheme(theme) {
 // Firebase Realtime Dinleyici
 function initFirebaseListener() {
     if (!window.db || !window.fs) {
-        setTimeout(initFirebaseListener, 500);
+        setTimeout(initFirebaseListener, 300);
         return;
     }
 
@@ -104,11 +120,12 @@ function renderDashboard() {
                     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     daysPassed = `${diffDays} Gün`;
 
-                    if (diffDays >= 45) {
+                    // SHOWROOM BÜYÜK AKÜ KURALI: En geç 5 gün!
+                    if (diffDays >= 5) {
                         bigStatusHTML = `<span class="statusBadge red"><i class="fa-solid fa-circle-exclamation"></i> Şarj Edilmeli (${diffDays} Gün)</span>`;
                         hasDanger = true;
-                        addNotification(vehicle, `Showroom aracı ${diffDays} gündür büyük aküye bağlı. Şarj kontrolü gerekli!`, 'danger');
-                    } else if (diffDays >= 30) {
+                        addNotification(vehicle, `Showroom aracı ${diffDays} gündür büyük aküye bağlı (Sınır: 5 gün). Şarj kontrolü yapılmalıdır!`, 'danger');
+                    } else if (diffDays >= 3) {
                         bigStatusHTML = `<span class="statusBadge yellow"><i class="fa-solid fa-triangle-exclamation"></i> Yaklaşıyor (${diffDays} Gün)</span>`;
                     } else {
                         bigStatusHTML = `<span class="statusBadge green"><i class="fa-solid fa-circle-check"></i> Uygun (${diffDays} Gün)</span>`;
@@ -117,7 +134,7 @@ function renderDashboard() {
                     bigStatusHTML = `<span class="statusBadge yellow">Tarih Girilmedi</span>`;
                 }
 
-                // Küçük Akü Mantığı: Tarih girilmişse Yeşil (Bağlandı), yoksa Kırmızı (Bağlı Değil)
+                // Küçük Akü Mantığı
                 if (vehicle.smallBatteryDate) {
                     smallStatusHTML = `<span class="statusBadge green"><i class="fa-solid fa-link"></i> Bağlandı (${vehicle.smallBatteryDate})</span>`;
                 } else {
@@ -140,7 +157,7 @@ function renderDashboard() {
                 <td>
                     <button class="actionBtn edit" onclick="openVehicleModal('${vehicle.id}')" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
                     <button class="actionBtn detail" onclick="openDetailModal('${vehicle.id}')" title="Detaylar"><i class="fa-solid fa-eye"></i></button>
-                    <button class="actionBtn delete" onclick="deleteVehicle('${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash"></i></button>
+                    <button class="actionBtn delete" onclick="openPasswordConfirmModal('delete', '${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash"></i></button>
                 </td>
             `;
             showroomTable.appendChild(tr);
@@ -152,16 +169,21 @@ function renderDashboard() {
             let parkDateText = vehicle.parkingDate || '-';
             let refDateStr = vehicle.lastBatteryCheckDate || vehicle.parkingDate || vehicle.createdAt;
             let statusHTML = '';
+            let confirmCheckBtn = '';
 
             if (refDateStr) {
                 const checkBaseDate = new Date(refDateStr);
                 checkBaseDate.setHours(0, 0, 0, 0);
                 const diffDays = Math.floor((today - checkBaseDate) / (1000 * 60 * 60 * 24));
 
+                // OTOPARK AKÜ KURALI: 10 gün kontrol süresi
                 if (diffDays >= 10) {
-                    statusHTML = `<span class="statusBadge red"><i class="fa-solid fa-triangle-exclamation"></i> Kontrol Edilmeli (${diffDays} Gün Oldu)</span>`;
+                    statusHTML = `<span class="statusBadge red"><i class="fa-solid fa-triangle-exclamation"></i> Kontrol Zamanı (${diffDays} Gün Oldu)</span>`;
                     hasDanger = true;
                     addNotification(vehicle, `Otopark aracının 10 günlük akü kontrol zamanı geldi! (${diffDays} Gün geçti)`, 'warning');
+                    
+                    // 10 günü geçtiğinde Onay Butonu çıkar
+                    confirmCheckBtn = `<button class="actionBtn confirm" onclick="openPasswordConfirmModal('parkingCheck', '${vehicle.id}')" title="10 Günlük Kontrolü Onayla"><i class="fa-solid fa-check-double"></i></button>`;
                 } else {
                     const remaining = 10 - diffDays;
                     statusHTML = `<span class="statusBadge green"><i class="fa-solid fa-check"></i> Kontrol Edildi (${remaining} Gün Kaldı)</span>`;
@@ -176,9 +198,10 @@ function renderDashboard() {
                 <td>${parkDateText}</td>
                 <td>${statusHTML}</td>
                 <td>
+                    ${confirmCheckBtn}
                     <button class="actionBtn edit" onclick="openVehicleModal('${vehicle.id}')" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
                     <button class="actionBtn detail" onclick="openDetailModal('${vehicle.id}')" title="Detaylar"><i class="fa-solid fa-eye"></i></button>
-                    <button class="actionBtn delete" onclick="deleteVehicle('${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash"></i></button>
+                    <button class="actionBtn delete" onclick="openPasswordConfirmModal('delete', '${vehicle.id}')" title="Sil"><i class="fa-solid fa-trash"></i></button>
                 </td>
             `;
             parkingTable.appendChild(tr);
@@ -213,24 +236,19 @@ function addNotification(vehicle, message, type) {
     notificationArea.appendChild(card);
 }
 
-// Modal Konum Mantığı
+// Modal Konum Değişimi
 function handleLocationChangeInModal() {
     const location = document.getElementById('vehicleLocation').value;
     const parkingDateGroup = document.getElementById('parkingDateGroup');
-    const parkingCheckGroup = document.getElementById('parkingCheckGroup');
-    const parkingPasswordGroup = document.getElementById('parkingPasswordGroup');
     const batteryRequiredGroup = document.getElementById('batteryRequiredGroup');
     const wrapper = document.getElementById('batteryDatesWrapper');
 
     if (location === 'parking') {
         parkingDateGroup.classList.remove('hidden');
-        parkingCheckGroup.classList.remove('hidden');
         batteryRequiredGroup.classList.add('hidden');
         wrapper.classList.add('hidden');
     } else {
         parkingDateGroup.classList.add('hidden');
-        parkingCheckGroup.classList.add('hidden');
-        parkingPasswordGroup.classList.add('hidden');
         batteryRequiredGroup.classList.remove('hidden');
         toggleBatteryDateInputs();
     }
@@ -245,17 +263,6 @@ function toggleBatteryDateInputs() {
         wrapper.classList.remove('hidden');
     } else {
         wrapper.classList.add('hidden');
-    }
-}
-
-function toggleParkingPasswordInput() {
-    const checked = document.getElementById('parkingCheck10Days').checked;
-    const parkingPasswordGroup = document.getElementById('parkingPasswordGroup');
-    if (checked) {
-        parkingPasswordGroup.classList.remove('hidden');
-    } else {
-        parkingPasswordGroup.classList.add('hidden');
-        document.getElementById('parkingCheckPassword').value = '';
     }
 }
 
@@ -279,8 +286,6 @@ function openVehicleModal(vehicleId = null) {
         document.getElementById('bigBatteryDate').value = v.bigBatteryDate || '';
         document.getElementById('smallBatteryDate').value = v.smallBatteryDate || '';
         document.getElementById('vehicleNote').value = '';
-        document.getElementById('parkingCheck10Days').checked = false;
-        document.getElementById('parkingCheckPassword').value = '';
     } else {
         title.innerText = 'Yeni Araç Ekle';
         document.getElementById('vehicleChassis').value = '';
@@ -292,8 +297,6 @@ function openVehicleModal(vehicleId = null) {
         document.getElementById('bigBatteryDate').value = '';
         document.getElementById('smallBatteryDate').value = '';
         document.getElementById('vehicleNote').value = '';
-        document.getElementById('parkingCheck10Days').checked = false;
-        document.getElementById('parkingCheckPassword').value = '';
     }
 
     handleLocationChangeInModal();
@@ -305,27 +308,27 @@ function closeVehicleModal() {
     editingVehicleId = null;
 }
 
-// Araç Kayıt / Güncelleme
+// Araç Kayıt / Düzenleme (Hata Düzeltildi & Firebase Tam Senkronize)
 async function handleSaveVehicle() {
     const chassis = document.getElementById('vehicleChassis').value.trim();
     const model = document.getElementById('vehicleModel').value.trim();
     const ownership = document.getElementById('vehicleOwnership').value;
     const location = document.getElementById('vehicleLocation').value;
     const batteryRequired = document.getElementById('batteryRequired').value;
-    const parkingDate = document.getElementById('parkingDate').value;
-    const bigBatteryDate = document.getElementById('bigBatteryDate').value;
-    const smallBatteryDate = document.getElementById('smallBatteryDate').value;
+    const parkingDate = document.getElementById('parkingDate').value || null;
+    const bigBatteryDate = document.getElementById('bigBatteryDate').value || null;
+    const smallBatteryDate = document.getElementById('smallBatteryDate').value || null;
     const noteText = document.getElementById('vehicleNote').value.trim();
-    const is10DaysChecked = document.getElementById('parkingCheck10Days').checked;
-    const parkingPassword = document.getElementById('parkingCheckPassword').value.trim();
 
     if (!chassis || !model) {
         alert('Lütfen Şase No ve Model alanlarını doldurunuz.');
         return;
     }
 
-    // Küçük akü bağlama tarihi varsa 'yes', yoksa 'no' kabul edilir.
-    const smallBatteryConnected = smallBatteryDate ? 'yes' : 'no';
+    if (!window.db || !window.fs) {
+        alert("Sistem veri bağlantısı bekleniyor, lütfen tekrar deneyin.");
+        return;
+    }
 
     const { collection, addDoc, updateDoc, doc } = window.fs;
     const nowIso = new Date().toISOString();
@@ -338,105 +341,140 @@ async function handleSaveVehicle() {
 
     try {
         if (editingVehicleId) {
+            // ARAÇ DÜZENLEME İŞLEMİ
             const vRef = doc(window.db, 'vehicles', editingVehicleId);
             const currentV = vehicles.find(x => x.id === editingVehicleId);
-            let updatedHistory = currentV.history || [];
+            let updatedHistory = currentV && currentV.history ? [...currentV.history] : [];
 
             if (historyItem) updatedHistory.push(historyItem);
 
-            let lastCheck = currentV.lastBatteryCheckDate || null;
-            
-            if (location === 'parking' && is10DaysChecked) {
-                if (!allowedDeletePasswords.includes(parkingPassword)) {
-                    alert('Kontrolü onaylamak için geçerli bir şifre girmelisiniz!');
-                    return;
-                }
-                lastCheck = new Date().toISOString().split('T')[0];
-                updatedHistory.push({
-                    date: formattedDate,
-                    note: `10 Günlük Akü Kontrolü Yapıldı (Onay Şifresi: ${parkingPassword}).`
-                });
-            }
-
-            await updateDoc(vRef, {
-                chassis, model, ownership, location,
+            const payload = {
+                chassis: chassis,
+                model: model,
+                ownership: ownership,
+                location: location,
                 batteryRequired: location === 'showroom' ? batteryRequired : 'no',
                 parkingDate: location === 'parking' ? parkingDate : null,
                 bigBatteryDate: location === 'showroom' ? bigBatteryDate : null,
                 smallBatteryDate: location === 'showroom' ? smallBatteryDate : null,
-                smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no',
-                lastBatteryCheckDate: lastCheck,
+                smallBatteryConnected: (location === 'showroom' && smallBatteryDate) ? 'yes' : 'no',
                 history: updatedHistory,
                 updatedAt: nowIso
-            });
+            };
+
+            await updateDoc(vRef, payload);
 
         } else {
+            // YENİ ARAÇ EKLEME
             let historyList = [];
             if (historyItem) historyList.push(historyItem);
 
-            let initialCheckDate = null;
-            if (location === 'parking' && is10DaysChecked) {
-                if (!allowedDeletePasswords.includes(parkingPassword)) {
-                    alert('Kontrolü onaylamak için geçerli bir şifre girmelisiniz!');
-                    return;
-                }
-                initialCheckDate = new Date().toISOString().split('T')[0];
-                historyList.push({
-                    date: formattedDate,
-                    note: `10 Günlük Akü Kontrolü Yapıldı (Onay Şifresi: ${parkingPassword}).`
-                });
-            }
-
-            await addDoc(collection(window.db, 'vehicles'), {
-                chassis, model, ownership, location,
+            const payload = {
+                chassis: chassis,
+                model: model,
+                ownership: ownership,
+                location: location,
                 batteryRequired: location === 'showroom' ? batteryRequired : 'no',
                 parkingDate: location === 'parking' ? parkingDate : null,
                 bigBatteryDate: location === 'showroom' ? bigBatteryDate : null,
                 smallBatteryDate: location === 'showroom' ? smallBatteryDate : null,
-                smallBatteryConnected: location === 'showroom' ? smallBatteryConnected : 'no',
-                lastBatteryCheckDate: initialCheckDate,
+                smallBatteryConnected: (location === 'showroom' && smallBatteryDate) ? 'yes' : 'no',
+                lastBatteryCheckDate: location === 'parking' ? parkingDate : null,
                 history: historyList,
                 isDeleted: false,
                 createdAt: nowIso,
                 updatedAt: nowIso
-            });
+            };
+
+            await addDoc(collection(window.db, 'vehicles'), payload);
         }
 
         closeVehicleModal();
     } catch (err) {
-        console.error("Kaydetme Hatası:", err);
-        alert("Kayıt sırasında hata oluştu: " + err.message);
+        console.error("Kaydetme / Düzenleme Hatası:", err);
+        alert("Kayıt güncellenirken bir hata oluştu: " + err.message);
     }
 }
 
-// Araç Silme (Şifre Korumalı)
-async function deleteVehicle(vehicleId) {
-    const inputPass = prompt("Araç silme işlemini onaylamak için lütfen yetkili şifrenizi giriniz:");
-    if (!inputPass) return;
+// ==========================================================================
+// POP-UP ŞİFRE ONAY EKRANI YÖNETİMİ
+// ==========================================================================
+function openPasswordConfirmModal(actionType, vehicleId) {
+    pendingAction = actionType;
+    pendingVehicleId = vehicleId;
 
-    if (!allowedDeletePasswords.includes(inputPass)) {
-        alert("Hatalı şifre! Araç silme işlemi gerçekleştirilemedi.");
+    const modal = document.getElementById('passwordConfirmModal');
+    const title = document.getElementById('passwordModalTitle');
+    const desc = document.getElementById('passwordModalDesc');
+    const input = document.getElementById('confirmPasswordInput');
+
+    input.value = '';
+
+    if (actionType === 'delete') {
+        title.innerHTML = `<i class="fa-solid fa-trash-can" style="color: var(--status-red);"></i> Araç Silme Onayı`;
+        desc.innerText = "Bu aracı sistemden silmek üzeresiniz. Lütfen yetkili şifrenizi giriniz:";
+    } else if (actionType === 'parkingCheck') {
+        title.innerHTML = `<i class="fa-solid fa-check-double" style="color: var(--status-green);"></i> 10 Günlük Akü Kontrol Onayı`;
+        desc.innerText = "Otopark aracının 10 günlük akü kontrolünü tamamlamak için yetkili şifrenizi giriniz:";
+    }
+
+    modal.style.display = 'flex';
+}
+
+function closePasswordConfirmModal() {
+    document.getElementById('passwordConfirmModal').style.display = 'none';
+    pendingAction = null;
+    pendingVehicleId = null;
+}
+
+async function executePasswordConfirmedAction() {
+    const inputPass = document.getElementById('confirmPasswordInput').value.trim();
+
+    if (!inputPass) {
+        alert("Lütfen şifrenizi giriniz!");
         return;
     }
 
-    if (!confirm("Bu aracı silmek istediğinize emin misiniz?")) return;
+    if (!allowedDeletePasswords.includes(inputPass)) {
+        alert("Hatalı Yetkili Şifresi!");
+        return;
+    }
+
+    const { updateDoc, doc } = window.fs;
+    const formattedDate = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR');
+    const currentV = vehicles.find(x => x.id === pendingVehicleId);
+
+    if (!currentV) {
+        closePasswordConfirmModal();
+        return;
+    }
 
     try {
-        const { updateDoc, doc } = window.fs;
-        const vRef = doc(window.db, 'vehicles', vehicleId);
-        const formattedDate = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR');
-        
-        const currentV = vehicles.find(x => x.id === vehicleId);
-        let updatedHistory = currentV.history || [];
-        updatedHistory.push({ date: formattedDate, note: `Araç silindi (Yetkili Şifresi: ${inputPass}).` });
+        const vRef = doc(window.db, 'vehicles', pendingVehicleId);
+        let updatedHistory = currentV.history ? [...currentV.history] : [];
 
-        await updateDoc(vRef, {
-            isDeleted: true,
-            deletedAt: new Date().toISOString(),
-            history: updatedHistory
-        });
+        if (pendingAction === 'delete') {
+            updatedHistory.push({ date: formattedDate, note: `Araç silindi (Yetkili Şifresi: ${inputPass}).` });
+            await updateDoc(vRef, {
+                isDeleted: true,
+                deletedAt: new Date().toISOString(),
+                history: updatedHistory
+            });
+        } else if (pendingAction === 'parkingCheck') {
+            const todayStr = new Date().toISOString().split('T')[0];
+            updatedHistory.push({ date: formattedDate, note: `10 Günlük Otopark Akü Kontrolü Onaylandı (Yetkili Şifresi: ${inputPass}).` });
+
+            await updateDoc(vRef, {
+                lastBatteryCheckDate: todayStr,
+                history: updatedHistory,
+                updatedAt: new Date().toISOString()
+            });
+        }
+
+        closePasswordConfirmModal();
     } catch (err) {
-        console.error("Silme Hatası:", err);
+        console.error("İşlem Hatası:", err);
+        alert("İşlem gerçekleştirilemedi: " + err.message);
     }
 }
 
@@ -477,11 +515,11 @@ function closeDetailModal() {
 }
 
 // ==========================================================================
-// YATAY (LANDSCAPE) PROFESYONEL PDF RAPORU OLUŞTURMA
+// YATAY (LANDSCAPE) PROFESYONEL PDF RAPORU OLUŞTURMA (Türkçe Karakter Düzeltmeli)
 // ==========================================================================
 function exportLandscapePDF() {
     if (!window.jspdf) {
-        alert("PDF Kütüphanesi yüklenemedi. Lütfen internet bağlantınızı kontrol edin.");
+        alert("PDF Kütüphanesi yüklenemedi.");
         return;
     }
 
@@ -494,35 +532,41 @@ function exportLandscapePDF() {
 
     const todayStr = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR');
 
-    // Başlık
-    doc.setFontSize(16);
-    doc.setTextColor(2, 136, 209); // BMW M Blue
-    doc.text("İNCİROĞLU BMW/MINI - GENEL ARAÇ AKÜ VE SÜREÇ RAPORU", 14, 15);
+    doc.setFontSize(15);
+    doc.setTextColor(2, 136, 209);
+    doc.text(trFix("INCIROGLU BMW/MINI - GENEL ARAC AKU VE SUREC RAPORU"), 14, 15);
 
     doc.setFontSize(9);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Rapor Oluşturulma Tarihi: ${todayStr}`, 14, 21);
-    doc.text(`Konum: Kayseri | Otomatik Sistem Çıktısı`, 14, 25);
+    doc.text(trFix(`Rapor Tarihi: ${todayStr}`), 14, 21);
+    doc.text(trFix(`Konum: Kayseri | Otomatik Sistem Ciktisi`), 14, 25);
 
     const activeVehicles = vehicles.filter(v => !v.isDeleted);
     const deletedVehicles = vehicles.filter(v => v.isDeleted);
 
-    // 1. Aktif Araçlar Tablosu Data
+    // Aktif Araçlar Data
     const activeRows = activeVehicles.map(v => {
         const historyText = (v.history || []).map(h => `[${h.date}] ${h.note}`).join('\n') || 'Not yok';
         return [
-            v.chassis || '-',
-            v.model || '-',
+            trFix(v.chassis || '-'),
+            trFix(v.model || '-'),
             v.location === 'showroom' ? 'Showroom' : 'Otopark',
-            v.bigBatteryDate || 'Yok / Gerekli Değil',
-            v.smallBatteryDate || 'Girilmedi',
-            historyText
+            trFix(v.bigBatteryDate || 'Gerekli Degil'),
+            trFix(v.smallBatteryDate || 'Girilmedi'),
+            trFix(historyText)
         ];
     });
 
     doc.autoTable({
         startY: 30,
-        head: [['Şase No (VIN)', 'Marka & Model', 'Konum', 'En Son Büyük Akü Tarihi', 'Küçük Akü Tarihi', 'Araç Süreç Notları & İşlem Geçmişi']],
+        head: [[
+            trFix('Sase No (VIN)'), 
+            trFix('Marka & Model'), 
+            trFix('Konum'), 
+            trFix('En Son Buyuk Aku Tarihi'), 
+            trFix('Kucuk Aku Tarihi'), 
+            trFix('Arac Surec Notlari & Islem Gecmisi')
+        ]],
         body: activeRows,
         styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
         headStyles: { fillColor: [2, 136, 209], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -539,32 +583,37 @@ function exportLandscapePDF() {
 
     let finalY = doc.lastAutoTable.finalY + 12;
 
-    // Page overflow check
     if (finalY > 160) {
         doc.addPage();
         finalY = 20;
     }
 
-    // 2. Silinen Araçlar Tablosu
-    doc.setFontSize(13);
-    doc.setTextColor(220, 38, 38); // Kırmızı
-    doc.text("SİLİNEN ARAÇLAR SİSTEM KAYDI", 14, finalY);
+    // Silinen Araçlar Data
+    doc.setFontSize(12);
+    doc.setTextColor(220, 38, 38);
+    doc.text(trFix("SILINEN ARACLAR SISTEM KAYDI"), 14, finalY);
 
     const deletedRows = deletedVehicles.map(v => {
         const historyText = (v.history || []).map(h => `[${h.date}] ${h.note}`).join('\n') || 'Silindi';
         return [
-            v.chassis || '-',
-            v.model || '-',
-            v.bigBatteryDate || '-',
-            v.smallBatteryDate || '-',
-            historyText
+            trFix(v.chassis || '-'),
+            trFix(v.model || '-'),
+            trFix(v.bigBatteryDate || '-'),
+            trFix(v.smallBatteryDate || '-'),
+            trFix(historyText)
         ];
     });
 
     doc.autoTable({
         startY: finalY + 4,
-        head: [['Şase No (VIN)', 'Marka & Model', 'En Son Büyük Akü Tarihi', 'Küçük Akü Tarihi', 'Silinme Sebebi / Tüm İşlem Geçmişi']],
-        body: deletedRows.length > 0 ? deletedRows : [['-', '-', '-', '-', 'Silinen araç bulunmuyor.']],
+        head: [[
+            trFix('Sase No (VIN)'), 
+            trFix('Marka & Model'), 
+            trFix('En Son Buyuk Aku Tarihi'), 
+            trFix('Kucuk Aku Tarihi'), 
+            trFix('Silinme Sebebi / Islem Gecmisi')
+        ]],
+        body: deletedRows.length > 0 ? deletedRows : [[trFix('-'), trFix('-'), trFix('-'), trFix('-'), trFix('Silinen arac bulunmuyor.')]],
         styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
         headStyles: { fillColor: [220, 38, 38], textColor: [255, 255, 255], fontStyle: 'bold' },
         alternateRowStyles: { fillColor: [254, 242, 242] },
@@ -581,7 +630,7 @@ function exportLandscapePDF() {
 }
 
 // ==========================================================================
-// SEÇİLİ TEK BİR ARACA ÖZEL PDF İNDİRME (Süreç Detay Raporu)
+// SEÇİLİ TEK BİR ARACA ÖZEL PDF İNDİRME
 // ==========================================================================
 function exportCurrentVehiclePDF() {
     if (!currentDetailVehicleId) return;
@@ -597,44 +646,51 @@ function exportCurrentVehiclePDF() {
 
     const todayStr = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR');
 
-    doc.setFontSize(16);
+    doc.setFontSize(15);
     doc.setTextColor(2, 136, 209);
-    doc.text(`İNCİROĞLU BMW/MINI - ARAÇ SÜREÇ TARİHÇE RAPORU`, 14, 15);
+    doc.text(trFix(`INCIROGLU BMW/MINI - ARAC SUREC TARAHCE RAPORU`), 14, 15);
 
     doc.setFontSize(10);
     doc.setTextColor(50, 50, 50);
-    doc.text(`Araç: ${v.chassis} - ${v.model}`, 14, 22);
-    doc.text(`Rapor Tarihi: ${todayStr}`, 14, 27);
+    doc.text(trFix(`Arac: ${v.chassis} - ${v.model}`), 14, 22);
+    doc.text(trFix(`Rapor Tarihi: ${todayStr}`), 14, 27);
 
-    // Araç Özet Tablosu
     doc.autoTable({
         startY: 32,
-        head: [['Şase No (VIN)', 'Marka / Model', 'Mülkiyet', 'Konum', 'En Son Büyük Akü Tarihi', 'Küçük Akü Tarihi', 'Durum']],
+        head: [[
+            trFix('Sase No (VIN)'), 
+            trFix('Marka / Model'), 
+            trFix('Mulkiyet'), 
+            trFix('Konum'), 
+            trFix('En Son Buyuk Aku Tarihi'), 
+            trFix('Kucuk Aku Tarihi'), 
+            trFix('Durum')
+        ]],
         body: [[
-            v.chassis || '-',
-            v.model || '-',
-            (v.ownership || 'stok').toUpperCase(),
+            trFix(v.chassis || '-'),
+            trFix(v.model || '-'),
+            trFix((v.ownership || 'stok').toUpperCase()),
             v.location === 'showroom' ? 'Showroom' : 'Otopark',
-            v.bigBatteryDate || 'Girilmedi',
-            v.smallBatteryDate || 'Girilmedi',
-            v.isDeleted ? 'SİLİNDİ' : 'AKTİF'
+            trFix(v.bigBatteryDate || 'Girilmedi'),
+            trFix(v.smallBatteryDate || 'Girilmedi'),
+            v.isDeleted ? 'SILINDI' : 'AKIF'
         ]],
         styles: { fontSize: 9, cellPadding: 3 },
         headStyles: { fillColor: [71, 85, 105], textColor: [255, 255, 255], fontStyle: 'bold' }
     });
 
-    let historyRows = (v.history || []).map(h => [h.date, h.note]);
+    let historyRows = (v.history || []).map(h => [trFix(h.date), trFix(h.note)]);
     if (historyRows.length === 0) {
-        historyRows = [['-', 'Sisteme girildiğinden bu yana henüz özel bir not eklenmedi.']];
+        historyRows = [['-', trFix('Sisteme girildiginden bu yana henüz ozel bir not eklenmedi.')]];
     }
 
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(2, 136, 209);
-    doc.text("ARAÇ EKLEME ANINDAN İTİBAREN GERÇEKLEŞEN TÜM SÜREÇLER & NOTLAR", 14, doc.lastAutoTable.finalY + 12);
+    doc.text(trFix("ARAC EKLEME ANINDAN ITIBAREN GERCEKLESEN TUM SURECLER & NOTLAR"), 14, doc.lastAutoTable.finalY + 12);
 
     doc.autoTable({
         startY: doc.lastAutoTable.finalY + 16,
-        head: [['İşlem Tarihi / Saat', 'Yapılan İşlem ve Not Detayı']],
+        head: [[trFix('Islem Tarihi / Saat'), trFix('Yapilan Islem ve Not Detayi')]],
         body: historyRows,
         styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
         headStyles: { fillColor: [2, 136, 209], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -644,7 +700,7 @@ function exportCurrentVehiclePDF() {
         }
     });
 
-    doc.save(`${v.chassis}_Satis_Ve_Aku_Surec_Raporu.pdf`);
+    doc.save(`${trFix(v.chassis)}_Surec_Raporu.pdf`);
 }
 
 // ==========================================================================
@@ -667,7 +723,6 @@ function exportExcelByRange(range) {
         return;
     }
 
-    // Aktif Araçlar Sayfası
     const activeRows = activeList.map(v => ({
         "Şase No (VIN)": v.chassis || '',
         "Marka & Model": v.model || '',
@@ -679,7 +734,6 @@ function exportExcelByRange(range) {
         "Tüm Süreç Notları & Geçmiş": (v.history || []).map(h => `[${h.date}] ${h.note}`).join(' | ')
     }));
 
-    // Silinen Araçlar Sayfası
     const deletedRows = deletedList.map(v => ({
         "Şase No (VIN)": v.chassis || '',
         "Marka & Model": v.model || '',
@@ -777,7 +831,6 @@ function closeAdminPanelModal() {
     document.getElementById('adminPanelModal').style.display = 'none';
 }
 
-// Şifre Listesini Admin Paneline Bas
 function renderPasswordListInAdmin() {
     const container = document.getElementById('adminPasswordList');
     if (!container) return;
