@@ -47,11 +47,6 @@
                 <button id="themeToggleBtn" class="themeToggleBtn" onclick="toggleTheme()" title="Temayı Değiştir">
                     <i class="fa-solid fa-moon" id="themeIcon"></i>
                 </button>
-                
-                <button id="summaryReportBtn" class="bmwBtnPrimary" style="background-color: #475569;" onclick="openSummaryReportModal()">
-                    <i class="fa-solid fa-file-lines"></i>
-                    <span>Özet İşlem Raporu</span>
-                </button>
 
                 <button id="exportPdfBtn" class="bmwBtnPrimary" style="background-color: #dc2626;" onclick="exportLandscapePDF()">
                     <i class="fa-solid fa-file-pdf"></i>
@@ -119,7 +114,7 @@
             <div class="sectionHeader">
                 <div>
                     <h2><i class="fa-solid fa-store" style="color: var(--bmw-blue);"></i> Showroom Araç Listesi</h2>
-                    <p>Showroom alanındaki araçların büyük ve küçük akü durumları</p>
+                    <p>Showroom alanındaki araçların büyük (Max 5 Gün) ve küçük akü durumları</p>
                 </div>
             </div>
 
@@ -220,22 +215,10 @@
                         </select>
                     </div>
 
-                    <!-- Otopark Seçilirse Görünen Tarih ve Kontrol Alanları -->
+                    <!-- Otopark Seçilirse Görünen Tarih -->
                     <div class="inputGroup hidden" id="parkingDateGroup">
                         <label>Otoparka Çekilme Tarihi *</label>
                         <input type="date" id="parkingDate">
-                    </div>
-
-                    <div class="inputGroup hidden" id="parkingCheckGroup">
-                        <label class="checkboxLabel">
-                            <input type="checkbox" id="parkingCheck10Days" onchange="toggleParkingPasswordInput()">
-                            <span>10 Günlük Akü Kontrolü Yapıldı</span>
-                        </label>
-                    </div>
-
-                    <div class="inputGroup hidden" id="parkingPasswordGroup">
-                        <label>Kontrol Onay Şifresi *</label>
-                        <input type="password" id="parkingCheckPassword" placeholder="Görünür şifrelerden birini girin">
                     </div>
 
                     <!-- Showroom Seçilirse Görünen Tarihler -->
@@ -260,6 +243,31 @@
                     <button class="cancelButton" onclick="closeVehicleModal()">Vazgeç</button>
                     <button class="saveButton" onclick="handleSaveVehicle()">
                         <i class="fa-solid fa-floppy-disk"></i> Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- POPUP MODAL: ÖZEL ŞİFRE ONAY EKRANI -->
+        <div class="modal" id="passwordConfirmModal">
+            <div class="modalContent" style="max-width: 400px;">
+                <div class="modalHeader">
+                    <h2 id="passwordModalTitle"><i class="fa-solid fa-shield-halved" style="color: var(--status-red);"></i> Yetkili Onayı</h2>
+                    <button onclick="closePasswordConfirmModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modalBody">
+                    <p id="passwordModalDesc" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+                        İşlemi onaylamak için yetkili şifrenizi giriniz.
+                    </p>
+                    <div class="inputGroup">
+                        <label>Yetkili Şifresi *</label>
+                        <input type="password" id="confirmPasswordInput" placeholder="Şifrenizi girin...">
+                    </div>
+                </div>
+                <div class="modalFooter">
+                    <button class="cancelButton" onclick="closePasswordConfirmModal()">İptal</button>
+                    <button class="bmwBtnPrimary" style="background-color: #dc2626;" onclick="executePasswordConfirmedAction()">
+                        <i class="fa-solid fa-check"></i> Onayla
                     </button>
                 </div>
             </div>
@@ -303,7 +311,7 @@
 
         <!-- ÖZET İŞLEM RAPORU MODALI -->
         <div class="modal" id="summaryReportModal">
-            <div class="modalContent" style="max-width: 800px;">
+            <div class="modalContent" style="max-width: 850px;">
                 <div class="modalHeader">
                     <h2><i class="fa-solid fa-chart-pie"></i> Sistem Tüm İşlem Raporu (Silinenler Dahil)</h2>
                     <button onclick="closeSummaryReportModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -371,14 +379,21 @@
                 </div>
                 <div class="modalBody">
                     
+                    <!-- Özet İşlem Raporu Butonu (Artık Yönetici Paneli İçinde) -->
+                    <div class="adminActionBox">
+                        <h4><i class="fa-solid fa-file-lines" style="color: var(--bmw-blue);"></i> Sistem Özet İşlem Raporu</h4>
+                        <p>Aktif ve silinmiş tüm araçların detaylı süreç ve not geçmişini tablo olarak görüntüleyin.</p>
+                        <button class="bmwBtnPrimary" style="background-color: #475569; width: 100%; margin-top: 10px;" onclick="openSummaryReportModal()">
+                            <i class="fa-solid fa-chart-pie"></i> Özet İşlem Raporunu Aç
+                        </button>
+                    </div>
+
                     <!-- Şifre Yönetimi Menüsü -->
                     <div class="adminActionBox">
                         <h4><i class="fa-solid fa-key" style="color:var(--status-yellow);"></i> Araç Silme & Onay Şifreleri Yönetimi</h4>
                         <p>Araç silerken veya 10 günlük kontrol onayında kullanılan geçerli şifreleri ekleyebilir ya da düzenleyebilirsiniz.</p>
                         
-                        <div class="passwordListWrapper" id="adminPasswordList" style="margin-top: 10px; margin-bottom: 10px;">
-                            <!-- Dinamik şifre listesi JS ile dolacak -->
-                        </div>
+                        <div class="passwordListWrapper" id="adminPasswordList" style="margin-top: 10px; margin-bottom: 10px;"></div>
 
                         <div style="display: flex; gap: 8px;">
                             <input type="text" id="newPasswordInput" placeholder="Yeni şifre girin..." style="flex:1; padding:8px; border:1px solid var(--border-color); border-radius:6px; font-size:13px;">
