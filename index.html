@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İnciroğlu BMW | Akü Kontrol Paneli</title>
+    <title>İnciroğlu BMW / MINI | Akü Kontrol Paneli</title>
 
     <!-- Tarayıcı İkonu -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%200288d1' d='M160 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16V48h64V16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16V48h32c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H128c-35.3 0-64-28.7-64-64V112c0-35.3 28.7-64 64-64h32V16zM272 160c0-8.8-7.2-16-16-16s-16 7.2-16 16v64H176c-8.8 0-16 7.2-16 16s7.2 16 16 16h64v64c0 8.8 7.2 16 16 16s16-7.2 16-16V256h64c8.8 0 16-7.2 16-16s-7.2-16-16-16H272V160zM176 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h160c8.8 0 16-7.2 16-16s-7.2-16-16-16H176z'/></svg>">
@@ -15,8 +15,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     
-    <!-- SheetJS Excel Library -->
+    <!-- SheetJS Excel Library & jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -32,7 +35,7 @@
                 <div class="brandBadge">
                     <div class="bmwLogoIcon"><i class="fa-solid fa-charging-station"></i></div>
                     <div>
-                        <div class="bmwSeriesTitle">İNCİROĞLU BMW</div>
+                        <div class="bmwSeriesTitle">İNCİROĞLU BMW / MINI</div>
                         <h1>Akü Kontrol Paneli</h1>
                     </div>
                 </div>
@@ -45,12 +48,12 @@
                 </button>
                 
                 <button id="summaryReportBtn" class="bmwBtnPrimary" style="background-color: #475569;" onclick="openSummaryReportModal()">
-                    <i class="fa-solid fa-file-lines"></i>
+                    <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>Özet İşlem Raporu</span>
                 </button>
-                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="openExcelFilterModal()">
-                    <i class="fa-solid fa-file-excel"></i>
-                    <span>Excel Raporu İndir</span>
+                <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="openExportChoiceModal()">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span>Rapor İndir</span>
                 </button>
                 <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -121,7 +124,7 @@
                             <th>Geçen Süre</th>
                             <th>Küçük Akü Durumu</th>
                             <th>Büyük Akü Durumu</th>
-                            <th>İşlem</th>
+                            <th style="text-align: center;">İşlem</th>
                         </tr>
                     </thead>
                     <tbody id="showroomTableBody"></tbody>
@@ -144,11 +147,9 @@
                         <tr>
                             <th>Şase No (VIN)</th>
                             <th>Marka ve Model</th>
-                            <th>Akü Şarj Durumu</th>
-                            <th>Otoparka Çekilme Günü</th>
-                            <th>Son Akü Kontrol Tarihi</th>
+                            <th>Otoparka Çekilme Tarihi</th>
                             <th>10 Günlük Kontrol Durumu</th>
-                            <th>İşlem</th>
+                            <th style="text-align: center;">İşlem</th>
                         </tr>
                     </thead>
                     <tbody id="parkingTableBody"></tbody>
@@ -171,7 +172,7 @@
         <div class="modal" id="vehicleModal">
             <div class="modalContent">
                 <div class="modalHeader">
-                    <h2 id="modalTitle">Yeni Araç Ekle</h2>
+                    <h2 id="modalTitle"><i class="fa-solid fa-car-side" style="color: var(--bmw-blue);"></i> Yeni Araç Ekle</h2>
                     <button onclick="closeVehicleModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
@@ -186,14 +187,6 @@
                     </div>
 
                     <div class="inputGroup">
-                        <label>Mülkiyet Durumu *</label>
-                        <select id="vehicleOwnership">
-                            <option value="stok">Stok Aracı</option>
-                            <option value="konsinye">Konsinye Araç</option>
-                        </select>
-                    </div>
-
-                    <div class="inputGroup">
                         <label>Araç Konumu *</label>
                         <select id="vehicleLocation" onchange="handleLocationChangeInModal()">
                             <option value="showroom">Showroom</option>
@@ -201,44 +194,57 @@
                         </select>
                     </div>
 
-                    <div class="inputGroup">
-                        <label>Akü Bağlantısı / Şarj Gerekli mi? *</label>
-                        <select id="batteryRequired" onchange="toggleBatteryDateInputs()">
-                            <option value="no">Hayır (Gerekli Değil)</option>
-                            <option value="yes">Evet (Şarj / Bağlantı Gerekli)</option>
-                        </select>
-                    </div>
-
-                    <div class="inputGroup hidden" id="parkingDateGroup">
-                        <label>Otoparka Çekilme Tarihi</label>
-                        <input type="date" id="parkingDate">
-                    </div>
-
-                    <!-- Otopark Akü Kontrol Kutusu -->
-                    <div class="inputGroup hidden" id="parkingCheckGroup">
-                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="checkbox" id="parkingCheck10Days" style="width:18px; height:18px;">
-                            <span>10 Günlük Akü Kontrolü Yapıldı</span>
-                        </label>
-                    </div>
-
-                    <div class="chargeInputsGroup hidden" id="batteryDatesWrapper">
-                        <div class="inputGroup" id="bigBatteryDateGroup">
-                            <label>Büyük Akü Bağlanma Tarihi</label>
-                            <input type="date" id="bigBatteryDate">
-                        </div>
-
-                        <div class="inputGroup" id="smallBatteryDateGroup">
-                            <label>Küçük Akü Bağlanma Tarihi</label>
-                            <input type="date" id="smallBatteryDate">
-                        </div>
-
-                        <div class="inputGroup" id="smallBatteryStatusGroup">
-                            <label>Küçük Akü Bağlı mı?</label>
-                            <select id="smallBatteryConnected">
-                                <option value="yes">Bağlı (Yeşil)</option>
-                                <option value="no">Bağlı Değil (Kırmızı)</option>
+                    <!-- SHOWROOM İÇİN ÖZEL ALANLAR -->
+                    <div id="showroomFieldsGroup">
+                        <div class="inputGroup">
+                            <label>Mülkiyet Durumu *</label>
+                            <select id="vehicleOwnership">
+                                <option value="stok">Stok Aracı</option>
+                                <option value="konsinye">Konsinye Araç</option>
                             </select>
+                        </div>
+
+                        <div class="inputGroup">
+                            <label>Akü Bağlantısı / Şarj Gerekli mi? *</label>
+                            <select id="batteryRequired" onchange="toggleBatteryDateInputs()">
+                                <option value="no">Hayır (Gerekli Değil)</option>
+                                <option value="yes">Evet (Şarj / Bağlantı Gerekli)</option>
+                            </select>
+                        </div>
+
+                        <div class="chargeInputsGroup hidden" id="batteryDatesWrapper">
+                            <div class="inputGroup" id="bigBatteryDateGroup">
+                                <label>Büyük Akü Bağlanma Tarihi</label>
+                                <input type="date" id="bigBatteryDate">
+                            </div>
+
+                            <div class="inputGroup" id="smallBatteryDateGroup">
+                                <label>Küçük Akü Bağlanma Tarihi</label>
+                                <input type="date" id="smallBatteryDate">
+                            </div>
+
+                            <div class="inputGroup" id="smallBatteryStatusGroup">
+                                <label>Küçük Akü Bağlı mı?</label>
+                                <select id="smallBatteryConnected">
+                                    <option value="yes">Bağlı (Yeşil)</option>
+                                    <option value="no">Bağlı Değil (Kırmızı)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OTOPARK İÇİN ÖZEL ALANLAR -->
+                    <div id="parkingFieldsGroup" class="hidden">
+                        <div class="inputGroup">
+                            <label>Otoparka Çekilme Tarihi *</label>
+                            <input type="date" id="parkingDate">
+                        </div>
+
+                        <div class="inputGroup">
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                <input type="checkbox" id="parkingCheck10Days" style="width:18px; height:18px;">
+                                <span>10 Günlük Düzenli Kontrol Takibi Başlatılsın mı?</span>
+                            </label>
                         </div>
                     </div>
 
@@ -248,8 +254,10 @@
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeVehicleModal()">Vazgeç</button>
-                    <button class="saveButton" onclick="handleSaveVehicle()">
+                    <button class="btn-action btn-cancel" onclick="closeVehicleModal()">
+                        <i class="fa-solid fa-xmark"></i> Vazgeç
+                    </button>
+                    <button class="btn-action btn-save" onclick="handleSaveVehicle()">
                         <i class="fa-solid fa-floppy-disk"></i> Kaydet
                     </button>
                 </div>
@@ -284,48 +292,76 @@
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeDetailModal()">Kapat</button>
+                    <button class="btn-action btn-cancel" onclick="closeDetailModal()">Kapat</button>
                 </div>
             </div>
         </div>
 
-        <!-- ÖZET İŞLEM RAPORU MODALI -->
+        <!-- ÖZET İŞLEM RAPORU MODALI (SADE & MODERN) -->
         <div class="modal" id="summaryReportModal">
-            <div class="modalContent">
+            <div class="modalContent" style="max-width: 650px;">
                 <div class="modalHeader">
-                    <h2><i class="fa-solid fa-chart-pie"></i> Sistem Tüm İşlem Raporu (Silinenler Dahil)</h2>
+                    <h2><i class="fa-solid fa-list-check" style="color: var(--bmw-blue);"></i> Son Yapılan İşlemler Raporu</h2>
                     <button onclick="closeSummaryReportModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
-                    <div id="summaryReportContent" class="summaryReportArea"></div>
+                    <div id="summaryReportContent" class="modernLogContainer"></div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeSummaryReportModal()">Kapat</button>
+                    <button class="btn-action btn-cancel" onclick="closeSummaryReportModal()">Kapat</button>
                 </div>
             </div>
         </div>
 
-        <!-- EXCEL İNDİRME MODALI -->
-        <div class="modal" id="excelFilterModal">
-            <div class="modalContent" style="max-width: 440px;">
+        <!-- EXCEL / PDF FORMAT SEÇİM MODALI -->
+        <div class="modal" id="exportChoiceModal">
+            <div class="modalContent" style="max-width: 400px;">
                 <div class="modalHeader">
-                    <h2><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Excel Raporu İndir</h2>
-                    <button onclick="closeExcelFilterModal()"><i class="fa-solid fa-xmark"></i></button>
+                    <h2><i class="fa-solid fa-file-export" style="color: #10b981;"></i> Rapor İndir</h2>
+                    <button onclick="closeExportChoiceModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <div class="modalBody">
-                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
-                        Raporlamak istediğiniz zaman aralığını seçin. Seçilen döneme ait aktif ve silinmiş tüm araç hareketleri dışa aktarılacaktır.
+                <div class="modalBody text-center">
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+                        Raporunuzu hangi formatta indirmek istersiniz?
                     </p>
-                    <div class="excelPresetButtons">
-                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('1week')"><i class="fa-solid fa-calendar-week"></i> Son 1 Hafta</button>
-                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('1month')"><i class="fa-solid fa-calendar-day"></i> Son 1 Ay</button>
-                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('6months')"><i class="fa-solid fa-calendar-days"></i> Son 6 Ay</button>
-                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('1year')"><i class="fa-solid fa-calendar"></i> Son 1 Yıl</button>
-                        <button class="bmwBtnPrimary" style="background-color: #10b981;" onclick="exportExcelByRange('all')"><i class="fa-solid fa-database"></i> Tüm Zamanlar</button>
+                    <div class="exportFormatButtons">
+                        <button class="exportBtn excel" onclick="processExport('excel')">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>Excel (.xlsx)</span>
+                        </button>
+                        <button class="exportBtn pdf" onclick="processExport('pdf')">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>PDF (.pdf)</span>
+                        </button>
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeExcelFilterModal()">İptal</button>
+                    <button class="btn-action btn-cancel" onclick="closeExportChoiceModal()">İptal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ŞİFRELİ SİLME ONAY MODALI -->
+        <div class="modal" id="deleteAuthModal">
+            <div class="modalContent" style="max-width: 380px;">
+                <div class="modalHeader">
+                    <h2><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> Silme Onayı</h2>
+                    <button onclick="closeDeleteAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modalBody">
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Araç kaydını silmek için yetkili kullanıcı şifrenizi giriniz.
+                    </p>
+                    <div class="inputGroup">
+                        <label>Kullanıcı Şifresi</label>
+                        <input type="password" id="deletePasswordInput" placeholder="Şifrenizi giriniz...">
+                    </div>
+                </div>
+                <div class="modalFooter">
+                    <button class="btn-action btn-cancel" onclick="closeDeleteAuthModal()">İptal</button>
+                    <button class="btn-action btn-delete" onclick="confirmVehicleDelete()">
+                        <i class="fa-solid fa-trash-can"></i> Sil
+                    </button>
                 </div>
             </div>
         </div>
@@ -344,8 +380,8 @@
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeAdminLoginModal()">İptal</button>
-                    <button class="saveButton" onclick="handleAdminLogin()">Giriş Yap</button>
+                    <button class="btn-action btn-cancel" onclick="closeAdminLoginModal()">İptal</button>
+                    <button class="btn-action btn-save" onclick="handleAdminLogin()">Giriş Yap</button>
                 </div>
             </div>
         </div>
@@ -376,20 +412,20 @@
                     <div class="adminActionBox danger">
                         <h4><i class="fa-solid fa-trash-can"></i> Rapor ve Veri Sıfırlama</h4>
                         <p>Tüm araç stok verilerini, işlem loglarını ve silinmiş geçmiş raporları kalıcı olarak temizler.</p>
-                        <button class="saveButton" style="background:#ef4444; width:100%; margin-top:12px;" onclick="resetAllData()">
+                        <button class="btn-action btn-delete" style="width:100%; margin-top:12px; justify-content:center;" onclick="resetAllData()">
                             <i class="fa-solid fa-triangle-exclamation"></i> Tüm Verileri ve Logları Sıfırla
                         </button>
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeAdminPanelModal()">Kapat</button>
+                    <button class="btn-action btn-cancel" onclick="closeAdminPanelModal()">Kapat</button>
                 </div>
             </div>
         </div>
 
         <footer class="footer">
             <div class="footerLeft">
-                <strong>İnciroğlu BMW Akü Kontrol Paneli</strong>
+                <strong>İnciroğlu BMW / MINI Akü Kontrol Paneli</strong>
             </div>
             <div class="footerRight">
                 <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
