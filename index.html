@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İnciroğlu BMW | Stok & Akü Takip Sistemi</title>
+    <title>İnciroğlu BMW | Akü Kontrol Paneli</title>
+
+    <!-- Tarayıcı İkonu (Şarj/Akü Logoslu Favicon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%200288d1' d='M160 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16V48h64V16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16V48h32c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H128c-35.3 0-64-28.7-64-64V112c0-35.3 28.7-64 64-64h32V16zM272 160c0-8.8-7.2-16-16-16s-16 7.2-16 16v64H176c-8.8 0-16 7.2-16 16s7.2 16 16 16h64v64c0 8.8 7.2 16 16 16s16-7.2 16-16V256h64c8.8 0 16-7.2 16-16s-7.2-16-16-16H272V160zM176 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h160c8.8 0 16-7.2 16-16s-7.2-16-16-16H176z'/></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,10 +30,10 @@
         <header class="bmw-header">
             <div class="headerLeft">
                 <div class="brandBadge">
-                    <div class="bmwLogoIcon"><i class="fa-solid fa-car-side"></i></div>
+                    <div class="bmwLogoIcon"><i class="fa-solid fa-charging-station"></i></div>
                     <div>
                         <div class="bmwSeriesTitle">İNCİROĞLU BMW</div>
-                        <h1>Stok & Akü Takip Panel <span class="mTextColorful"><span class="c1">/</span><span class="c2">/</span><span class="c3">M</span></span></h1>
+                        <h1>Akü Kontrol Paneli</h1>
                     </div>
                 </div>
                 <p class="headerSubtitle">Anlık Showroom ve Otopark Araç Akü Yönetimi</p>
@@ -66,7 +69,7 @@
             <div class="card">
                 <div class="cardIcon blue"><i class="fa-solid fa-car"></i></div>
                 <div class="cardContent">
-                    <span>Toplam Aktif Stok</span>
+                    <span>Toplam Otomobil</span>
                     <h2 id="totalVehicle">0</h2>
                     <small>Showroom + Otopark</small>
                 </div>
@@ -100,7 +103,7 @@
             </div>
         </section>
 
-        <!-- 1. EN ÜST: SHOWROOM ARAÇ LİSTESİ -->
+        <!-- 1. SHOWROOM ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
@@ -127,7 +130,7 @@
             </div>
         </section>
 
-        <!-- 2. ORTADA: OTOPARK ARAÇ LİSTESİ -->
+        <!-- 2. OTOPARK ARAÇ LİSTESİ -->
         <section class="vehicleSection">
             <div class="sectionHeader">
                 <div>
@@ -153,7 +156,7 @@
             </div>
         </section>
 
-        <!-- 3. EN ALTTAN: BİLDİRİMLER EKRANI -->
+        <!-- 3. BİLDİRİMLER EKRANI -->
         <section class="notificationSection">
             <div class="sectionHeader">
                 <div>
@@ -303,7 +306,7 @@
                 </div>
                 <div class="modalBody">
                     <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-                        Belirttiğiniz tarihler arasında yapılan tüm işlemleri ve silinen araç detaylarını Excel dosyasına aktarır.
+                        Aktif ve silinen araçların tüm detaylı geçmiş kayıtlarını profesyonel Excel raporu halinde indirir.
                     </p>
                     <div class="inputGroup">
                         <label>Başlangıç Tarihi</label>
@@ -382,7 +385,7 @@
 
         <footer class="footer">
             <div class="footerLeft">
-                <strong>İnciroğlu BMW Akü Takip Paneli</strong>
+                <strong>İnciroğlu BMW Akü Kontrol Paneli</strong>
             </div>
             <div class="footerRight">
                 <span class="mColorBadge">İNCİROĞLU OTOMOTİV</span>
@@ -396,7 +399,6 @@
     </main>
 
     <!-- Firebase SDK Kurulumu -->
-    <!-- Firebase SDK ve Veritabanı Bağlantısı -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
@@ -412,23 +414,15 @@
             measurementId: "G-KVLFY2B4QH"
         };
 
-        // Firebase Başlatılıyor
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        
-        // Veritabanı Servisini Alıyoruz
         const db = getFirestore(app);
 
-        // app.js dosyasından erişebilmemiz için pencereye (window) tanımlıyoruz
         window.db = db;
         window.fs = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot };
     </script>
 
-    <!-- Ana Uygulama Kodunuz -->
-    <script src="app.js"></script>
-    </script>
-
-    <!-- Uygulama Scripti -->
+    <!-- Ana Uygulama Kodları -->
     <script src="app.js"></script>
 </body>
 
