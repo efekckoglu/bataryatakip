@@ -1,280 +1,191 @@
-/* ==========================================================================
-   İNCİROĞLU BMW - AKÜ & STOK TAKİP SİSTEMİ STİLLERİ
-   ========================================================================== */
-
+/* Rooot Değişkenleri & Temel Stiller */
 :root {
-    /* Renk Paleti - Light Theme */
+    --bmw-blue: #0066b1;
+    --bmw-dark-blue: #003366;
+    --status-red: #ef4444;
+    --status-green: #10b981;
+    --status-yellow: #f59e0b;
+    --status-gray: #64748b;
     --bg-primary: #f8fafc;
-    --bg-secondary: #ffffff;
     --bg-card: #ffffff;
     --text-primary: #0f172a;
     --text-secondary: #64748b;
     --border-color: #e2e8f0;
-    
-    /* BMW Marka Renkleri */
-    --bmw-blue: #0066b1;
-    --bmw-dark-blue: #002663;
-    --bmw-m-cyan: #00a3e0;
-    --bmw-m-blue: #00205b;
-    --bmw-m-red: #e30613;
-
-    /* Durum Renkleri */
-    --status-green: #10b981;
-    --status-green-bg: #ecfdf5;
-    --status-yellow: #f59e0b;
-    --status-yellow-bg: #fffbe6;
-    --status-red: #ef4444;
-    --status-red-bg: #fef2f2;
-
-    /* Gölgeler */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
-/* Dark Theme Değişkenleri */
 body.dark-theme {
-    --bg-primary: #0b0f17;
-    --bg-secondary: #161e2e;
+    --bg-primary: #0f172a;
     --bg-card: #1e293b;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --border-color: #334155;
-
-    --status-green-bg: rgba(16, 185, 129, 0.15);
-    --status-yellow-bg: rgba(245, 158, 11, 0.15);
-    --status-red-bg: rgba(239, 68, 68, 0.15);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Outfit', sans-serif;
 }
 
 body {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-/* BMW M Stripe Top Bar */
+/* Header & Banner */
 .bmw-m-stripe {
-    height: 5px;
-    width: 100%;
-    background: linear-gradient(90deg, var(--bmw-m-cyan) 33.3%, var(--bmw-m-blue) 33.3% 66.6%, var(--bmw-m-red) 66.6%);
+    height: 4px;
+    background: linear-gradient(90deg, #0066b1 0%, #003366 33%, #e11d48 100%);
 }
 
-.container-fluid {
-    max-width: 1440px;
-    margin: 0 auto;
+.mainContent {
     padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-/* Header */
 .bmw-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-secondary);
-    padding: 20px 28px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
     margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 16px;
 }
 
 .brandBadge {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .bmwLogoIcon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--bmw-blue), var(--bmw-dark-blue));
-    color: #fff;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-}
-
-.bmwSeriesTitle {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
+    font-size: 28px;
     color: var(--bmw-blue);
 }
 
-.brandBadge h1 {
+.bmwSeriesTitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--bmw-blue);
+}
+
+.bmw-header h1 {
+    margin: 0;
     font-size: 22px;
     font-weight: 700;
 }
 
-.mTextColorful .c1 { color: var(--bmw-m-cyan); }
-.mTextColorful .c2 { color: var(--bmw-m-blue); }
-.mTextColorful .c3 { color: var(--bmw-m-red); }
-
 .headerSubtitle {
+    margin: 4px 0 0 0;
     font-size: 13px;
     color: var(--text-secondary);
-    margin-top: 4px;
 }
 
 .headerRight {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.themeToggleBtn {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+/* Butonlar */
+.bmwBtnPrimary, .bmwBtnSecondary, .themeToggleBtn {
+    border: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
     cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease;
-}
-
-.themeToggleBtn:hover {
-    background: var(--border-color);
-}
-
-.bmwBtnPrimary, .bmwBtnSecondary {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 
 .bmwBtnPrimary {
     background-color: var(--bmw-blue);
-    color: #ffffff;
+    color: #fff;
 }
+
 .bmwBtnPrimary:hover {
-    background-color: var(--bmw-dark-blue);
+    opacity: 0.9;
 }
 
 .bmwBtnSecondary {
     background-color: #10b981;
-    color: #ffffff;
+    color: #fff;
 }
-.bmwBtnSecondary:hover {
-    background-color: #059669;
+
+.themeToggleBtn {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .todayDate {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    background: var(--bg-primary);
-    padding: 9px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
+    margin-left: 8px;
 }
 
-/* Dashboard Özet Kartları */
+/* Dashboard Kartları */
 .dashboardCards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    margin-bottom: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
 .card {
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 20px;
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    padding: 16px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
+    border: 1px solid var(--border-color);
 }
 
 .cardIcon {
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
 }
 
-.cardIcon.blue { background-color: rgba(0, 102, 177, 0.12); color: var(--bmw-blue); }
-.cardIcon.green { background-color: rgba(16, 185, 129, 0.12); color: var(--status-green); }
-.cardIcon.yellow { background-color: rgba(245, 158, 11, 0.12); color: var(--status-yellow); }
-.cardIcon.red { background-color: rgba(239, 68, 68, 0.12); color: var(--status-red); }
+.cardIcon.blue { background: rgba(0, 102, 177, 0.1); color: var(--bmw-blue); }
+.cardIcon.green { background: rgba(16, 185, 129, 0.1); color: var(--status-green); }
+.cardIcon.yellow { background: rgba(245, 158, 11, 0.1); color: var(--status-yellow); }
+.cardIcon.red { background: rgba(239, 68, 68, 0.1); color: var(--status-red); }
 
-.cardContent span {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
+.cardContent span { font-size: 12px; color: var(--text-secondary); }
+.cardContent h2 { margin: 2px 0; font-size: 22px; }
+.cardContent small { font-size: 11px; color: var(--text-secondary); }
 
-.cardContent h2 {
-    font-size: 26px;
-    font-weight: 700;
-    margin: 2px 0;
-}
-
-.cardContent small {
-    font-size: 11px;
-    color: var(--text-secondary);
-}
-
-/* Bölümler & Tablolar */
+/* Tablolar */
 .vehicleSection {
-    background-color: var(--bg-secondary);
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 28px;
-    box-shadow: var(--shadow-sm);
-}
-
-.sectionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
 }
 
 .sectionHeader h2 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .sectionHeader p {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    margin-top: 2px;
+    margin: 4px 0 16px 0;
 }
 
 .tableArea {
@@ -284,126 +195,73 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 13px;
     text-align: left;
-    font-size: 13.5px;
 }
 
 th {
-    padding: 12px 14px;
-    background-color: var(--bg-primary);
+    padding: 12px;
+    border-bottom: 2px solid var(--border-color);
     color: var(--text-secondary);
     font-weight: 600;
-    border-bottom: 1px solid var(--border-color);
-    white-space: nowrap;
 }
 
 td {
-    padding: 14px;
+    padding: 12px;
     border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
 }
 
-tr:last-child td {
-    border-bottom: none;
-}
-
-/* Rozetler & Durum Göstergeleri */
-.statusBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+/* Badges */
+.badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 600;
 }
 
-.statusBadge.green { background-color: var(--status-green-bg); color: var(--status-green); }
-.statusBadge.yellow { background-color: var(--status-yellow-bg); color: var(--status-yellow); }
-.statusBadge.red { background-color: var(--status-red-bg); color: var(--status-red); }
+.badge.green { background: rgba(16, 185, 129, 0.15); color: #047857; }
+.badge.red { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+.badge.gray { background: rgba(100, 116, 139, 0.15); color: #475569; }
 
-.actionBtnGroup {
-    display: flex;
-    gap: 8px;
-}
-
-.iconBtn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Aksiyon Butonları */
+.actionBtn {
+    border: none;
+    background: transparent;
+    padding: 6px 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
-.iconBtn:hover {
-    background-color: var(--bmw-blue);
-    color: #ffffff;
-    border-color: var(--bmw-blue);
-}
-
-.iconBtn.danger:hover {
-    background-color: var(--status-red);
-    color: #ffffff;
-    border-color: var(--status-red);
-}
+.actionBtn.view { color: var(--bmw-blue); }
+.actionBtn.edit { color: var(--status-yellow); }
+.actionBtn.delete { color: var(--status-red); }
 
 /* Bildirim Paneli */
-.notificationSection {
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 28px;
-}
-
-.notifCard {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    border-radius: 12px;
-    background-color: var(--status-red-bg);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    margin-bottom: 10px;
-}
-
-.notifCard.warning {
-    background-color: var(--status-yellow-bg);
-    border-color: rgba(245, 158, 11, 0.2);
-}
-
-.notifContent {
+.notificationCard {
     display: flex;
     align-items: center;
     gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
 }
 
-.notifContent i {
-    font-size: 18px;
-}
+.notificationCard.danger { background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--status-red); }
+.notificationCard.green { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--status-green); }
 
 /* Modal Stilleri */
 .modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 1000;
+    transition: opacity 0.2s;
+    z-index: 999;
 }
 
 .modal.active {
@@ -412,191 +270,87 @@ tr:last-child td {
 }
 
 .modalContent {
-    background-color: var(--bg-secondary);
-    width: 90%;
-    max-width: 580px;
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
+    background: var(--bg-card);
+    width: 100%;
+    max-width: 540px;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 24px;
     border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
 }
 
-.modalHeader h2 {
-    font-size: 17px;
-    font-weight: 700;
-}
+.modalHeader h2 { margin: 0; font-size: 16px; }
+.modalHeader button { border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
 
-.modalHeader button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: var(--text-secondary);
-    cursor: pointer;
-}
-
-.modalBody {
-    padding: 24px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.inputGroup {
+.modalBody .inputGroup {
     display: flex;
     flex-direction: column;
     gap: 6px;
-}
-
-.inputGroup label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.inputGroup input, .inputGroup select, .inputGroup textarea {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    outline: none;
-    font-size: 13.5px;
-}
-
-.inputGroup input:focus, .inputGroup select:focus, .inputGroup textarea:focus {
-    border-color: var(--bmw-blue);
-}
-
-.hidden {
-    display: none !important;
-}
-
-.chargeInputsGroup {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-}
-
-.modalFooter {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    background-color: var(--bg-primary);
-}
-
-.cancelButton {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.saveButton {
-    background-color: var(--bmw-blue);
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-/* Detay Kartı ve Rapor Alanları */
-.detailCard {
-    background-color: var(--bg-primary);
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.detailGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    font-size: 13px;
-}
-
-.detailGrid span {
-    display: block;
-    color: var(--text-secondary);
-    font-size: 11px;
-}
-
-.notesHistoryContainer {
-    max-height: 200px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.noteItem {
-    background: var(--bg-primary);
-    padding: 10px 14px;
-    border-radius: 8px;
-    border-left: 3px solid var(--bmw-blue);
-    font-size: 12.5px;
-}
-
-.adminActionBox {
-    background: var(--bg-primary);
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
     margin-bottom: 12px;
 }
-.adminActionBox.danger {
-    border-color: rgba(239, 68, 68, 0.3);
+
+.modalBody label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+.modalBody input, .modalBody select, .modalBody textarea {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
 }
 
-.adminActionBox h4 {
-    font-size: 14px;
-    margin-bottom: 6px;
+.hidden { display: none !important; }
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
 }
 
-.adminActionBox p {
-    font-size: 12px;
-    color: var(--text-secondary);
+.cancelButton, .saveButton {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
 }
+
+.cancelButton { background: var(--border-color); color: var(--text-primary); }
+.saveButton { background: var(--bmw-blue); color: #fff; }
+
+/* Admin Paneli Kutusu */
+.adminActionBox {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.adminActionBox.danger { border-color: rgba(239, 68, 68, 0.3); }
 
 /* Footer */
 .footer {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 20px 0;
-    margin-top: 20px;
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--text-secondary);
     border-top: 1px solid var(--border-color);
+    margin-top: 30px;
 }
 
-.adminLink {
-    color: var(--bmw-blue);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .bmw-header { flex-direction: column; align-items: flex-start; }
-    .headerRight { width: 100%; justify-content: space-between; }
-    .chargeInputsGroup { grid-template-columns: 1fr; }
-}
+.adminLink { color: var(--text-secondary); text-decoration: none; }
+.adminLink:hover { color: var(--bmw-blue); }
