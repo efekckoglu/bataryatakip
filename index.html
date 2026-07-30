@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İnciroğlu BMW | Akü Kontrol Paneli</title>
 
-    <!-- Tarayıcı İkonu (Şarj/Akü Logoslu Favicon) -->
+    <!-- Tarayıcı İkonu -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%200288d1' d='M160 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16V48h64V16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16V48h32c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H128c-35.3 0-64-28.7-64-64V112c0-35.3 28.7-64 64-64h32V16zM272 160c0-8.8-7.2-16-16-16s-16 7.2-16 16v64H176c-8.8 0-16 7.2-16 16s7.2 16 16 16h64v64c0 8.8 7.2 16 16 16s16-7.2 16-16V256h64c8.8 0 16-7.2 16-16s-7.2-16-16-16H272V160zM176 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h160c8.8 0 16-7.2 16-16s-7.2-16-16-16H176z'/></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,6 @@
             </div>
 
             <div class="headerRight">
-                <!-- Tema Değiştirme Butonu -->
                 <button id="themeToggleBtn" class="themeToggleBtn" onclick="toggleTheme()" title="Temayı Değiştir">
                     <i class="fa-solid fa-moon" id="themeIcon"></i>
                 </button>
@@ -51,7 +50,7 @@
                 </button>
                 <button id="exportExcelBtn" class="bmwBtnSecondary" onclick="openExcelFilterModal()">
                     <i class="fa-solid fa-file-excel"></i>
-                    <span>Tarihli Excel Raporu İndir</span>
+                    <span>Excel Raporu İndir</span>
                 </button>
                 <button id="openVehicleModalHeader" class="bmwBtnPrimary" onclick="openVehicleModal()">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -145,9 +144,10 @@
                         <tr>
                             <th>Şase No (VIN)</th>
                             <th>Marka ve Model</th>
+                            <th>Akü Şarj Durumu</th>
                             <th>Otoparka Çekilme Günü</th>
-                            <th>Büyük Aküye Bağlanma Tarihi</th>
-                            <th>Büyük Akü Durumu</th>
+                            <th>Son Akü Kontrol Tarihi</th>
+                            <th>10 Günlük Kontrol Durumu</th>
                             <th>İşlem</th>
                         </tr>
                     </thead>
@@ -202,10 +202,10 @@
                     </div>
 
                     <div class="inputGroup">
-                        <label>Akü Bağlantısı Yapıldı mı / Gerekiyor mu? *</label>
+                        <label>Akü Bağlantısı / Şarj Gerekli mi? *</label>
                         <select id="batteryRequired" onchange="toggleBatteryDateInputs()">
                             <option value="no">Hayır (Gerekli Değil)</option>
-                            <option value="yes">Evet (Bağlantı Yapıldı)</option>
+                            <option value="yes">Evet (Şarj / Bağlantı Gerekli)</option>
                         </select>
                     </div>
 
@@ -214,8 +214,16 @@
                         <input type="date" id="parkingDate">
                     </div>
 
+                    <!-- Otopark Akü Kontrol Kutusu -->
+                    <div class="inputGroup hidden" id="parkingCheckGroup">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="checkbox" id="parkingCheck10Days" style="width:18px; height:18px;">
+                            <span>10 Günlük Akü Kontrolü Yapıldı</span>
+                        </label>
+                    </div>
+
                     <div class="chargeInputsGroup hidden" id="batteryDatesWrapper">
-                        <div class="inputGroup">
+                        <div class="inputGroup" id="bigBatteryDateGroup">
                             <label>Büyük Akü Bağlanma Tarihi</label>
                             <input type="date" id="bigBatteryDate">
                         </div>
@@ -297,31 +305,27 @@
             </div>
         </div>
 
-        <!-- TARİHLİ EXCEL İNDİRME MODALI -->
+        <!-- EXCEL İNDİRME MODALI -->
         <div class="modal" id="excelFilterModal">
-            <div class="modalContent" style="max-width: 420px;">
+            <div class="modalContent" style="max-width: 440px;">
                 <div class="modalHeader">
                     <h2><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Excel Raporu İndir</h2>
                     <button onclick="closeExcelFilterModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modalBody">
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-                        Aktif ve silinen araçların tüm detaylı geçmiş kayıtlarını profesyonel Excel raporu halinde indirir.
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Raporlamak istediğiniz zaman aralığını seçin. Seçilen döneme ait aktif ve silinmiş tüm araç hareketleri dışa aktarılacaktır.
                     </p>
-                    <div class="inputGroup">
-                        <label>Başlangıç Tarihi</label>
-                        <input type="date" id="excelStartDate">
-                    </div>
-                    <div class="inputGroup">
-                        <label>Bitiş Tarihi</label>
-                        <input type="date" id="excelEndDate">
+                    <div class="excelPresetButtons">
+                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('1week')"><i class="fa-solid fa-calendar-week"></i> Son 1 Hafta</button>
+                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('1month')"><i class="fa-solid fa-calendar-day"></i> Son 1 Ay</button>
+                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('6months')"><i class="fa-solid fa-calendar-days"></i> Son 6 Ay</button>
+                        <button class="bmwBtnSecondary" onclick="exportExcelByRange('1year')"><i class="fa-solid fa-calendar"></i> Son 1 Yıl</button>
+                        <button class="bmwBtnPrimary" style="background-color: #10b981;" onclick="exportExcelByRange('all')"><i class="fa-solid fa-database"></i> Tüm Zamanlar</button>
                     </div>
                 </div>
                 <div class="modalFooter">
-                    <button class="cancelButton" onclick="closeExcelFilterModal()">Vazgeç</button>
-                    <button class="saveButton" style="background-color: #10b981;" onclick="exportInventoryToExcelWithDates()">
-                        <i class="fa-solid fa-download"></i> Raporu Oluştur & İndir
-                    </button>
+                    <button class="cancelButton" onclick="closeExcelFilterModal()">İptal</button>
                 </div>
             </div>
         </div>
